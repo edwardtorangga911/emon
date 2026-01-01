@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "Lendom Parfum E-Commerce",
+    "category": "E-Commerce",
+    "icon": "fas fa-shopping-cart",
+    "description": "Website e-commerce modern untuk toko parfum dengan integrasi WhatsApp checkout, shopping cart, dan responsive design",
+    "image": "https://via.placeholder.com/400x250/ff6b9d/ffffff?text=Lendom+Parfum",
+    "technologies": ["HTML", "CSS", "JavaScript", "WhatsApp API"],
+    "features": [
+      "Shopping Cart Functionality",
+      "WhatsApp Checkout Integration",
+      "Product Catalog with JSON Database",
+      "Responsive Design",
+      "Customer Information Form"
+    ],
+    "url": "https://lendom-parfum.example.com",
+    "github": "https://github.com/edwardtorangga911/lendom-parfum",
+    "status": "completed",
+    "year": "2026"
+  },
+  {
+    "id": 2,
+    "name": "CV Catur Wijaya Sentosa",
+    "category": "Company Profile",
+    "icon": "fas fa-building",
+    "description": "Website profil perusahaan modern dengan portfolio showcase, testimonials, dan contact form terintegrasi WhatsApp",
+    "image": "https://via.placeholder.com/400x250/4ecdc4/ffffff?text=CV+Website",
+    "technologies": ["HTML", "CSS", "JavaScript", "GitHub Pages"],
+    "features": [
+      "Responsive Single-Page Design",
+      "Portfolio Section",
+      "Testimonials Carousel",
+      "WhatsApp Integration",
+      "Custom Logo Design"
+    ],
+    "url": "https://cv-catur.example.com",
+    "github": "https://github.com/edwardtorangga911/cv-catur",
+    "status": "completed",
+    "year": "2026"
+  },
+  {
+    "id": 3,
+    "name": "Videotron Digital Signage",
+    "category": "Digital Signage",
+    "icon": "fas fa-tv",
+    "description": "Sistem videotron digital dengan admin panel untuk manajemen konten real-time, playlist scheduling, dan multi-zone display",
+    "image": "https://via.placeholder.com/400x250/ff6b6b/ffffff?text=Digital+Signage",
+    "technologies": ["JavaScript", "Node.js", "WebSocket", "Admin Panel"],
+    "features": [
+      "Real-time Content Management",
+      "Playlist Scheduling",
+      "Multi-zone Display Support",
+      "Admin Dashboard",
+      "Media Upload & Management"
+    ],
+    "url": "#",
+    "github": "https://github.com/edwardtorangga911/videotron",
+    "status": "in-progress",
+    "year": "2025"
+  },
+  {
+    "id": 4,
+    "name": "DHCP Server Manager",
+    "category": "Network Tools",
+    "icon": "fas fa-server",
+    "description": "Aplikasi manajemen DHCP server untuk konfigurasi dan monitoring IP address allocation dalam jaringan lokal",
+    "image": "https://via.placeholder.com/400x250/95e1d3/ffffff?text=DHCP+Manager",
+    "technologies": ["Windows", "Network Configuration", "Server Management"],
+    "features": [
+      "IP Address Management",
+      "DHCP Configuration",
+      "Network Monitoring",
+      "Lease Management",
+      "Auto-configuration"
+    ],
+    "url": "https://emon.my.id/unduh/DHCPServerStable.zip",
+    "github": "#",
+    "status": "completed",
+    "year": "2025"
+  },
+  {
+    "id": 5,
+    "name": "Security System CI3/CI4",
+    "category": "Security",
+    "icon": "fas fa-shield-alt",
+    "description": "Advanced security system untuk CodeIgniter 3 & 4 dengan firewall, user-agent blocking, dan request method filtering",
+    "image": "https://via.placeholder.com/400x250/a8e6cf/ffffff?text=Security+System",
+    "technologies": ["PHP", "CodeIgniter 3", "CodeIgniter 4", "Security"],
+    "features": [
+      "User-Agent Blocking",
+      "Request Method Filtering",
+      "Firewall Dashboard",
+      "Bot Attack Prevention",
+      "Framework Wrapper Integration"
+    ],
+    "url": "#",
+    "github": "https://github.com/edwardtorangga911/security-ci",
+    "status": "completed",
+    "year": "2025"
+  },
+  {
+    "id": 6,
+    "name": "Arduino Relay Timer",
+    "category": "IoT",
+    "icon": "fas fa-microchip",
+    "description": "Proyek Arduino untuk kontrol relay dengan timer delay, tersedia versi Uno (standalone) dan ESP8266 (WiFi web interface)",
+    "image": "https://via.placeholder.com/400x250/ffd3b6/ffffff?text=Arduino+Timer",
+    "technologies": ["Arduino", "ESP8266", "C++", "IoT"],
+    "features": [
+      "Timer Delay Configuration",
+      "Web Interface (ESP8266)",
+      "Relay Control",
+      "WiFi Connectivity",
+      "Power Switching"
+    ],
+    "url": "#",
+    "github": "https://github.com/edwardtorangga911/arduino-relay",
+    "status": "completed",
+    "year": "2025"
+  }
+]

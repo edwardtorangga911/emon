@@ -56,85 +56,7 @@ function toggleDarkMode() {
     icon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
 }
 
-// ========== LOAD TOOLS FROM JSON ==========
-async function loadTools() {
-    try {
-        const response = await fetch('/data/tools.json');
-        const tools = await response.json();
-        
-        const toolsContainer = document.getElementById('Tools');
-        const categories = {};
-        
-        // Group tools by category
-        tools.forEach(tool => {
-            if (!categories[tool.category]) {
-                categories[tool.category] = [];
-            }
-            categories[tool.category].push(tool);
-        });
-        
-        // Build HTML
-        let html = '<div class="search-box"><input type="text" id="toolSearch" placeholder="🔍 Cari tools..." onkeyup="searchTools()"></div>';
-        
-        Object.keys(categories).forEach(category => {
-            const categoryIcon = getCategoryIcon(category);
-            html += `
-                <div class="tool-category">
-                    <h3><i class="${categoryIcon}"></i> ${category}</h3>
-                    <ul class="tools-list">
-            `;
-            
-            categories[category].forEach(tool => {
-                html += `
-                    <li>
-                        <a href="${tool.url}" target="_blank" rel="noopener noreferrer" data-name="${tool.name.toLowerCase()}" data-desc="${tool.description.toLowerCase()}">
-                            <i class="${tool.icon}"></i>
-                            <div>
-                                <span>${tool.name}</span>
-                                <span class="tool-description">${tool.description}</span>
-                            </div>
-                        </a>
-                    </li>
-                `;
-            });
-            
-            html += '</ul></div>';
-        });
-        
-        toolsContainer.innerHTML = html;
-    } catch (error) {
-        console.error('Error loading tools:', error);
-    }
-}
 
-function getCategoryIcon(category) {
-    const icons = {
-        'Jaringan': 'fas fa-network-wired',
-        'Development': 'fas fa-code',
-        'Design': 'fas fa-palette',
-        'Productivity': 'fas fa-tasks'
-    };
-    return icons[category] || 'fas fa-tools';
-}
-
-// ========== SEARCH TOOLS ==========
-function searchTools() {
-    const input = document.getElementById('toolSearch');
-    const filter = input.value.toLowerCase();
-    const toolsList = document.querySelectorAll('.tools-list li');
-    
-    toolsList.forEach(item => {
-        const link = item.querySelector('a');
-        const name = link.getAttribute('data-name');
-        const desc = link.getAttribute('data-desc');
-        
-        if (name.includes(filter) || desc.includes(filter)) {
-            item.style.display = '';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-}
 
 // ========== LOAD PROJECTS FROM JSON ==========
 async function loadProjects() {
@@ -261,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Load dynamic content
-    await loadTools();
+    await loadApps();
     await loadProjects();
     await loadSkills();
     
