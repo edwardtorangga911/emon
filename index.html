@@ -1,357 +1,102 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-<head>
+  <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta name="theme-color" content="#0970e7" />
 
-    <title>Profil Edward Torangga</title>
-    <meta name="description" content="Website profil Edward Torangga yang menampilkan daftar tools yang digunakan." />
-    <meta property="og:title" content="Profil Edward Torangga" />
-    <meta property="og:description" content="Website profil Edward Torangga yang menampilkan daftar tools yang digunakan." />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    <link rel="apple-touch-icon" href="/assets/favicon.png" />
+
+    <!-- SEO Meta Tags -->
+    <title>Edward Torangga - Web Developer & Network Specialist</title>
+    <meta
+      name="description"
+      content="Portfolio website Edward Torangga - Web Developer, Network Specialist, dan IT Professional. Menampilkan projects, skills, dan tools yang digunakan."
+    />
+    <meta
+      name="keywords"
+      content="Edward Torangga, Web Developer, Network Specialist, IT Professional, Portfolio"
+    />
+    <meta name="author" content="Edward Torangga" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta
+      property="og:title"
+      content="Edward Torangga - Web Developer & Network Specialist"
+    />
+    <meta
+      property="og:description"
+      content="Portfolio website Edward Torangga - Web Developer, Network Specialist, dan IT Professional."
+    />
     <meta property="og:type" content="website" />
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Profil Edward Torangga" />
+    <meta property="og:url" content="https://emon.my.id/" />
+    <meta
+      property="og:image"
+      content="https://emon.my.id/assets/profile.jpeg"
+    />
 
+    <!-- Twitter Card Meta Tags -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:title"
+      content="Edward Torangga - Web Developer & Network Specialist"
+    />
+    <meta
+      property="twitter:description"
+      content="Portfolio website Edward Torangga - Web Developer, Network Specialist, dan IT Professional."
+    />
+    <meta
+      property="twitter:image"
+      content="https://emon.my.id/assets/profile.jpeg"
+    />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css" as="style" />
-    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap"
+    />
 
-    <style>
-        /* Reset & Global Styles */
-        :root {
-            --primary-font: 'Nunito Sans', sans-serif;
-            --secondary-font: 'Inter', sans-serif;
-            --primary-color: #0970e7;
-        }
+    <!-- Font Awesome -->
+    <link
+      rel="preload"
+      href="https://use.fontawesome.com/releases/v6.7.2/css/all.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.7.2/css/all.css"
+    />
 
-        html, body {
-            height: 100%;
-        }
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
-        body {
-            margin: 0;
-            font-family: var(--primary-font);
-            background-color: #f0f2f5;
-            display: flex;
-            flex-direction: column;
-        }
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/dark-mode.css" />
 
-        /* Hero Section (Latar Belakang Gradien) */
-        .hero-section {
-            flex-grow: 1; /* Membuat section ini mengisi ruang yang tersedia */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            /* Latar belakang diatur oleh JavaScript, tetapi transisi diatur di sini */
-            background-image: linear-gradient(340deg, #0011ff 0%, #11cccb 100%); /* Default/Fallback */
-            transition: background-image 2s ease-in-out; /* TRANSISI BARU UNTUK BACKGROUND */
-            box-sizing: border-box;
-        }
 
-        /* Main Card Container */
-        .portfolio-card {
-            display: flex;
-            width: 100%;
-            max-width: 900px;
-            min-height: 600px;
-            background-color: #fff;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
+  </head>
+  <body>
 
-        /* Kolom Kiri & Kanan */
-        .card-column {
-            width: 50%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .left-column {
-            padding: 20px 30px;
-            box-sizing: border-box;
-        }
-
-        .right-column {
-            background: url('https://res.cloudinary.com/dbyioi2qq/q_auto/v1667560649/static/photo_1846759_1667560648_64017.jpg') center / cover no-repeat;
-        }
-
-        /* --- STYLING UNTUK TAB DAN MENU --- */
-        
-        /* Tombol Menu Mobile */
-        .mobile-menu-button {
-            display: none;
-            background-color: #f7f7f7;
-            border: 1px solid #ddd;
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            text-align: left;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
-
-        /* Navigasi Tab */
-        .tabs-navigation {
-            display: flex;
-            border-bottom: 2px solid #eee;
-            margin-bottom: 25px;
-        }
-
-        .tab-link {
-            border: none;
-            background-color: transparent;
-            padding: 14px 18px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            color: #888;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-        }
-
-        .tab-link:hover {
-            color: #333;
-        }
-
-        .tab-link.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-
-        /* Panel Konten Tab */
-        .tab-content-panel {
-            display: none;
-            animation: fadeIn 0.5s;
-            max-height: 450px;
-            overflow-y: auto;
-        }
-
-        .tab-content-panel.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Konten Profil (di dalam Tab) */
-        .profile-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 20px;
-        }
-
-        .profile-image {
-            width: 180px;
-            height: 180px;
-            border-radius: 100%;
-            background: url('http://emon.my.id/assets/profile.jpeg') center / cover no-repeat;
-        }
-
-        .profile-name {
-            font-family: var(--primary-font);
-            font-size: 24px;
-            font-weight: 700;
-            color: #000;
-            line-height: 1.2;
-            margin: 0;
-        }
-
-        .profile-bio {
-            font-size: 16px;
-            font-weight: 400;
-            color: #333;
-            line-height: 26px;
-            margin: 0;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .social-icon {
-            display: inline-block;
-            font-size: 24px;
-            color: #333;
-            padding: 4px;
-            transition: color 0.3s ease;
-            text-decoration: none;
-        }
-
-        .social-icon:hover {
-            color: var(--primary-color);
-        }
-        
-        /* Konten Tab Tools dengan Kategori */
-        .tool-category {
-            margin-bottom: 25px;
-        }
-        .tool-category:last-child {
-            margin-bottom: 5px;
-        }
-        .tool-category h3 {
-            display: flex;
-            align-items: center;
-            font-size: 18px;
-            font-weight: 700;
-            color: #333;
-            margin: 0 0 15px 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-        }
-        .tool-category h3 i {
-            margin-right: 10px;
-            color: var(--primary-color);
-        }
-
-        .tools-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .tools-list li a {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #333;
-            font-weight: 600;
-            font-family: var(--secondary-font);
-            transition: all 0.2s ease-in-out;
-        }
-        .tools-list li a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
-            background-color: #fff;
-            color: var(--primary-color);
-            border-color: #e0e0e0;
-        }
-        .tools-list li i {
-            font-size: 20px;
-            width: 35px;
-            text-align: center;
-            margin-right: 15px;
-            color: #888;
-            transition: color 0.2s ease-in-out;
-        }
-        .tools-list li a:hover i {
-            color: var(--primary-color);
-        }
-        
-        /* Konten Tab Kontak */
-        .contact-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-        .contact-form input,
-        .contact-form textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            margin-bottom: 15px;
-            font-family: var(--primary-font);
-        }
-        .contact-form button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .contact-form button:hover {
-            background-color: #075ab5;
-        }
-
-        /* Footer */
-        .footer-credit {
-            flex-shrink: 0;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            font-family: var(--secondary-font);
-            color: #888;
-            background-color: #fff;
-        }
-        .footer-credit a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .footer-credit a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .portfolio-card {
-                flex-direction: column;
-                min-height: 0;
-                margin: 20px 0;
-            }
-            .card-column {
-                width: 100%;
-            }
-            .right-column {
-                display: none;
-            }
-            .mobile-menu-button {
-                display: block;
-            }
-            .tabs-navigation {
-                display: none;
-                flex-direction: column;
-                border-bottom: none;
-            }
-            .tabs-navigation.show {
-                display: flex;
-            }
-            .tab-link {
-                border-bottom: 1px solid #eee;
-                margin-bottom: 0;
-            }
-            .tab-link.active {
-                border-bottom-color: #eee;
-                background-color: #f0f8ff;
-            }
-            .tab-content-panel {
-                max-height: none;
-                overflow-y: visible;
-            }
-        }
-    </style>
-</head>
-<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <section class="hero-section">
+        <!-- Particle Background -->
+        <div id="particles-js"></div>
+        
         <main class="portfolio-card">
 
             <div class="card-column left-column">
@@ -360,6 +105,8 @@
                 
                 <nav class="tabs-navigation">
                     <button class="tab-link active" onclick="openTab(event, 'Profil')" id="defaultOpen">Profil</button>
+                    <button class="tab-link" onclick="openTab(event, 'Portfolio')">Portfolio</button>
+                    <button class="tab-link" onclick="openTab(event, 'Skills')">Skills</button>
                     <button class="tab-link" onclick="openTab(event, 'Tools')">Tools</button>
                     <button class="tab-link" onclick="openTab(event, 'Kontak')">Kontak</button>
                 </nav>
@@ -368,39 +115,54 @@
                     <div class="profile-content">
                         <div class="profile-image"></div>
                         <h1 class="profile-name">Edward Torangga</h1>
-                        <p class="profile-bio">.</p>
-                        <p class="profile-bio">I currently work for SMA DEMPO in Malang.</p>
+                        <p class="profile-bio">Web Developer & Network Specialist</p>
+                        <p class="profile-bio">Passionate about creating modern web applications and managing network infrastructure. Currently working at SMA DEMPO in Malang.</p>
+                        
+                        <a href="#" class="download-cv-btn">
+                            <i class="fas fa-download"></i>
+                            Download CV
+                        </a>
                         
                         <div class="social-links">
-						<a href="https://wa.me/6289516236789" class="social-icon" aria-label="Kirim WhatsApp" target="_blank" rel="noopener noreferrer">
-        <i class="fab fa-whatsapp" aria-hidden="true"></i>
-    </a>
-                            
+                            <a href="https://wa.me/6289516236789" class="social-icon" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://github.com/edwardtorangga911" class="social-icon" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-github" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/edward-torangga" class="social-icon" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-linkedin" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.instagram.com/edwardtorangga" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <div id="Tools" class="tab-content-panel">
-         
-                    <div class="tool-category">
-                        <h3><i class="fas fa-network-wired"></i> Jaringan</h3>
-                        <ul class="tools-list">
-     <li><a href="https://emon.my.id/unduh/DHCPServerStable.zip" target="_blank" rel="noopener noreferrer"><i class="fas fa-server"></i><span>DHCP SERVER</span></a></li>
-                                              
-					   </ul>
-                    </div>
+                <div id="Portfolio" class="tab-content-panel">
+                    <!-- Content will be loaded dynamically from projects.json -->
+                </div>
 
+                <div id="Skills" class="tab-content-panel">
+                    <!-- Content will be loaded dynamically from skills.json -->
+                </div>
+
+                <div id="Tools" class="tab-content-panel">
+                    <!-- Content will be loaded dynamically from tools.json -->
                 </div>
 
                 <div id="Kontak" class="tab-content-panel">
-                    <form action="#" class="contact-form" onsubmit="event.preventDefault(); alert('Pesan terkirim!');">
+                    <form class="contact-form" onsubmit="handleContactForm(event)">
                         <label for="name">Nama</label>
                         <input type="text" id="name" name="name" required>
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" required>
                         <label for="message">Pesan</label>
                         <textarea id="message" name="message" rows="4" required></textarea>
-                        <button type="submit">Kirim Pesan</button>
+                        <button type="submit">
+                            <i class="fab fa-whatsapp"></i> Kirim via WhatsApp
+                        </button>
                     </form>
                 </div>
                 
@@ -410,65 +172,19 @@
 
         </main>
     </section>
-    
+
+
     <footer class="footer-credit">
-        &copy; <span id="year"></span> Edward Torangga. Dibuat dengan ❤️ oleh <a href="https://emon.my.id/" target="_blank" rel="noopener noreferrer">Edward Torangga</a>.
+      &copy; <span id="year"></span> Edward Torangga. Dibuat dengan ❤️ oleh
+      <a href="https://emon.my.id/" target="_blank" rel="noopener noreferrer"
+        >Edward Torangga</a
+      >.
     </footer>
+
     
-    <script>
-        // Fungsi untuk membuka tab
-        function openTab(evt, tabName) {
-            const tabContent = document.getElementsByClassName("tab-content-panel");
-            for (let i = 0; i < tabContent.length; i++) {
-                tabContent[i].style.display = "none";
-            }
-
-            const tabLinks = document.getElementsByClassName("tab-link");
-            for (let i = 0; i < tabLinks.length; i++) {
-                tabLinks[i].classList.remove("active");
-            }
-
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.classList.add("active");
-        }
-
-        // Fungsi untuk toggle menu di mobile
-        function toggleMenu() {
-            const nav = document.querySelector('.tabs-navigation');
-            nav.classList.toggle('show');
-        }
-
-        // Fungsi untuk membuat gradien acak
-        function setRandomGradient() {
-            const hero = document.querySelector('.hero-section');
-            
-            // Fungsi helper untuk membuat satu warna cerah acak
-            const randomBrightColor = () => {
-                const h = Math.floor(Math.random() * 361); // Hue (0-360)
-                const s = Math.floor(Math.random() * 30) + 70; // Saturation (70-100%)
-                const l = Math.floor(Math.random() * 15) + 60; // Lightness (60-75%)
-                return `hsl(${h}, ${s}%, ${l}%)`;
-            };
-
-            const color1 = randomBrightColor();
-            const color2 = randomBrightColor();
-            const angle = Math.floor(Math.random() * 361);
-
-            hero.style.backgroundImage = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
-        }
-
-        // Menjalankan fungsi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', (event) => {
-            // Mengatur latar belakang gradien acak
-            setRandomGradient();
-
-            // Mengatur tahun di footer secara otomatis
-            document.getElementById('year').textContent = new Date().getFullYear();
-
-            // Secara default, buka tab pertama saat halaman dimuat
-            document.getElementById("defaultOpen").click();
-        });
-    </script>
+    <!-- External JavaScript -->
+    <script src="/js/particles-config.js"></script>
+    <script src="/js/main.js"></script>
 
 </body>
 </html>

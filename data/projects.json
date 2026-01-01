@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "E-Commerce Website",
+    "description": "Website e-commerce modern dengan integrasi WhatsApp checkout dan responsive design",
+    "image": "https://via.placeholder.com/400x250/0970e7/ffffff?text=E-Commerce",
+    "technologies": ["HTML", "CSS", "JavaScript", "WhatsApp API"],
+    "url": "#",
+    "github": "#"
+  },
+  {
+    "id": 2,
+    "title": "Company Profile Website",
+    "description": "Website profil perusahaan dengan portfolio showcase dan contact form",
+    "image": "https://via.placeholder.com/400x250/11cccb/ffffff?text=Company+Profile",
+    "technologies": ["HTML", "CSS", "JavaScript", "GitHub Pages"],
+    "url": "#",
+    "github": "#"
+  },
+  {
+    "id": 3,
+    "title": "Digital Signage System",
+    "description": "Sistem videotron digital dengan admin panel dan real-time content management",
+    "image": "https://via.placeholder.com/400x250/ff6b6b/ffffff?text=Digital+Signage",
+    "technologies": ["JavaScript", "Node.js", "WebSocket", "Admin Panel"],
+    "url": "#",
+    "github": "#"
+  },
+  {
+    "id": 4,
+    "title": "Network Tools Collection",
+    "description": "Kumpulan tools untuk network administration dan troubleshooting",
+    "image": "https://via.placeholder.com/400x250/4ecdc4/ffffff?text=Network+Tools",
+    "technologies": ["DHCP", "Network Analysis", "Server Management"],
+    "url": "#",
+    "github": "#"
+  }
+]

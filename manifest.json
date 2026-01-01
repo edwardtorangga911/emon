@@ -1,0 +1,24 @@
+{
+  "name": "Edward Torangga - Profile",
+  "short_name": "Edward T.",
+  "description": "Website profil Edward Torangga yang menampilkan portfolio, skills, dan tools",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0970e7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

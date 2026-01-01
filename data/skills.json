@@ -1,0 +1,46 @@
+[
+  {
+    "category": "Frontend Development",
+    "icon": "fas fa-laptop-code",
+    "skills": [
+      { "name": "HTML5", "level": 90 },
+      { "name": "CSS3", "level": 85 },
+      { "name": "JavaScript", "level": 80 },
+      { "name": "React", "level": 70 },
+      { "name": "Vue.js", "level": 65 }
+    ]
+  },
+  {
+    "category": "Backend Development",
+    "icon": "fas fa-server",
+    "skills": [
+      { "name": "Node.js", "level": 75 },
+      { "name": "PHP", "level": 80 },
+      { "name": "Python", "level": 70 },
+      { "name": "MySQL", "level": 85 },
+      { "name": "MongoDB", "level": 65 }
+    ]
+  },
+  {
+    "category": "Network & Infrastructure",
+    "icon": "fas fa-network-wired",
+    "skills": [
+      { "name": "Network Configuration", "level": 85 },
+      { "name": "DHCP Server", "level": 90 },
+      { "name": "Linux Administration", "level": 75 },
+      { "name": "Windows Server", "level": 80 },
+      { "name": "Network Security", "level": 70 }
+    ]
+  },
+  {
+    "category": "Tools & Others",
+    "icon": "fas fa-tools",
+    "skills": [
+      { "name": "Git & GitHub", "level": 85 },
+      { "name": "VS Code", "level": 90 },
+      { "name": "Figma", "level": 75 },
+      { "name": "Photoshop", "level": 70 },
+      { "name": "Docker", "level": 60 }
+    ]
+  }
+]

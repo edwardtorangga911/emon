@@ -1,0 +1,83 @@
+[
+  {
+    "id": 1,
+    "name": "DHCP SERVER",
+    "category": "Jaringan",
+    "icon": "fas fa-server",
+    "description": "Server DHCP untuk manajemen IP address otomatis dalam jaringan lokal",
+    "url": "https://emon.my.id/unduh/DHCPServerStable.zip",
+    "type": "download"
+  },
+  {
+    "id": 2,
+    "name": "Wireshark",
+    "category": "Jaringan",
+    "icon": "fas fa-network-wired",
+    "description": "Network protocol analyzer untuk troubleshooting dan analisis jaringan",
+    "url": "#",
+    "type": "external"
+  },
+  {
+    "id": 3,
+    "name": "Visual Studio Code",
+    "category": "Development",
+    "icon": "fas fa-code",
+    "description": "Code editor modern dengan fitur IntelliSense dan debugging",
+    "url": "#",
+    "type": "external"
+  },
+  {
+    "id": 4,
+    "name": "Git",
+    "category": "Development",
+    "icon": "fab fa-git-alt",
+    "description": "Version control system untuk tracking perubahan kode",
+    "url": "#",
+    "type": "external"
+  },
+  {
+    "id": 5,
+    "name": "Postman",
+    "category": "Development",
+    "icon": "fas fa-paper-plane",
+    "description": "API development dan testing platform",
+    "url": "#",
+    "type": "external"
+  },
+  {
+    "id": 6,
+    "name": "Figma",
+    "category": "Design",
+    "icon": "fas fa-palette",
+    "description": "Collaborative interface design tool",
+    "url": "#",
+    "type": "external"
+  },
+  {
+    "id": 7,
+    "name": "Adobe Photoshop",
+    "category": "Design",
+    "icon": "fas fa-image",
+    "description": "Professional image editing software",
+    "url": "#",
+    "type": "external"
+  },
+  {
+    "id": 8,
+    "name": "Notion",
+    "category": "Productivity",
+    "icon": "fas fa-sticky-note",
+    "description": "All-in-one workspace untuk notes, tasks, dan wiki",
+    "url": "#",
+    "type": "external"
+  },
+  {
+    "id": 9,
+    "name": "Trello",
+    "category": "Productivity",
+    "icon": "fas fa-tasks",
+    "description": "Project management tool dengan Kanban board",
+    "url": "#",
+    "type": "external"
+  }
+]

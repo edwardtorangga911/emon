@@ -1,0 +1,55 @@
+/* Dark Mode Styles */
+body.dark-mode {
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: #b0b0b0;
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #0d0d0d;
+    --bg-card: #2a2a2a;
+    --border-color: #3a3a3a;
+    --border-color-dark: #4a4a4a;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .hero-section {
+    background-image: linear-gradient(340deg, #1a0066 0%, #006666 100%);
+}
+
+body.dark-mode .profile-image {
+    box-shadow: 0 0 20px rgba(9, 112, 231, 0.3);
+}
+
+body.dark-mode .dark-mode-toggle {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .tab-link.active {
+    background-color: rgba(9, 112, 231, 0.1);
+}
+
+body.dark-mode .skill-bar {
+    background-color: var(--border-color-dark);
+}
+
+body.dark-mode .contact-form label {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .contact-form input,
+body.dark-mode .contact-form textarea {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .search-box input {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .right-column {
+    opacity: 0.8;
+}
