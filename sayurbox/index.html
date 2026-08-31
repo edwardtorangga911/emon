@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#16a34a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>SayurBox — Segar dari Kebun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:       #16a34a;
+    --primary-dark:  #14532d;
+    --primary-light: #dcfce7;
+    --lime:          #84cc16;
+    --yellow:        #fbbf24;
+    --orange:        #f97316;
+    --red:           #ef4444;
+    --pink:          #ec4899;
+    --sky:           #0ea5e9;
+    --text:          #1a1a2e;
+    --muted:         #64748b;
+    --bg:            #f0fdf4;
+    --surface:       #ffffff;
+    --border:        #e2e8f0;
+    --r-sm:  8px;
+    --r-md:  14px;
+    --r-lg:  20px;
+    --r-xl:  28px;
+    --sh-sm: 0 1px 3px rgba(0,0,0,.08);
+    --sh-md: 0 4px 14px rgba(0,0,0,.1);
+    --sh-lg: 0 12px 32px rgba(0,0,0,.14);
+    --sh-xl: 0 24px 48px rgba(0,0,0,.18);
+    --font-d: 'Nunito', sans-serif;
+    --font-b: 'Inter', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --safe-top:    env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left:   env(safe-area-inset-left, 0px);
+    --safe-right:  env(safe-area-inset-right, 0px);
+    --nav-h: 64px;
+    --header-h: 60px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg);
+    font-family: var(--font-b);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    padding-bottom: calc(var(--nav-h) + var(--safe-bottom));
+  }
+  button, input, textarea { font-family: inherit; }
+  img { display: block; }
+
+  /* ───────── RIPPLE EFFECT ───────── */
+  .ripple { position: relative; overflow: hidden; }
+  .ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,.3);
+    transform: scale(0);
+    opacity: 0;
+    border-radius: inherit;
+    transition: transform .4s ease, opacity .4s ease;
+  }
+  .ripple:active::after { transform: scale(1); opacity: 1; transition: none; }
+
+  /* ───────── SPLASH SCREEN ───────── */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(160deg, #14532d 0%, #16a34a 55%, #84cc16 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity .5s ease, visibility .5s ease;
+    padding-top: var(--safe-top);
+  }
+  #splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .splash-ring {
+    position: absolute; width: 200px; height: 200px; border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(255,255,255,.2), rgba(255,255,255,0), rgba(255,255,255,.2));
+    animation: spinRing 2.5s linear infinite;
+  }
+  @keyframes spinRing { to { transform: rotate(360deg); } }
+
+  .splash-logo-bg {
+    width: 100px; height: 100px; border-radius: 24px;
+    background: rgba(255,255,255,.22); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,.25);
+    animation: logoPop .7s cubic-bezier(.175,.885,.32,1.275) .2s both;
+    z-index: 1;
+  }
+  @keyframes logoPop { from { transform: scale(0) rotate(-15deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+  .splash-logo-bg svg { width: 60px; height: 60px; }
+  .sp-leaf { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 280; stroke-dashoffset: 280; animation: drawPath .9s ease .8s forwards; }
+  .sp-vein { fill: none; stroke: rgba(255,255,255,.75); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 70; stroke-dashoffset: 70; animation: drawPath .4s ease 1.4s forwards; }
+  .sp-drop { fill: #84cc16; opacity: 0; animation: dropIn .4s ease 1.5s forwards; }
+  @keyframes drawPath { to { stroke-dashoffset: 0; } }
+  @keyframes dropIn { from { opacity: 0; transform: scale(0) translateY(-8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+  .splash-brand { font-family: var(--font-d); font-weight: 900; font-size: 28px; color: #fff; margin-top: 18px; z-index: 1; opacity: 0; animation: fadeUp .5s ease 1.3s forwards; }
+  .splash-tagline { font-size: 13px; color: rgba(255,255,255,.85); margin-top: 5px; z-index: 1; opacity: 0; animation: fadeUp .5s ease 1.5s forwards; }
+  .splash-bar-wrap { width: 140px; height: 4px; background: rgba(255,255,255,.25); border-radius: 4px; margin-top: 22px; overflow: hidden; z-index: 1; opacity: 0; animation: fadeUp .4s ease 1.6s forwards; }
+  .splash-bar { height: 100%; width: 0%; background: #fff; border-radius: 4px; animation: fillBar .9s ease 1.7s forwards; }
+  .splash-particle { position: absolute; border-radius: 50%; opacity: 0; animation: particleFly 3s ease-in-out infinite; pointer-events: none; }
+  @keyframes fillBar { to { width: 100%; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes particleFly { 0%{opacity:0;transform:translateY(0) scale(0)} 20%{opacity:.7} 80%{opacity:.4} 100%{opacity:0;transform:translateY(-100px) scale(1.4)} }
+
+  /* ───────── APP WRAPPER ───────── */
+  #app { opacity: 0; transition: opacity .4s ease; min-height: 100vh; display: flex; flex-direction: column; }
+  #app.show { opacity: 1; }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 16px; width: 100%; }
+
+  /* ───────── HEADER (MOBILE-FIRST) ───────── */
+  .app-header {
+    background: #fff;
+    padding-top: var(--safe-top);
+    position: sticky; top: 0; z-index: 50;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--sh-sm);
+  }
+  .header-inner {
+    display: flex; align-items: center; gap: 10px;
+    height: var(--header-h); padding: 0 16px;
+  }
+  .brand-row {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #16a34a, #84cc16);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(22,163,74,.35);
+    transition: transform .2s ease;
+  }
+  .logo-mark:active { transform: scale(.92); }
+  .logo-mark svg { width: 22px; height: 22px; }
+  .brand-name {
+    font-family: var(--font-d); font-weight: 900; font-size: 18px;
+    background: linear-gradient(135deg, #16a34a, #84cc16);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: -.4px; line-height: 1;
+  }
+  .brand-dot { -webkit-text-fill-color: var(--yellow) !important; }
+
+  /* MOBILE: search bar stretches */
+  .search-wrapper { flex: 1; position: relative; min-width: 0; }
+  .search-input {
+    width: 100%; padding: 9px 36px 9px 38px;
+    border: 1.5px solid var(--border); border-radius: 50px;
+    font-size: 14px; outline: none; transition: all .2s;
+    background: var(--bg); color: var(--text);
+  }
+  .search-input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(22,163,74,.14); }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; display: flex; }
+  .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--muted); cursor: pointer; display: none; padding: 4px; line-height: 1; }
+
+  /* MOBILE: cart icon button (compact, no text) */
+  .header-cart-icon {
+    flex-shrink: 0; position: relative;
+    background: var(--primary-light); border: none; border-radius: 50%;
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s;
+  }
+  .header-cart-icon:active { transform: scale(.9); background: var(--primary); }
+  .header-cart-icon svg { width: 20px; height: 20px; color: var(--primary); transition: color .2s; }
+  .header-cart-icon:active svg { color: #fff; }
+  .h-badge {
+    position: absolute; top: -2px; right: -2px;
+    background: var(--orange); color: #fff; border-radius: 50%;
+    width: 18px; height: 18px; font-size: 10px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff; opacity: 0; transform: scale(0);
+    transition: opacity .2s, transform .2s cubic-bezier(.175,.885,.32,1.275);
+  }
+  .h-badge.show { opacity: 1; transform: scale(1); }
+  @keyframes badgePop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.5)} }
+  .h-badge.pop { animation: badgePop .35s ease; }
+
+  /* ───────── HERO BANNER ───────── */
+  .hero {
+    background: linear-gradient(135deg, #14532d 0%, #16a34a 60%, #84cc16 100%);
+    padding: 24px 16px 30px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M20 20h4v4h-4zm-10-10h4v4h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-deco { position: absolute; font-size: 28px; animation: floatDeco 5s ease-in-out infinite; user-select: none; pointer-events: none; opacity: .22; }
+  @keyframes floatDeco { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-12px) rotate(6deg)} }
+
+  .hero-content { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .hero-text { flex: 1; min-width: 0; }
+  .hero-kicker {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.18); color: #fff; border-radius: 50px;
+    padding: 5px 12px; font-size: 11px; font-weight: 800; margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(4px);
+  }
+  .hero-kicker .dot { width: 7px; height: 7px; background: #84cc16; border-radius: 50%; animation: pulse 1.5s ease infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:.7} }
+  .hero h1 { font-family: var(--font-d); font-weight: 900; font-size: clamp(20px, 5.5vw, 36px); color: #fff; line-height: 1.2; margin-bottom: 8px; }
+  .hero h1 em { font-style: normal; color: #bbf7d0; }
+  .hero-sub { font-size: 12px; color: rgba(255,255,255,.85); line-height: 1.5; margin-bottom: 14px; }
+  .hero-visual { font-size: clamp(60px, 18vw, 100px); animation: heroFloat 4s ease-in-out infinite; filter: drop-shadow(0 10px 16px rgba(0,0,0,.22)); flex-shrink: 0; }
+  @keyframes heroFloat { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-10px) rotate(3deg)} }
+
+  .hero-stats { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .hero-stats::-webkit-scrollbar { display: none; }
+  .stat-pill {
+    flex: none; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 10px; padding: 6px 10px; text-align: center; backdrop-filter: blur(4px);
+  }
+  .stat-num { font-family: var(--font-d); font-weight: 900; font-size: 15px; color: #fff; }
+  .stat-lbl { font-size: 10px; color: rgba(255,255,255,.8); margin-top: 1px; white-space: nowrap; }
+
+  /* ───────── PROMO STRIP ───────── */
+  .promo-strip { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding: 16px 16px 8px; }
+  .promo-strip::-webkit-scrollbar { display: none; }
+  .promo-card {
+    flex: none; width: 200px; border-radius: var(--r-lg); padding: 16px;
+    position: relative; overflow: hidden; min-height: 100px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    cursor: pointer; transition: transform .2s ease, box-shadow .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .promo-card:active { transform: scale(.97); }
+  .promo-card.green  { background: linear-gradient(135deg, #16a34a, #4ade80); }
+  .promo-card.orange { background: linear-gradient(135deg, #f97316, #fbbf24); }
+  .promo-card.sky    { background: linear-gradient(135deg, #0ea5e9, #38bdf8); }
+  .promo-card.pink   { background: linear-gradient(135deg, #ec4899, #f9a8d4); }
+  .promo-card .pe { position: absolute; top: -4px; right: -4px; font-size: 54px; opacity: .25; }
+  .promo-label { font-size: 10px; color: rgba(255,255,255,.9); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+  .promo-title { font-family: var(--font-d); font-size: 14px; font-weight: 900; color: #fff; line-height: 1.2; margin-top: 3px; }
+  .promo-sub { font-size: 10px; color: rgba(255,255,255,.9); margin-top: 3px; }
+
+  /* ───────── SECTION ───────── */
+  .section-wrap { padding: 12px 16px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-ttl { font-family: var(--font-d); font-weight: 900; font-size: 17px; color: var(--text); }
+  .section-lbl { font-family: var(--font-d); font-weight: 800; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+  .section-badge { font-size: 12px; font-weight: 700; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 50px; padding: 3px 12px; }
+
+  /* ───────── KATEGORI CHIPS ───────── */
+  .chips-wrap { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  .chips-wrap::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; font-family: var(--font-d); font-weight: 800; font-size: 13px;
+    padding: 8px 16px; border-radius: 50px; border: 2px solid var(--border);
+    background: var(--surface); color: var(--muted); cursor: pointer;
+    transition: all .2s; display: flex; align-items: center; gap: 5px;
+    -webkit-tap-highlight-color: transparent; white-space: nowrap;
+  }
+  .chip:active { transform: scale(.95); }
+  .chip.active {
+    background: linear-gradient(135deg, var(--primary), var(--lime));
+    color: #fff; border-color: transparent; font-weight: 900;
+    box-shadow: 0 4px 14px rgba(22,163,74,.35);
+  }
+
+  /* ───────── PRODUK GRID ───────── */
+  .grid-produk { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  @keyframes cardIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+
+  .kartu-produk {
+    background: var(--surface); border-radius: var(--r-md);
+    border: 1.5px solid var(--border); overflow: hidden;
+    display: flex; flex-direction: column; opacity: 0;
+    animation: cardIn .45s cubic-bezier(.16,1,.3,1) forwards;
+    transition: box-shadow .2s, border-color .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .kartu-produk:active { box-shadow: none; }
+
+  .kartu-produk .foto { width: 100%; aspect-ratio: 1/1; position: relative; overflow: hidden; background: #e2e8f0; }
+  .kartu-produk .foto img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+  .kartu-produk:active .foto img { transform: scale(1.04); }
+
+  .foto-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.28) 100%); pointer-events: none; }
+  .badge-wrap { position: absolute; top: 8px; left: 8px; display: flex; flex-direction: column; gap: 3px; z-index: 2; }
+  .badge-label {
+    font-family: var(--font-d); font-weight: 900; font-size: 8px; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 5px; color: #fff; letter-spacing: .05em; width: fit-content;
+  }
+  .badge-label.organik  { background: linear-gradient(135deg, #16a34a, #84cc16); }
+  .badge-label.promo    { background: linear-gradient(135deg, #ef4444, #f97316); }
+  .badge-label.baru     { background: linear-gradient(135deg, #f97316, #fbbf24); }
+  .badge-label.terlaris { background: linear-gradient(135deg, #ec4899, #f9a8d4); }
+  .badge-label.premium  { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+  .badge-label.lokal    { background: linear-gradient(135deg, #0ea5e9, #38bdf8); }
+
+  .stok-habis {
+    position: absolute; inset: 0; background: rgba(255,255,255,.82); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-d); font-weight: 900; font-size: 11px;
+    color: var(--red); text-transform: uppercase; z-index: 10;
+  }
+  .wishlist-btn {
+    position: absolute; top: 8px; right: 8px; z-index: 3;
+    width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.9);
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; box-shadow: var(--sh-sm);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .kartu-produk .info { padding: 10px; flex: 1; display: flex; flex-direction: column; }
+  .kartu-produk .nama { font-family: var(--font-d); font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 3px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .kartu-produk .deskripsi { display: none; } /* hidden on mobile to save space */
+
+  .rating-row { display: flex; align-items: center; gap: 3px; margin-top: 5px; }
+  .stars { font-size: 10px; color: #fbbf24; letter-spacing: 1px; }
+  .rating-num { font-size: 10px; font-weight: 700; color: var(--muted); }
+
+  .harga-wrapper { margin-top: 6px; }
+  .harga-utama { font-family: var(--font-d); font-size: 15px; font-weight: 900; color: var(--primary); display: block; }
+  .harga-coret { font-size: 11px; color: var(--muted); text-decoration: line-through; }
+  .satuan { font-size: 10px; color: var(--muted); }
+
+  /* QTY Control — compact for mobile */
+  .qty-control {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg); border-radius: 50px; padding: 3px;
+    border: 1.5px solid var(--border); margin-top: 8px;
+  }
+  .qty-btn {
+    width: 28px; height: 28px; border-radius: 50%; border: none;
+    background: var(--surface); color: var(--text); font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    user-select: none; font-weight: 800; line-height: 1;
+    -webkit-tap-highlight-color: transparent; transition: transform .1s;
+  }
+  .qty-btn:active:not(:disabled) { transform: scale(.84); }
+  .qty-btn.tambah { background: linear-gradient(135deg, var(--primary), var(--lime)); color: #fff; }
+  .qty-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .qty-value { font-family: var(--font-m); font-size: 13px; font-weight: 800; width: 26px; text-align: center; }
+
+  /* ───────── BOTTOM NAV ───────── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding-bottom: var(--safe-bottom);
+    display: flex; align-items: center;
+    height: calc(var(--nav-h) + var(--safe-bottom));
+    box-shadow: 0 -2px 16px rgba(0,0,0,.08);
+  }
+  .nav-inner { display: flex; width: 100%; }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 8px 0; border: none; background: none; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; transition: all .2s;
+    position: relative; height: var(--nav-h);
+  }
+  .nav-item:active { background: rgba(22,163,74,.06); }
+  .nav-icon { font-size: 22px; transition: transform .2s; }
+  .nav-lbl { font-family: var(--font-d); font-size: 10px; font-weight: 700; color: var(--muted); transition: color .2s; }
+  .nav-item.active .nav-lbl { color: var(--primary); font-weight: 900; }
+  .nav-item.active .nav-icon { transform: translateY(-2px); }
+  .nav-badge {
+    position: absolute; top: 8px; right: calc(50% - 22px);
+    background: var(--orange); color: #fff; border-radius: 50%;
+    min-width: 16px; height: 16px; font-size: 9px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff; padding: 0 3px;
+    opacity: 0; transform: scale(0);
+    transition: opacity .2s, transform .2s cubic-bezier(.175,.885,.32,1.275);
+  }
+  .nav-badge.show { opacity: 1; transform: scale(1); }
+
+  /* Active tab indicator */
+  .nav-item::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 0; height: 3px; background: var(--primary); border-radius: 0 0 4px 4px;
+    transition: width .25s cubic-bezier(.16,1,.3,1);
+  }
+  .nav-item.active::before { width: 28px; }
+
+  /* ───────── MODAL (BOTTOM SHEET on mobile) ───────── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,.5);
+    backdrop-filter: blur(4px); z-index: 99; opacity: 0;
+    pointer-events: none; transition: opacity .3s ease;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+  /* Cart = full bottom sheet */
+  .cart-drawer {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    transition: transform .4s cubic-bezier(.16,1,.3,1);
+    display: flex; flex-direction: column;
+    max-height: calc(94vh - var(--safe-top));
+    padding-bottom: var(--safe-bottom);
+  }
+  .modal-overlay.show .cart-drawer { transform: translateY(0); }
+
+  .sheet-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 4px; margin: 10px auto 0;
+    cursor: grab;
+  }
+
+  /* Invoice = centered card on desktop, bottom sheet on mobile */
+  .modal-center {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    transform: translateY(110%) scale(.98);
+    transition: all .4s cubic-bezier(.16,1,.3,1);
+    display: flex; flex-direction: column;
+    max-height: calc(94vh - var(--safe-top));
+    opacity: 0;
+    padding-bottom: var(--safe-bottom);
+  }
+  .modal-overlay.show .modal-center { transform: translateY(0) scale(1); opacity: 1; }
+
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+  .modal-header h2 { font-family: var(--font-d); font-weight: 900; font-size: 17px; color: var(--text); }
+  .modal-close {
+    background: var(--bg); border: none; width: 32px; height: 32px; border-radius: 50%;
+    font-size: 18px; color: var(--muted); cursor: pointer; display: flex;
+    align-items: center; justify-content: center; transition: all .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .modal-close:active { background: #fee2e2; color: var(--red); }
+
+  .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+  .cart-footer { padding: 14px 20px; border-top: 1px solid var(--border); background: var(--bg); }
+
+  @keyframes slideInR { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+  .item-cart { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); gap: 10px; }
+  .item-cart:last-child { border-bottom: none; }
+  .item-cart-left { display: flex; gap: 10px; align-items: center; flex: 1; min-width: 0; }
+  .item-cart img { width: 46px; height: 46px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+  .item-cart .i-nama { font-size: 13px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-cart .i-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .item-cart-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+  .item-harga { font-family: var(--font-m); font-size: 13px; color: var(--primary); font-weight: 800; white-space: nowrap; }
+
+  .cart-qty-ctrl { display: flex; align-items: center; gap: 4px; background: #fff; border: 1.5px solid var(--border); border-radius: 20px; padding: 2px 5px; }
+  .cqb { background: none; border: none; font-size: 16px; font-weight: 900; cursor: pointer; color: var(--primary); width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; }
+  .cqb:active { color: var(--red); }
+  .cqv { font-family: var(--font-m); font-size: 12px; font-weight: 800; min-width: 16px; text-align: center; }
+
+  textarea.catatan {
+    width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-md);
+    padding: 10px; font-size: 13px; background: var(--surface); resize: none; outline: none; transition: .2s;
+  }
+  textarea.catatan:focus { border-color: var(--primary); }
+  .ringkasan-total { display: flex; justify-content: space-between; padding-bottom: 12px; font-family: var(--font-d); font-weight: 900; font-size: 17px; color: var(--text); }
+
+  .btn-utama {
+    width: 100%; background: linear-gradient(135deg, var(--primary), var(--lime));
+    color: #fff; border: none; border-radius: 50px; padding: 14px;
+    font-family: var(--font-d); font-weight: 900; font-size: 15px;
+    cursor: pointer; transition: transform .15s, box-shadow .15s; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-utama:active:not(:disabled) { transform: scale(.97); }
+  .btn-utama:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-sekunder {
+    width: 100%; background: transparent; color: var(--primary);
+    border: 2px solid var(--primary); border-radius: 50px; padding: 12px;
+    font-family: var(--font-d); font-weight: 800; font-size: 14px;
+    cursor: pointer; margin-top: 10px; transition: .2s; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-sekunder:active { background: var(--primary-light); }
+
+  /* ───────── INVOICE ───────── */
+  #area-print { background: #fafafa; font-family: var(--font-m); font-size: 12px; color: #111; padding: 16px; border: 1.5px dashed #ccc; border-radius: 12px; margin-bottom: 16px; }
+  #area-print .pusat { text-align: center; margin-bottom: 10px; }
+  #area-print hr { border: none; border-top: 1px dashed #bbb; margin: 8px 0; }
+  #area-print .baris { display: flex; justify-content: space-between; margin: 4px 0; font-size: 11px; }
+
+  /* ───────── TOAST ───────── */
+  .toast {
+    position: fixed; top: calc(var(--header-h) + var(--safe-top) + 12px); left: 50%;
+    transform: translate(-50%, -20px);
+    background: rgba(15,23,42,.92); color: #fff; font-weight: 700; font-size: 13px;
+    padding: 10px 20px; border-radius: 50px; z-index: 9999;
+    opacity: 0; visibility: hidden; white-space: nowrap;
+    transition: all .3s cubic-bezier(.16,1,.3,1);
+    box-shadow: var(--sh-xl); backdrop-filter: blur(8px); max-width: calc(100vw - 32px);
+  }
+  .toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+
+  .no-result { grid-column: 1/-1; text-align: center; padding: 40px 16px; color: var(--muted); background: var(--surface); border-radius: var(--r-md); border: 2px dashed var(--border); }
+  .no-result .icon { font-size: 36px; margin-bottom: 8px; }
+  .status-kosong { text-align: center; padding: 32px 16px; color: var(--muted); }
+  .status-kosong .icon { font-size: 44px; margin-bottom: 10px; display: block; animation: heroFloat 3s ease-in-out infinite; }
+
+  /* ───────── FOOTER ───────── */
+  footer.site-footer { background: var(--primary-dark); color: rgba(255,255,255,.75); padding: 24px 16px; text-align: center; font-size: 12px; }
+  footer.site-footer strong { color: #fff; font-family: var(--font-d); }
+
+  /* ───────── PRINT STYLES ───────── */
+  @media print {
+    body * { visibility: hidden; }
+    #area-print, #area-print * { visibility: visible; }
+    #area-print { position: fixed; left: 0; top: 0; width: 100%; border: none; }
+  }
+
+  /* ═══════════════════════════════════════
+     TABLET (≥ 600px)
+  ═══════════════════════════════════════ */
+  @media (min-width: 600px) {
+    :root { --nav-h: 70px; }
+    .grid-produk { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .kartu-produk .deskripsi { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .hero-visual { font-size: clamp(80px, 14vw, 110px); }
+    .promo-card { width: 220px; }
+  }
+
+  /* ═══════════════════════════════════════
+     DESKTOP (≥ 900px) — HORIZONTAL HEADER
+  ═══════════════════════════════════════ */
+  @media (min-width: 900px) {
+    body { padding-bottom: 0; }
+    .bottom-nav { display: none; }
+
+    .app-header {
+      border-bottom: 3px solid transparent;
+      border-image: linear-gradient(90deg, #16a34a, #84cc16, #fbbf24) 1;
+      box-shadow: 0 1px 0 var(--border), 0 4px 16px rgba(0,0,0,.04);
+    }
+    .header-inner { height: 68px; padding: 0 24px; gap: 16px; }
+    .brand-row gap { gap: 12px; }
+    .logo-mark { width: 42px; height: 42px; border-radius: 12px; }
+    .logo-mark svg { width: 26px; height: 26px; }
+    .brand-name { font-size: 21px; }
+
+    /* show desktop cart button */
+    .header-cart-icon { display: none; }
+    .header-cart-btn-desktop {
+      flex-shrink: 0; background: var(--primary-light); border: 2px solid rgba(22,163,74,.2);
+      border-radius: 50px; padding: 8px 18px; display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-d); font-weight: 800; font-size: 14px; color: var(--primary-dark);
+      cursor: pointer; transition: all .25s ease; white-space: nowrap;
+    }
+    .header-cart-btn-desktop:hover { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 16px rgba(22,163,74,.35); transform: translateY(-2px); }
+    .header-cart-btn-desktop svg { width: 18px; height: 18px; }
+    .d-badge { background: var(--orange); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
+
+    .grid-produk { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+    .kartu-produk .deskripsi { display: -webkit-box; }
+    .kartu-produk:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); border-color: rgba(22,163,74,.3); }
+    .kartu-produk { transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s, border-color .3s; }
+
+    .promo-card { width: 250px; min-height: 120px; }
+    .promo-strip { padding: 16px 24px 8px; }
+    .section-wrap { padding: 14px 24px; }
+
+    /* Desktop: side drawer */
+    .cart-drawer {
+      bottom: auto; right: 0; top: 0; left: auto;
+      width: 100%; max-width: 420px; height: 100%;
+      border-radius: 0; transform: translateX(100%);
+      max-height: none;
+    }
+    .modal-overlay.show .cart-drawer { transform: translateX(0); }
+    .sheet-handle { display: none; }
+
+    /* Desktop: center modal */
+    .modal-center {
+      bottom: auto; left: 50%; top: 50%;
+      transform: translate(-50%, -46%) scale(.95);
+      width: 100%; max-width: 440px; height: auto;
+      border-radius: var(--r-xl); max-height: 90vh;
+    }
+    .modal-overlay.show .modal-center { transform: translate(-50%, -50%) scale(1); }
+
+    .hero { padding: 40px 0 48px; }
+    .hero-content { flex-direction: row; }
+    .hero h1 { font-size: clamp(28px, 3.5vw, 42px); }
+
+    .chips-wrap { flex-wrap: nowrap; }
+  }
+
+  /* ═══════════════════════════════════════
+     LARGE DESKTOP (≥ 1200px)
+  ═══════════════════════════════════════ */
+  @media (min-width: 1200px) {
+    .grid-produk { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SPLASH SCREEN ═══════════ -->
+<div id="splash">
+  <div class="splash-ring"></div>
+  <div class="splash-particle" style="width:7px;height:7px;background:#84cc16;left:25%;top:70%;animation-delay:0s;animation-duration:2.5s;"></div>
+  <div class="splash-particle" style="width:5px;height:5px;background:#fbbf24;left:68%;top:75%;animation-delay:.5s;animation-duration:3s;"></div>
+  <div class="splash-particle" style="width:6px;height:6px;background:#fff;left:50%;top:78%;animation-delay:.9s;animation-duration:2.8s;"></div>
+  <div class="splash-particle" style="width:4px;height:4px;background:#4ade80;left:18%;top:60%;animation-delay:1.3s;animation-duration:3.2s;"></div>
+  <div class="splash-particle" style="width:5px;height:5px;background:#fbbf24;left:80%;top:65%;animation-delay:.3s;animation-duration:2.6s;"></div>
+  <div class="splash-logo-bg">
+    <svg viewBox="0 0 76 76" fill="none">
+      <path class="sp-leaf" d="M38 12 C14 22, 10 48, 32 66 C36 50, 44 36, 64 24 C50 14, 44 12, 38 12 Z"/>
+      <path class="sp-vein" d="M38 62 C36 46, 40 32, 60 20"/>
+      <path class="sp-drop" d="M24 56 C24 60, 28 64, 28 64 C28 64, 32 60, 32 56 C32 53.8 30.2 52 28 52 C25.8 52 24 53.8 24 56Z"/>
+    </svg>
+  </div>
+  <div class="splash-brand">SayurBox<span style="color:#84cc16;">.</span></div>
+  <div class="splash-tagline">🌿 Segar dari kebun, tiba di pintu Anda</div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+
+  <!-- ── HEADER ── -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a class="brand-row" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+        <div class="logo-mark ripple">
+          <svg viewBox="0 0 76 76" fill="none">
+            <path d="M38 8 C16 20, 12 50, 34 68 C38 52, 46 36, 66 22 C52 10, 45 8, 38 8Z" fill="white"/>
+            <path d="M38 64 C36 48, 40 32, 60 18" stroke="rgba(22,163,74,.6)" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <circle cx="28" cy="58" r="4.5" fill="#84cc16"/>
+          </svg>
+        </div>
+        <div class="brand-name">SayurBox<span class="brand-dot">.</span></div>
+      </a>
+
+      <div class="search-wrapper">
+        <input type="text" id="input-search" class="search-input" placeholder="Cari produk segar...">
+        <span class="search-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </span>
+        <button class="search-clear" id="btn-clear-search" onclick="clearSearch()">&times;</button>
+      </div>
+
+      <!-- Mobile: icon button -->
+      <button class="header-cart-icon" id="btn-buka-cart-m" aria-label="Keranjang">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="h-badge" id="h-badge-m">0</span>
+      </button>
+
+      <!-- Desktop: text button -->
+      <button class="header-cart-btn-desktop" id="btn-buka-cart-d" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="18" height="18">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span>Keranjang</span>
+        <span class="d-badge" id="d-badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-deco" style="top:8%;left:4%;animation-delay:0s;">🥦</div>
+    <div class="hero-deco" style="top:55%;left:10%;animation-delay:1s;">🍅</div>
+    <div class="hero-deco" style="top:15%;right:24%;animation-delay:.5s;">🥕</div>
+    <div class="hero-deco" style="bottom:10%;left:45%;animation-delay:1.5s;">🌽</div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-kicker"><span class="dot"></span> Pengiriman Cepat 2 Jam</div>
+          <h1>Sayur &amp; Buah <em>Segar</em><br>dari Petani</h1>
+          <p class="hero-sub">Kualitas premium, harga terjangkau, diantar ke pintu Anda.</p>
+          <div class="hero-stats">
+            <div class="stat-pill"><div class="stat-num">24+</div><div class="stat-lbl">Produk</div></div>
+            <div class="stat-pill"><div class="stat-num">2 Jam</div><div class="stat-lbl">Kirim</div></div>
+            <div class="stat-pill"><div class="stat-num">4.9⭐</div><div class="stat-lbl">Rating</div></div>
+            <div class="stat-pill"><div class="stat-num">12K+</div><div class="stat-lbl">Member</div></div>
+          </div>
+        </div>
+        <div class="hero-visual">🥬</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROMO STRIP ── -->
+  <div class="promo-strip">
+    <div class="promo-card green ripple" onclick="filterByPromo('Sayuran')">
+      <div class="pe">🥬</div>
+      <div class="promo-label">Promo Hari Ini</div>
+      <div class="promo-title">Sayuran Organik<br>Diskon 20%</div>
+      <div class="promo-sub">Min. belanja Rp 50rb &rarr;</div>
+    </div>
+    <div class="promo-card orange ripple" onclick="filterByPromo('Buah')">
+      <div class="pe">🍊</div>
+      <div class="promo-label">Flash Sale</div>
+      <div class="promo-title">Buah Segar<br>Diskon 15%</div>
+      <div class="promo-sub">Berlaku s/d jam 20.00 &rarr;</div>
+    </div>
+    <div class="promo-card sky ripple" onclick="filterByPromo('Semua')">
+      <div class="pe">🚚</div>
+      <div class="promo-label">Gratis Ongkir</div>
+      <div class="promo-title">Belanja 75rb<br>Bebas Ongkir!</div>
+      <div class="promo-sub">Berlaku seluruh kota &rarr;</div>
+    </div>
+    <div class="promo-card pink ripple" onclick="filterByPromo('Bumbu')">
+      <div class="pe">🌶️</div>
+      <div class="promo-label">Bumbu Dapur</div>
+      <div class="promo-title">Paket Bumbu<br>Hemat 30%</div>
+      <div class="promo-sub">Stok terbatas &rarr;</div>
+    </div>
+  </div>
+
+  <!-- ── KATEGORI ── -->
+  <div class="section-wrap" style="padding-bottom:0;">
+    <div class="section-lbl">Jelajahi Kategori</div>
+    <div class="chips-wrap" id="kategori-bar"></div>
+  </div>
+
+  <!-- ── PRODUK ── -->
+  <div class="section-wrap" id="katalog-section">
+    <div class="section-head">
+      <div class="section-ttl" id="katalog-title">🛒 Semua Produk</div>
+      <span class="section-badge" id="jumlah-produk">0 produk</span>
+    </div>
+    <div class="grid-produk" id="product-list"></div>
+  </div>
+
+  <!-- ── CART DRAWER (bottom sheet) ── -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="cart-drawer">
+      <div class="sheet-handle"></div>
+      <div class="modal-header">
+        <h2>🛒 Keranjang</h2>
+        <button class="modal-close" id="btn-tutup-cart">&times;</button>
+      </div>
+      <div class="modal-body" id="isi-cart"></div>
+      <div class="cart-footer">
+        <div class="ringkasan-total"><span>Total</span><span id="total-cart">Rp 0</span></div>
+        <textarea class="catatan" id="catatan-pelanggan" rows="2" placeholder="Catatan pesanan..."></textarea>
+        <button class="btn-utama" id="btn-checkout" style="margin-top:12px;" disabled>Checkout 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INVOICE MODAL ── -->
+  <div class="modal-overlay" id="invoice-modal">
+    <div class="modal-center">
+      <div class="sheet-handle"></div>
+      <div class="modal-header">
+        <h2>🎉 Pesanan Berhasil!</h2>
+        <button class="modal-close" id="btn-tutup-invoice">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="area-print"></div>
+        <button class="btn-utama" id="btn-kirim-wa">Kirim ke WhatsApp 💬</button>
+        <button class="btn-sekunder" id="btn-print">Cetak Struk 🖨️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <strong>SayurBox.</strong> &mdash; 🌿 Segar dari petani, tiba di pintu Anda.<br>
+    <span style="font-size:11px;margin-top:4px;display:block;opacity:.8;">&copy; 2026 SayurBox Enterprise</span>
+  </footer>
+
+  <!-- ── BOTTOM NAVIGATION ── -->
+  <nav class="bottom-nav">
+    <div class="nav-inner">
+      <button class="nav-item active" id="nav-home" onclick="setNav('home')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-lbl">Beranda</span>
+      </button>
+      <button class="nav-item" id="nav-katalog" onclick="setNav('katalog')">
+        <span class="nav-icon">🥦</span>
+        <span class="nav-lbl">Katalog</span>
+      </button>
+      <button class="nav-item" id="nav-favorit" onclick="setNav('favorit')">
+        <span class="nav-icon">❤️</span>
+        <span class="nav-lbl">Favorit</span>
+      </button>
+      <button class="nav-item" id="nav-keranjang" onclick="bukaKeranjang()">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-lbl">Keranjang</span>
+        <span class="nav-badge" id="nav-badge">0</span>
+      </button>
+    </div>
+  </nav>
+
+</div><!-- /app -->
+
+<script>
+  const CONFIG = { NAMA_TOKO: 'SayurBox', NO_WHATSAPP: '6281234567890' };
+
+  const KATALOG = [
+    { id:'S001', kategori:'Sayuran', emoji:'🥬', nama:'Bayam Hijau Organik', deskripsi:'Dipetik pagi ini dari kebun hidroponik bersertifikat organik.', harga:6000, hargaCoret:null, satuan:'ikat', stok:null, label:'organik', rating:4.8, gambar:'https://images.unsplash.com/photo-1576045057995-568f588f82fb?q=80&w=500&auto=format&fit=crop' },
+    { id:'S002', kategori:'Sayuran', emoji:'🥕', nama:'Wortel Brastagi Premium', deskripsi:'Ukuran jumbo manis, cocok untuk jus dan masakan keluarga.', harga:12000, hargaCoret:15000, satuan:'kg', stok:20, label:'promo', rating:4.7, gambar:'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?q=80&w=500&auto=format&fit=crop' },
+    { id:'S003', kategori:'Sayuran', emoji:'🥔', nama:'Kentang Dieng Super', deskripsi:'Kualitas terbaik dari Dieng, tekstur padat sempurna.', harga:18000, hargaCoret:null, satuan:'kg', stok:0, label:'', rating:4.5, gambar:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?q=80&w=500&auto=format&fit=crop' },
+    { id:'S004', kategori:'Sayuran', emoji:'🥦', nama:'Brokoli Bebas Pestisida', deskripsi:'Dipanen saat bunga masih kencang, kaya serat dan antioksidan.', harga:22000, hargaCoret:null, satuan:'pcs', stok:10, label:'baru', rating:4.9, gambar:'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?q=80&w=500&auto=format&fit=crop' },
+    { id:'S005', kategori:'Sayuran', emoji:'🥒', nama:'Timun Jepang Kyuri', deskripsi:'Kulit tipis, renyah tanpa rasa pahit, sempurna untuk salad.', harga:10000, hargaCoret:null, satuan:'pcs', stok:30, label:'lokal', rating:4.6, gambar:'https://images.unsplash.com/photo-1604977042946-1eecc30f269e?q=80&w=500&auto=format&fit=crop' },
+    { id:'S006', kategori:'Sayuran', emoji:'🌽', nama:'Jagung Manis Madu', deskripsi:'Manis alami, bulir rapat dan empuk dari ladang Jawa Tengah.', harga:8000, hargaCoret:null, satuan:'pcs', stok:null, label:'terlaris', rating:4.8, gambar:'https://images.unsplash.com/photo-1551754655-cd27e38d2076?q=80&w=500&auto=format&fit=crop' },
+    { id:'S007', kategori:'Sayuran', emoji:'🥗', nama:'Kubis Kol Putih Segar', deskripsi:'Lembaran rapat, garing, cocok untuk capcay, soup & asinan.', harga:7000, hargaCoret:null, satuan:'pcs', stok:15, label:'', rating:4.4, gambar:'https://images.unsplash.com/photo-1550411994-e41cc80c2178?q=80&w=500&auto=format&fit=crop' },
+    { id:'S008', kategori:'Sayuran', emoji:'🥬', nama:'Selada Romaine Hidroponik', deskripsi:'Tumbuh higienis tanpa pestisida, super renyah untuk salad.', harga:14000, hargaCoret:17000, satuan:'pcs', stok:8, label:'organik', rating:4.9, gambar:'https://images.unsplash.com/photo-1556801712-76c8eb07bbc9?q=80&w=500&auto=format&fit=crop' },
+    { id:'S009', kategori:'Sayuran', emoji:'🫑', nama:'Paprika Merah & Kuning', deskripsi:'Dua warna satu harga, kaya vitamin C untuk hidangan mewah.', harga:20000, hargaCoret:null, satuan:'pcs', stok:12, label:'premium', rating:4.7, gambar:'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?q=80&w=500&auto=format&fit=crop' },
+    { id:'S010', kategori:'Sayuran', emoji:'🍆', nama:'Terong Ungu Organik', deskripsi:'Kulit mulus berkilau, daging empuk cocok dibakar atau ditumis.', harga:9000, hargaCoret:null, satuan:'pcs', stok:null, label:'organik', rating:4.5, gambar:'https://images.unsplash.com/photo-1615484477778-ca3b77940c25?q=80&w=500&auto=format&fit=crop' },
+    { id:'B001', kategori:'Buah', emoji:'🍌', nama:'Pisang Cavendish Sunpride', deskripsi:'Tingkat kematangan prima, manis lembut berenergi tinggi.', harga:25000, hargaCoret:30000, satuan:'sisir', stok:null, label:'promo', rating:4.8, gambar:'https://images.unsplash.com/photo-1528825871115-3581a5387919?q=80&w=500&auto=format&fit=crop' },
+    { id:'B002', kategori:'Buah', emoji:'🍊', nama:'Jeruk Medan Manis', deskripsi:'Kaya vitamin C, rasa manis segar berair banyak tanpa biji.', harga:28000, hargaCoret:null, satuan:'kg', stok:12, label:'', rating:4.6, gambar:'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=500&auto=format&fit=crop' },
+    { id:'B003', kategori:'Buah', emoji:'🍎', nama:'Apel Fuji Premium Import', deskripsi:'Renyah, manis harum, dipetik langsung dari kebun terbaik.', harga:45000, hargaCoret:55000, satuan:'kg', stok:6, label:'premium', rating:4.9, gambar:'https://images.unsplash.com/photo-1560806887-1e4cd0b6faa6?q=80&w=500&auto=format&fit=crop' },
+    { id:'B004', kategori:'Buah', emoji:'🍓', nama:'Stroberi Lembang Merah', deskripsi:'Dipetik saat merah sempurna di kebun Lembang, aroma harum.', harga:38000, hargaCoret:null, satuan:'250g', stok:5, label:'baru', rating:4.9, gambar:'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=500&auto=format&fit=crop' },
+    { id:'B005', kategori:'Buah', emoji:'🥭', nama:'Mangga Harum Manis Super', deskripsi:'Daging tebal legit, serat halus, manis khas Probolinggo.', harga:32000, hargaCoret:null, satuan:'kg', stok:null, label:'terlaris', rating:4.8, gambar:'https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=500&auto=format&fit=crop' },
+    { id:'B006', kategori:'Buah', emoji:'🍇', nama:'Anggur Shine Muscat Manis', deskripsi:'Manis tanpa biji, kulit renyah bisa dimakan langsung.', harga:65000, hargaCoret:80000, satuan:'500g', stok:4, label:'premium', rating:4.9, gambar:'https://images.unsplash.com/photo-1537640538966-79f369143f8f?q=80&w=500&auto=format&fit=crop' },
+    { id:'B007', kategori:'Buah', emoji:'🍍', nama:'Nanas Madu Palembang', deskripsi:'Ukuran besar, manis dan asam segar seimbang tanpa gatal.', harga:18000, hargaCoret:null, satuan:'pcs', stok:null, label:'lokal', rating:4.6, gambar:'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?q=80&w=500&auto=format&fit=crop' },
+    { id:'B008', kategori:'Buah', emoji:'🥝', nama:'Kiwi Gold Zespri', deskripsi:'Tinggi vitamin C, serat melimpah, rasa manis segar premium.', harga:48000, hargaCoret:null, satuan:'pcs', stok:9, label:'premium', rating:4.7, gambar:'https://images.unsplash.com/photo-1618897996318-5a901fa6ca71?q=80&w=500&auto=format&fit=crop' },
+    { id:'R001', kategori:'Bumbu', emoji:'🧅', nama:'Bawang Merah Super Brebes', deskripsi:'Kering bersih beraroma tajam, ukuran besar seragam.', harga:35000, hargaCoret:null, satuan:'kg', stok:null, label:'', rating:4.7, gambar:'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?q=80&w=500&auto=format&fit=crop' },
+    { id:'R002', kategori:'Bumbu', emoji:'🧄', nama:'Bawang Putih Kating', deskripsi:'Siung besar padat, rendah air, aroma masakan gurih mantap.', harga:28000, hargaCoret:35000, satuan:'kg', stok:null, label:'promo', rating:4.8, gambar:'https://images.unsplash.com/photo-1573506048786-8f08fdba74e8?q=80&w=500&auto=format&fit=crop' },
+    { id:'R003', kategori:'Bumbu', emoji:'🌶️', nama:'Cabai Merah Keriting', deskripsi:'Pedas pas, warna merah cerah alami, segar bukan cabe kering.', harga:42000, hargaCoret:null, satuan:'kg', stok:7, label:'terlaris', rating:4.6, gambar:'https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?q=80&w=500&auto=format&fit=crop' },
+    { id:'R004', kategori:'Bumbu', emoji:'🫚', nama:'Kunyit Segar Organik', deskripsi:'Rimpang besar bersih, kaya kurkumin alami berkhasiat.', harga:15000, hargaCoret:null, satuan:'250g', stok:null, label:'organik', rating:4.5, gambar:'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=500&auto=format&fit=crop' },
+    { id:'R005', kategori:'Bumbu', emoji:'🫛', nama:'Jahe Emprit Segar', deskripsi:'Pedas mantap menghangatkan, cocok untuk wedang dan masakan.', harga:20000, hargaCoret:null, satuan:'250g', stok:null, label:'', rating:4.6, gambar:'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=500&auto=format&fit=crop' },
+    { id:'R006', kategori:'Bumbu', emoji:'🍃', nama:'Daun Jeruk & Serai Wangi', deskripsi:'Paket bumbu aromaterapi dapur, harum segar masakan Nusantara.', harga:8000, hargaCoret:null, satuan:'ikat', stok:20, label:'baru', rating:4.7, gambar:'https://images.unsplash.com/photo-1563539124-6c36fd00b3d7?q=80&w=500&auto=format&fit=crop' }
+  ];
+
+  /* STATE */
+  const CART_KEY = 'cartSayurBoxV3';
+  let cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+  let kategoriAktif = 'Semua';
+  let searchTerm = '';
+  let pesananTerakhir = null;
+  let wishlist = new Set(JSON.parse(localStorage.getItem('wishlistSB') || '[]'));
+  let activeNav = 'home';
+
+  /* HELPERS */
+  function formatAngka(n) { return Number(n || 0).toLocaleString('id-ID'); }
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function simpanCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+  function simpanWishlist() { localStorage.setItem('wishlistSB', JSON.stringify([...wishlist])); }
+  function getQty(id) { const i = cart.find(x => x.id === id); return i ? i.qty : 0; }
+  function totalCart() { return cart.reduce((s,i) => s + i.harga * i.qty, 0); }
+  function jumlahItem() { return cart.reduce((s,i) => s + i.qty, 0); }
+  function starStr(r) {
+    const f = Math.floor(r), h = (r % 1) >= 0.5;
+    return '★'.repeat(f) + (h ? '½' : '') + '☆'.repeat(5 - f - (h ? 1 : 0));
+  }
+  function tampilkanToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+  function tutupSplash() {
+    document.getElementById('splash').classList.add('hide');
+    document.getElementById('app').classList.add('show');
+  }
+
+  /* BOTTOM NAV */
+  const KAT_EMOJI = { 'Semua':'🌈', 'Sayuran':'🥦', 'Buah':'🍎', 'Bumbu':'🌶️', 'Favorit':'❤️' };
+
+  function setNav(tab) {
+    activeNav = tab;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navEl = document.getElementById('nav-' + tab);
+    if (navEl) navEl.classList.add('active');
+
+    if (tab === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      kategoriAktif = 'Semua';
+      renderKategori();
+      renderProduk();
+    } else if (tab === 'katalog') {
+      document.getElementById('katalog-section').scrollIntoView({ behavior: 'smooth' });
+      kategoriAktif = 'Semua';
+      renderKategori();
+      renderProduk();
+    } else if (tab === 'favorit') {
+      document.getElementById('katalog-section').scrollIntoView({ behavior: 'smooth' });
+      kategoriAktif = 'Favorit';
+      renderKategori();
+      renderProduk();
+    }
+  }
+
+  function bukaKeranjang() {
+    renderIsiCart();
+    bukaModal('cart-modal');
+    setNavActive('keranjang');
+  }
+  function setNavActive(tab) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById('nav-' + tab);
+    if (el) el.classList.add('active');
+  }
+
+  function filterByPromo(kat) {
+    kategoriAktif = kat;
+    renderKategori();
+    renderProduk();
+    document.getElementById('katalog-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /* RENDER KATEGORI */
+  function renderKategori() {
+    const list = ['Semua', 'Sayuran', 'Buah', 'Bumbu', 'Favorit'];
+    const bar = document.getElementById('kategori-bar');
+    bar.innerHTML = list.map(k => {
+      const active = k === kategoriAktif ? ' active' : '';
+      const count = k === 'Favorit' ? wishlist.size : '';
+      return `<button class="chip${active}" data-k="${escapeHtml(k)}">${KAT_EMOJI[k]||'🌿'} ${escapeHtml(k)}${count ? ` (${count})` : ''}</button>`;
+    }).join('');
+    bar.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        kategoriAktif = btn.dataset.k;
+        renderKategori();
+        renderProduk();
+      });
+    });
+  }
+
+  /* RENDER PRODUK */
+  function renderProduk() {
+    const list = document.getElementById('product-list');
+    const filtered = KATALOG.filter(p => {
+      let ok = true;
+      if (kategoriAktif === 'Favorit') ok = wishlist.has(p.id);
+      else if (kategoriAktif !== 'Semua') ok = p.kategori === kategoriAktif;
+      const s = p.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.deskripsi.toLowerCase().includes(searchTerm.toLowerCase());
+      return ok && s;
+    });
+
+    document.getElementById('jumlah-produk').textContent = filtered.length + ' produk';
+    document.getElementById('katalog-title').textContent =
+      kategoriAktif === 'Favorit' ? '❤️ Produk Favorit' :
+      kategoriAktif === 'Semua' ? '🛒 Semua Produk' : '🛒 ' + kategoriAktif;
+
+    if (!filtered.length) {
+      list.innerHTML = `<div class="no-result"><div class="icon">${kategoriAktif==='Favorit'?'🤍':'🔍'}</div>
+        ${kategoriAktif==='Favorit' ? 'Belum ada favorit. Ketuk ikon hati ❤️ pada produk!' : `"<b>${escapeHtml(searchTerm)}</b>" tidak ditemukan.`}
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map((p, idx) => {
+      const habis = p.stok !== null && p.stok <= 0;
+      const qty = getQty(p.id);
+      const wl = wishlist.has(p.id);
+      return `
+        <div class="kartu-produk" data-id="${p.id}" style="animation-delay:${(idx*0.035).toFixed(2)}s">
+          <div class="foto">
+            <img src="${p.gambar}" alt="${escapeHtml(p.nama)}" loading="lazy">
+            <div class="foto-overlay"></div>
+            <div class="badge-wrap">${p.label ? `<span class="badge-label ${p.label}">${escapeHtml(p.label)}</span>` : ''}</div>
+            <button class="wishlist-btn" data-wid="${p.id}">${wl ? '❤️' : '🤍'}</button>
+            ${habis ? '<div class="stok-habis">⚠️ Habis</div>' : ''}
+          </div>
+          <div class="info">
+            <div class="nama">${p.emoji} ${escapeHtml(p.nama)}</div>
+            <div class="deskripsi">${escapeHtml(p.deskripsi)}</div>
+            <div class="rating-row"><span class="stars">${starStr(p.rating)}</span><span class="rating-num">${p.rating}</span></div>
+            <div class="harga-wrapper">
+              <span class="harga-utama">Rp ${formatAngka(p.harga)}</span>
+              ${p.hargaCoret ? `<span class="harga-coret">Rp ${formatAngka(p.hargaCoret)}</span>` : ''}
+              <span class="satuan">/${escapeHtml(p.satuan)}</span>
+            </div>
+            <div class="qty-control">
+              <button class="qty-btn kurang" ${qty===0?'disabled':''} aria-label="Kurang">&minus;</button>
+              <span class="qty-value">${qty}</span>
+              <button class="qty-btn tambah" ${habis?'disabled':''} aria-label="Tambah">+</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.kartu-produk').forEach(k => {
+      const id = k.dataset.id;
+      k.querySelector('.tambah').addEventListener('click', () => ubahQty(id, 1));
+      k.querySelector('.kurang').addEventListener('click', () => ubahQty(id, -1));
+      k.querySelector('.wishlist-btn').addEventListener('click', () => toggleWishlist(id));
+    });
+  }
+
+  /* QTY */
+  function ubahQty(id, delta) {
+    const produk = KATALOG.find(p => p.id === id);
+    if (!produk) return;
+    let item = cart.find(i => i.id === id);
+    if (!item) {
+      if (delta > 0) cart.push({ id:produk.id, nama:produk.nama, harga:produk.harga, satuan:produk.satuan, qty:1, gambar:produk.gambar, emoji:produk.emoji });
+    } else {
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+    }
+    simpanCart();
+    const k = document.querySelector(`.kartu-produk[data-id="${id}"]`);
+    if (k) {
+      const q = getQty(id);
+      k.querySelector('.qty-value').textContent = q;
+      k.querySelector('.kurang').disabled = q === 0;
+    }
+    if (delta > 0) tampilkanToast(`✅ ${produk.nama} ditambahkan!`);
+    updateBadge();
+    if (document.getElementById('cart-modal').classList.contains('show')) renderIsiCart();
+  }
+
+  /* WISHLIST */
+  function toggleWishlist(id) {
+    const p = KATALOG.find(x => x.id === id);
+    if (!p) return;
+    if (wishlist.has(id)) { wishlist.delete(id); tampilkanToast(`💔 ${p.nama} dihapus dari favorit`); }
+    else { wishlist.add(id); tampilkanToast(`❤️ ${p.nama} disimpan ke favorit!`); }
+    simpanWishlist();
+    renderKategori();
+    if (kategoriAktif === 'Favorit') renderProduk();
+    else {
+      const btn = document.querySelector(`.wishlist-btn[data-wid="${id}"]`);
+      if (btn) btn.textContent = wishlist.has(id) ? '❤️' : '🤍';
+    }
+  }
+
+  /* BADGE */
+  function updateBadge() {
+    const n = jumlahItem();
+    // nav badge
+    const nb = document.getElementById('nav-badge');
+    nb.textContent = n; nb.classList.toggle('show', n > 0);
+    // header icon badge
+    const hb = document.getElementById('h-badge-m');
+    hb.textContent = n;
+    if (n > 0) { hb.classList.add('show'); hb.classList.remove('pop'); void hb.offsetWidth; hb.classList.add('pop'); }
+    else hb.classList.remove('show');
+    // desktop badge
+    const db = document.getElementById('d-badge');
+    if (db) db.textContent = n;
+  }
+
+  /* MODAL */
+  function bukaModal(id) {
+    document.getElementById(id).classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function tutupModal(id) {
+    document.getElementById(id).classList.remove('show');
+    document.body.style.overflow = '';
+    // restore nav active
+    if (activeNav) setNavActive(activeNav);
+  }
+
+  /* CART RENDER */
+  function renderIsiCart() {
+    const wrap = document.getElementById('isi-cart');
+    if (!cart.length) {
+      wrap.innerHTML = `<div class="status-kosong"><span class="icon">🛒</span><p><b>Keranjang masih kosong.</b><br>Yuk tambahkan produk segar!</p></div>`;
+    } else {
+      wrap.innerHTML = cart.map((i,idx) => `
+        <div class="item-cart" style="animation:slideInR .3s ease ${idx*.04}s both">
+          <div class="item-cart-left">
+            <img src="${i.gambar}" alt="${escapeHtml(i.nama)}">
+            <div>
+              <div class="i-nama">${i.emoji||'🌿'} ${escapeHtml(i.nama)}</div>
+              <div class="i-sub">${i.qty} ${escapeHtml(i.satuan)} &times; Rp ${formatAngka(i.harga)}</div>
+            </div>
+          </div>
+          <div class="item-cart-right">
+            <div class="item-harga">Rp ${formatAngka(i.harga * i.qty)}</div>
+            <div class="cart-qty-ctrl">
+              <button class="cqb" onclick="ubahQty('${i.id}',-1)">&minus;</button>
+              <span class="cqv">${i.qty}</span>
+              <button class="cqb" onclick="ubahQty('${i.id}',1)">+</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+    document.getElementById('total-cart').textContent = 'Rp ' + formatAngka(totalCart());
+    document.getElementById('btn-checkout').disabled = cart.length === 0;
+  }
+
+  /* CHECKOUT */
+  function generateOrderId() {
+    const n = new Date();
+    return 'INV-' + n.toISOString().slice(2,10).replace(/-/g,'') + '-' + (Math.floor(Math.random()*900)+100);
+  }
+  function prosesCheckout() {
+    if (!cart.length) return;
+    const btn = document.getElementById('btn-checkout');
+    btn.disabled = true; btn.innerHTML = '⏳ Memproses...';
+    setTimeout(() => {
+      const idPesanan = generateOrderId();
+      const catatan = document.getElementById('catatan-pelanggan').value.trim();
+      pesananTerakhir = { idPesanan, items:[...cart], total:totalCart(), catatan };
+      tampilkanInvoice(pesananTerakhir);
+      cart = []; simpanCart(); renderProduk(); updateBadge();
+      document.getElementById('catatan-pelanggan').value = '';
+      btn.disabled = false; btn.innerHTML = 'Checkout 🚀';
+      tutupModal('cart-modal');
+      setTimeout(() => bukaModal('invoice-modal'), 250);
+    }, 900);
+  }
+  function tampilkanInvoice(p) {
+    const waktu = new Date().toLocaleString('id-ID', { dateStyle:'medium', timeStyle:'short' });
+    const baris = p.items.map(i => `<div class="baris"><span>${escapeHtml(i.nama)} (${i.qty} ${escapeHtml(i.satuan)})</span><span>Rp ${formatAngka(i.harga*i.qty)}</span></div>`).join('');
+    document.getElementById('area-print').innerHTML = `
+      <div class="pusat"><strong>${escapeHtml(CONFIG.NAMA_TOKO)}</strong><br><small>${waktu}</small></div>
+      <hr><div class="baris"><span>No. Pesanan</span><strong>${escapeHtml(p.idPesanan)}</strong></div><hr>
+      ${baris}<hr>
+      <div class="baris" style="font-size:13px;"><strong>TOTAL</strong><strong>Rp ${formatAngka(p.total)}</strong></div>
+      ${p.catatan ? `<hr><div class="baris" style="flex-direction:column;gap:3px;"><strong>Catatan:</strong><span>${escapeHtml(p.catatan)}</span></div>` : ''}
+      <hr><div class="pusat" style="margin-top:8px;font-size:10px;">🌿 Terima kasih berbelanja di SayurBox!</div>`;
+  }
+  function kirimWA() {
+    if (!pesananTerakhir) return;
+    const daftar = pesananTerakhir.items.map(i => `▪ ${i.qty} ${i.satuan} ${i.nama} — Rp ${formatAngka(i.harga*i.qty)}`).join('\n');
+    const teks = `Halo *${CONFIG.NAMA_TOKO}* 🌿, konfirmasi pesanan:\n\n*ID:* ${pesananTerakhir.idPesanan}\n\n*Detail:*\n${daftar}\n\n*Total: Rp ${formatAngka(pesananTerakhir.total)}*`
+      + (pesananTerakhir.catatan ? `\n\n*Catatan:* ${pesananTerakhir.catatan}` : '');
+    window.open('https://wa.me/' + CONFIG.NO_WHATSAPP + '?text=' + encodeURIComponent(teks), '_blank');
+  }
+  function clearSearch() {
+    document.getElementById('input-search').value = '';
+    searchTerm = '';
+    document.getElementById('btn-clear-search').style.display = 'none';
+    renderProduk();
+  }
+
+  /* DESKTOP DETECTION */
+  function checkDesktop() {
+    const isDesktop = window.innerWidth >= 900;
+    document.getElementById('header-cart-icon') && (document.getElementById('header-cart-icon').style.display = isDesktop ? 'none' : 'flex');
+    const dbtn = document.getElementById('btn-buka-cart-d');
+    if (dbtn) dbtn.style.display = isDesktop ? 'flex' : 'none';
+  }
+
+  /* EVENTS */
+  document.getElementById('input-search').addEventListener('input', e => {
+    searchTerm = e.target.value;
+    document.getElementById('btn-clear-search').style.display = searchTerm ? 'block' : 'none';
+    renderProduk();
+  });
+  document.getElementById('btn-buka-cart-m').addEventListener('click', bukaKeranjang);
+  document.getElementById('btn-buka-cart-d').addEventListener('click', bukaKeranjang);
+  document.getElementById('btn-tutup-cart').addEventListener('click', () => tutupModal('cart-modal'));
+  document.getElementById('btn-tutup-invoice').addEventListener('click', () => tutupModal('invoice-modal'));
+  document.getElementById('btn-checkout').addEventListener('click', prosesCheckout);
+  document.getElementById('btn-kirim-wa').addEventListener('click', kirimWA);
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+  document.querySelectorAll('.modal-overlay').forEach(ov => {
+    ov.addEventListener('mousedown', e => { if (e.target === ov) tutupModal(ov.id); });
+  });
+
+  // Swipe down to close modals (mobile)
+  let touchStartY = 0;
+  document.querySelectorAll('.cart-drawer, .modal-center').forEach(el => {
+    el.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+    el.addEventListener('touchend', e => {
+      if (e.changedTouches[0].clientY - touchStartY > 80) {
+        const modal = el.closest('.modal-overlay');
+        if (modal) tutupModal(modal.id);
+      }
+    }, { passive: true });
+  });
+
+  // Desktop check on resize
+  window.addEventListener('resize', checkDesktop);
+
+  /* INIT */
+  checkDesktop();
+  renderKategori();
+  renderProduk();
+  updateBadge();
+  setTimeout(tutupSplash, 2400);
+</script>
+</body>
+</html>
