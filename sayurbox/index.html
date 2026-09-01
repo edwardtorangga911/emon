@@ -1410,8 +1410,9 @@
   document.getElementById('btn-tutup-cart').addEventListener('click', () => tutupModal('cart-modal'));
   document.getElementById('btn-tutup-invoice').addEventListener('click', () => tutupModal('invoice-modal'));
   document.getElementById('btn-checkout').addEventListener('click', prosesCheckout);
-  document.getElementById('btn-kirim-wa').addEventListener('click', kirimWA);
-  document.getElementById('btn-print').addEventListener('click', () => window.print());
+  
+  const btnKirimWa = document.getElementById('btn-kirim-wa');
+  if (btnKirimWa) btnKirimWa.addEventListener('click', kirimWA);
 
   document.querySelectorAll('.modal-overlay').forEach(ov => {
     ov.addEventListener('mousedown', e => { if (e.target === ov) tutupModal(ov.id); });
