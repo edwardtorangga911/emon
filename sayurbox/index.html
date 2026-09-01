@@ -13,6 +13,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>SayurBox — Segar dari Kebun</title>
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -625,6 +626,53 @@
   @media (min-width: 1200px) {
     .grid-produk { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
   }
+
+  /* FLASH SALE */
+  .flash-sale-bar {
+    background: linear-gradient(135deg, #dc2626, #ef4444, #f97316);
+    color: #fff;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-radius: 16px;
+    margin: 0 16px 16px;
+    box-shadow: 0 4px 20px rgba(220,38,38,.3);
+    animation: flashPulse 2s ease-in-out infinite;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .flash-sale-bar::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -60%;
+    width: 40%; height: 200%;
+    background: rgba(255,255,255,.15);
+    transform: skewX(-20deg);
+    animation: shimmerFlash 2.5s ease-in-out infinite;
+  }
+  @keyframes shimmerFlash {
+    0% { left: -60%; }
+    100% { left: 120%; }
+  }
+  @keyframes flashPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(220,38,38,.3); }
+    50% { box-shadow: 0 4px 30px rgba(220,38,38,.6); }
+  }
+  .flash-label { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: .9; }
+  .flash-title { font-size: 15px; font-weight: 900; font-family: var(--font-d); }
+  .flash-timer { display: flex; gap: 6px; }
+  .timer-block {
+    background: rgba(0,0,0,.25);
+    border-radius: 8px; padding: 6px 10px;
+    text-align: center; min-width: 44px;
+  }
+  .timer-num { font-size: 18px; font-weight: 900; font-family: monospace; line-height: 1; }
+  .timer-lbl { font-size: 9px; font-weight: 600; opacity: .8; text-transform: uppercase; }
+  .timer-sep { font-size: 18px; font-weight: 900; align-self: flex-start; padding-top: 5px; opacity: .6; }
+  .flash-sale-bar.hidden { display: none; }
 </style>
 </head>
 <body>
@@ -747,6 +795,21 @@
       <div class="promo-label">Bumbu Dapur</div>
       <div class="promo-title">Paket Bumbu<br>Hemat 30%</div>
       <div class="promo-sub">Stok terbatas &rarr;</div>
+    </div>
+  </div>
+
+  <!-- ── FLASH SALE COUNTDOWN ── -->
+  <div class="flash-sale-bar" id="flash-sale-bar" onclick="filterByPromo('promo')">
+    <div>
+      <div class="flash-label">⚡ Flash Sale</div>
+      <div class="flash-title">Diskon hingga 30% hari ini!</div>
+    </div>
+    <div class="flash-timer">
+      <div class="timer-block"><div class="timer-num" id="fs-h">00</div><div class="timer-lbl">Jam</div></div>
+      <div class="timer-sep">:</div>
+      <div class="timer-block"><div class="timer-num" id="fs-m">00</div><div class="timer-lbl">Mnt</div></div>
+      <div class="timer-sep">:</div>
+      <div class="timer-block"><div class="timer-num" id="fs-s">00</div><div class="timer-lbl">Dtk</div></div>
     </div>
   </div>
 
@@ -1518,6 +1581,48 @@
   }
   
   initApp();
+
+  /* FLASH SALE COUNTDOWN */
+  function initFlashSale() {
+    // Flash sale ends at 23:59:59 today (configurable)
+    // Admin can change this by modifying the target hour
+    const FLASH_SALE_END_HOUR = 23; // Berakhir jam 23:00 setiap hari
+
+    function tick() {
+      const now = new Date();
+      const end = new Date();
+      end.setHours(FLASH_SALE_END_HOUR, 59, 59, 0);
+
+      // If past end time today, hide the banner
+      if (now >= end) {
+        document.getElementById('flash-sale-bar').classList.add('hidden');
+        return;
+      }
+
+      const diff = end - now;
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      document.getElementById('fs-h').textContent = String(h).padStart(2, '0');
+      document.getElementById('fs-m').textContent = String(m).padStart(2, '0');
+      document.getElementById('fs-s').textContent = String(s).padStart(2, '0');
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  initFlashSale();
+
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.log('SW failed:', err));
+    });
+  }
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925" integrity="sha512-d9sL6GJLXn6fInD1+TVXhTcQOsmxeHfmHAvwGDIxp5TO+uo1fiWW7mHomMj4MLRlCsJDTqXzWLHJFFlPCEIj/A==" data-cf-beacon='{"version":"2024.11.0","token":"e21dca7c20404959a8e91d4fb68596fd","r":1}' crossorigin="anonymous"></script>
 </body>
