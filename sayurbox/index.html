@@ -906,7 +906,9 @@
 
   /* STATE */
   const CART_KEY = 'cartSayurBoxV3';
-  let cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+  let cart = [];
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch(e){}
+  if (!Array.isArray(cart)) cart = [];
   let kategoriAktif = 'Semua';
   let searchTerm = '';
   let pesananTerakhir = null;
@@ -1059,9 +1061,13 @@
     const filtered = KATALOG.filter(p => {
       let ok = true;
       if (kategoriAktif === 'Favorit') ok = wishlist.has(p.id);
-      else if (kategoriAktif !== 'Semua') ok = p.kategori === kategoriAktif;
-      const s = p.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                p.deskripsi.toLowerCase().includes(searchTerm.toLowerCase());
+      else if (kategoriAktif !== 'Semua') ok = (p.kategori || '') === kategoriAktif;
+      
+      const nama = String(p.nama || '').toLowerCase();
+      const deskripsi = String(p.deskripsi || '').toLowerCase();
+      const q = String(searchTerm || '').toLowerCase();
+      
+      const s = nama.includes(q) || deskripsi.includes(q);
       return ok && s;
     });
 
@@ -1478,10 +1484,13 @@
     const cachedKatalog = localStorage.getItem('sb_katalog_cache');
     if (cachedKatalog) {
       try {
-        KATALOG = JSON.parse(cachedKatalog);
-        isFetching = false;
-        renderKategori();
-        renderProduk();
+        const parsed = JSON.parse(cachedKatalog);
+        if (Array.isArray(parsed)) {
+          KATALOG = parsed;
+          isFetching = false;
+          renderKategori();
+          renderProduk();
+        }
       } catch(e) {}
     }
 
@@ -1491,10 +1500,11 @@
         const res = await fetch(SCRIPT_URL + "?action=getProducts");
         const freshKatalog = await res.json();
         
-        // 3. Update state & cache, lalu re-render diam-diam (Silent Update)
-        KATALOG = freshKatalog;
-        localStorage.setItem('sb_katalog_cache', JSON.stringify(KATALOG));
-        
+        if (Array.isArray(freshKatalog)) {
+          // 3. Update state & cache, lalu re-render diam-diam (Silent Update)
+          KATALOG = freshKatalog;
+          localStorage.setItem('sb_katalog_cache', JSON.stringify(KATALOG));
+        }
       } catch (err) {
         console.error("Gagal memuat produk dari server", err);
       }
