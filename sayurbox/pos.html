@@ -1283,14 +1283,32 @@
   updateBadge();
   
   async function initApp() {
+    // 1. Coba load dari cache lokal agar tampil INSTAN (0 detik)
+    const cachedKatalog = localStorage.getItem('sb_katalog_cache');
+    if (cachedKatalog) {
+      try {
+        KATALOG = JSON.parse(cachedKatalog);
+        isFetching = false;
+        renderKategori();
+        renderProduk();
+      } catch(e) {}
+    }
+
     if (SCRIPT_URL) {
       try {
+        // 2. Fetch data terbaru di belakang layar (Background Sync)
         const res = await fetch(SCRIPT_URL + "?action=getProducts");
-        KATALOG = await res.json();
+        const freshKatalog = await res.json();
+        
+        // 3. Update state & cache, lalu re-render diam-diam (Silent Update)
+        KATALOG = freshKatalog;
+        localStorage.setItem('sb_katalog_cache', JSON.stringify(KATALOG));
+        
       } catch (err) {
         console.error("Gagal memuat produk dari server", err);
       }
     }
+    
     isFetching = false;
     renderKategori();
     renderProduk();
