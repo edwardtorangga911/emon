@@ -864,19 +864,21 @@
     document.getElementById('theme-icon').textContent = '☀️';
   }
 
+  let audioCtx = null;
   function playBeep() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(audioCtx.destination);
       osc.frequency.value = 800;
       osc.type = 'sine';
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.1);
       osc.start();
-      osc.stop(ctx.currentTime + 0.1);
+      osc.stop(audioCtx.currentTime + 0.1);
     } catch (e) {}
   }
   
@@ -1232,32 +1234,36 @@
   let barcodeTimeout = null;
 
   window.addEventListener('keydown', e => {
+    const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName);
+    
     // Barcode scanner logic (scanners type very fast and end with Enter)
-    if (e.key !== 'Enter' && e.key.length === 1) {
-      barcodeBuffer += e.key;
-      clearTimeout(barcodeTimeout);
-      barcodeTimeout = setTimeout(() => { barcodeBuffer = ''; }, 50); // reset if slow typing
-    } else if (e.key === 'Enter' && barcodeBuffer.length > 2) {
-      // Find product by ID (barcode)
-      const produk = KATALOG.find(p => p.id.toLowerCase() === barcodeBuffer.toLowerCase());
-      if (produk) {
-        ubahQty(produk.id, 1);
-        tampilkanToast(`🎯 Barcode Terdeteksi: ${produk.nama}`);
-      } else {
-        tampilkanToast(`❌ Barcode ${barcodeBuffer} tidak ditemukan!`);
+    if (!isTyping) {
+      if (e.key !== 'Enter' && e.key.length === 1) {
+        barcodeBuffer += e.key;
+        clearTimeout(barcodeTimeout);
+        barcodeTimeout = setTimeout(() => { barcodeBuffer = ''; }, 50); // reset if slow typing
+      } else if (e.key === 'Enter' && barcodeBuffer.length > 2) {
+        // Find product by ID (barcode)
+        const produk = KATALOG.find(p => p.id.toLowerCase() === barcodeBuffer.toLowerCase());
+        if (produk) {
+          ubahQty(produk.id, 1);
+          tampilkanToast(`🎯 Barcode Terdeteksi: ${produk.nama}`);
+        } else {
+          tampilkanToast(`❌ Barcode ${barcodeBuffer} tidak ditemukan!`);
+        }
+        barcodeBuffer = '';
+        e.preventDefault();
+        return;
       }
-      barcodeBuffer = '';
-      e.preventDefault();
-      return;
     }
 
     if (e.key === 'F2') {
       e.preventDefault();
       document.getElementById('input-search').focus();
-    } else if (e.key === 'F9') {
+    } else if (e.key === 'F9' && !isTyping) {
       e.preventDefault();
       prosesCheckout();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === 'Escape' && !isTyping) {
       clearSearch();
     }
   });
