@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SayurBox Admin | Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:       #059669; /* Emerald 600 */
+    --primary-hover: #047857; /* Emerald 700 */
+    --primary-light: #d1fae5;
+    --sidebar-bg:    #0f172a; /* Slate 900 */
+    --sidebar-hover: #1e293b;
+    --sidebar-text:  #94a3b8;
+    --sidebar-active:#f8fafc;
+    --bg-main:       #f1f5f9; /* Slate 100 */
+    --surface:       #ffffff;
+    --text-main:     #0f172a;
+    --text-muted:    #64748b;
+    --border:        #e2e8f0;
+    --danger:        #ef4444;
+    --success:       #10b981;
+    --font-ui: 'Plus Jakarta Sans', sans-serif;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-ui); background: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  
+  /* SIDEBAR */
+  .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; color: var(--sidebar-text); flex-shrink: 0; }
+  .brand { padding: 24px; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .brand span { color: var(--success); }
+  .nav-list { padding: 20px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .nav-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; background: transparent; color: var(--sidebar-text); width: 100%; text-align: left; }
+  .nav-item:hover { background: var(--sidebar-hover); color: #fff; }
+  .nav-item.active { background: var(--primary); color: #fff; }
+  .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+  .user-card { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .user-info { font-size: 13px; line-height: 1.4; }
+  .user-name { color: #fff; font-weight: 600; }
+  
+  /* MAIN CONTENT */
+  .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .header { height: 72px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 32px; flex-shrink: 0; }
+  .page-title { font-size: 20px; font-weight: 700; color: var(--text-main); }
+  .header-actions { display: flex; gap: 12px; align-items: center; }
+  
+  .content { flex: 1; padding: 32px; overflow-y: auto; }
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  /* DASHBOARD CARDS */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+  .stat-card { background: var(--surface); padding: 24px; border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); display: flex; align-items: center; gap: 20px; transition: transform 0.2s; }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .stat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+  .stat-icon.green { background: #dcfce7; color: #059669; }
+  .stat-icon.blue { background: #e0f2fe; color: #0284c7; }
+  .stat-icon.orange { background: #ffedd5; color: #ea580c; }
+  .stat-info { flex: 1; min-width: 0; }
+  .stat-label { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 800; color: var(--text-main); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  
+  /* TABLES & CARDS */
+  .card { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; }
+  .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fff; }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+  
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th { padding: 16px 24px; background: #f8fafc; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 16px 24px; font-size: 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:hover td { background: #f8fafc; }
+  tr:last-child td { border-bottom: none; }
+  
+  .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+  .badge.success { background: #dcfce7; color: #059669; }
+  .badge.warning { background: #fef3c7; color: #d97706; }
+  .badge.danger { background: #fee2e2; color: #dc2626; }
+  .badge.neutral { background: #f1f5f9; color: #475569; }
+  
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+  .btn-secondary { background: var(--surface); border-color: var(--border); color: var(--text-main); }
+  .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+  .btn-danger-text { background: transparent; color: var(--danger); padding: 6px 12px; }
+  .btn-danger-text:hover { background: #fee2e2; }
+  
+  /* FORMS & SLIDE-OVER */
+  .slide-over { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; justify-content: flex-end; }
+  .slide-over.show { opacity: 1; pointer-events: auto; }
+  .slide-panel { width: 100%; max-width: 480px; background: var(--surface); height: 100%; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: -8px 0 32px rgba(0,0,0,0.1); }
+  .slide-over.show .slide-panel { transform: translateX(0); }
+  
+  .slide-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .slide-body { padding: 24px; overflow-y: auto; flex: 1; }
+  .slide-footer { padding: 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end; background: #f8fafc; }
+  
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: var(--text-main); }
+  .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; transition: border-color 0.2s; background: #f8fafc; }
+  .form-control:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  
+  .loader-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: rgba(5, 150, 105, 0.2); overflow: hidden; display: none; z-index: 50; }
+  .loader-bar::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 40%; background: var(--primary); animation: loading 1.5s infinite ease-in-out; border-radius: 3px; }
+  @keyframes loading { 0% { left: -40%; } 100% { left: 100%; } }
+</style>
+</head>
+<body>
+
+<script>
+  // Auth Check Modern
+  if (sessionStorage.getItem('admin_pin') !== 'sayur123') {
+    let pin = prompt("🔒 Sistem POS Profesional\nMasukkan PIN Admin:");
+    if (pin === 'sayur123') {
+      sessionStorage.setItem('admin_pin', pin);
+    } else {
+      document.body.innerHTML = "<div style='display:flex;height:100vh;align-items:center;justify-content:center;background:#0f172a;color:#fff;font-family:sans-serif;'><h2>⛔ Akses Ditolak</h2></div>";
+      throw new Error("Akses Ditolak");
+    }
+  }
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRC7VIUrBxwPuOZvAHveWZBQsvuj_-gHEQOD__pqXBnlJOLEmUGoLQ-_v57bRyrA_b/exec";
+</script>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    SayurBox<span>.</span>POS
+  </div>
+  <nav class="nav-list">
+    <button class="nav-item active" onclick="switchNav('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="switchNav('products')">
+      <span class="nav-icon">📦</span> Manajemen Produk
+    </button>
+    <button class="nav-item" onclick="switchNav('orders')">
+      <span class="nav-icon">🧾</span> Riwayat Pesanan
+    </button>
+  </nav>
+  <div class="user-card">
+    <div class="avatar">A</div>
+    <div class="user-info">
+      <div class="user-name">Admin SayurBox</div>
+      <div style="color:var(--sidebar-text)">Superadmin</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<main class="main-wrapper">
+  <div class="loader-bar" id="loader"></div>
+  <header class="header">
+    <h1 class="page-title" id="page-title">Dashboard Analitik</h1>
+    <div class="header-actions">
+      <span style="font-size:13px; color:var(--text-muted); margin-right:8px;" id="clock">Memuat waktu...</span>
+      <button class="btn btn-secondary" onclick="loadData()">
+        <span>🔄</span> Sinkronisasi
+      </button>
+      <button class="btn btn-primary" onclick="window.open('pos.html', '_blank')">
+        Buka POS Kasir ↗
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+    
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon green">💰</div>
+          <div class="stat-info">
+            <div class="stat-label">Total Omzet Keseluruhan</div>
+            <div class="stat-value" id="dash-omzet">Rp 0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">🧾</div>
+          <div class="stat-info">
+            <div class="stat-label">Total Transaksi Selesai</div>
+            <div class="stat-value" id="dash-trx">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">🛍️</div>
+          <div class="stat-info">
+            <div class="stat-label">Total Item Terjual</div>
+            <div class="stat-value" id="dash-items">0</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Aktivitas Transaksi Terbaru</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID Transaksi</th>
+                <th>Waktu</th>
+                <th>Total Nominal</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-orders-tbody">
+              <tr><td colspan="4" style="text-align:center;">Belum ada data disinkronisasi.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div id="panel-products" class="panel">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Katalog Produk Aktif</span>
+          <button class="btn btn-primary" onclick="openSlideOver('slide-product')">+ Tambah Produk</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th>Kategori</th>
+                <th>Harga Retail</th>
+                <th>Sisa Stok</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="product-tbody">
+              <tr><td colspan="5" style="text-align:center;">Klik Sinkronisasi untuk memuat data.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div id="panel-orders" class="panel">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Semua Riwayat Pesanan</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID Pesanan</th>
+                <th>Waktu Transaksi</th>
+                <th>Total Tagihan</th>
+                <th>Rincian Item</th>
+                <th>Catatan Kasir</th>
+              </tr>
+            </thead>
+            <tbody id="order-tbody">
+              <tr><td colspan="5" style="text-align:center;">Klik Sinkronisasi untuk memuat data.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- SLIDE OVER ADD PRODUCT -->
+<div class="slide-over" id="slide-product" onclick="if(event.target===this) closeSlideOver('slide-product')">
+  <div class="slide-panel">
+    <div class="slide-header">
+      <h3 style="font-size:18px; font-weight:700;">Tambah Produk Baru</h3>
+      <button class="btn btn-secondary" style="padding:6px 10px; border-radius:50%;" onclick="closeSlideOver('slide-product')">✕</button>
+    </div>
+    <div class="slide-body">
+      <form id="addProductForm">
+        <div class="form-grid">
+          <div class="form-group"><label>ID Produk (Kosong = Auto)</label><input type="text" id="p_id" class="form-control"></div>
+          <div class="form-group"><label>Kategori</label><input type="text" id="p_kategori" class="form-control" required placeholder="Cth: Sayuran"></div>
+          <div class="form-group" style="grid-column: span 2;"><label>Nama Produk Lengkap</label><input type="text" id="p_nama" class="form-control" required placeholder="Cth: Wortel Brastagi Premium"></div>
+          
+          <div class="form-group"><label>Harga (Rp)</label><input type="number" id="p_harga" class="form-control" required placeholder="15000"></div>
+          <div class="form-group"><label>Satuan Jual</label><input type="text" id="p_satuan" class="form-control" required placeholder="kg / pcs / ikat"></div>
+          
+          <div class="form-group"><label>Stok Awal</label><input type="number" id="p_stok" class="form-control" placeholder="Kosong = Tak terbatas"></div>
+          <div class="form-group"><label>Emoji Icon</label><input type="text" id="p_emoji" class="form-control" required placeholder="🥕"></div>
+          
+          <div class="form-group"><label>Label Tag</label><input type="text" id="p_label" class="form-control" placeholder="promo / organik"></div>
+          <div class="form-group"><label>Harga Coret (Diskon)</label><input type="number" id="p_hargaCoret" class="form-control"></div>
+          
+          <div class="form-group" style="grid-column: span 2;"><label>URL Gambar Thumbnail</label><input type="text" id="p_gambar" class="form-control" required placeholder="https://..."></div>
+          <div class="form-group" style="grid-column: span 2;"><label>Deskripsi Pendek</label><textarea id="p_deskripsi" class="form-control" rows="2" placeholder="Deskripsi produk untuk pelanggan..."></textarea></div>
+        </div>
+      </form>
+    </div>
+    <div class="slide-footer">
+      <button class="btn btn-secondary" onclick="closeSlideOver('slide-product')">Batal</button>
+      <button class="btn btn-primary" onclick="submitProduct()">Simpan Produk</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function formatAngka(n) { return Number(n || 0).toLocaleString('id-ID'); }
+  
+  // Realtime Clock
+  setInterval(() => {
+    document.getElementById('clock').textContent = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
+  }, 1000);
+
+  const TITLES = { 'dashboard': 'Dashboard Analitik', 'products': 'Manajemen Produk', 'orders': 'Riwayat Pesanan' };
+  
+  function switchNav(tab) {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    
+    event.currentTarget.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+    document.getElementById('page-title').textContent = TITLES[tab];
+  }
+
+  function openSlideOver(id) { document.getElementById(id).classList.add('show'); }
+  function closeSlideOver(id) { document.getElementById(id).classList.remove('show'); }
+
+  async function loadData() {
+    document.getElementById('loader').style.display = 'block';
+    try {
+      const [resP, resO] = await Promise.all([
+        fetch(SCRIPT_URL + "?action=getProducts").then(r => r.json()),
+        fetch(SCRIPT_URL + "?action=getOrders").then(r => r.json())
+      ]);
+      renderProducts(resP);
+      renderOrders(resO);
+    } catch (err) {
+      alert("Gagal memuat data dari server Google. Periksa koneksi.");
+      console.error(err);
+    } finally {
+      document.getElementById('loader').style.display = 'none';
+    }
+  }
+
+  function getStockBadge(stok) {
+    if (stok === "") return `<span class="badge neutral">Tak Terbatas</span>`;
+    const num = Number(stok);
+    if (num <= 0) return `<span class="badge danger">Habis</span>`;
+    if (num <= 5) return `<span class="badge warning">Sisa ${num}</span>`;
+    return `<span class="badge success">${num} Stok</span>`;
+  }
+
+  function renderProducts(data) {
+    const tbody = document.getElementById('product-tbody');
+    if(!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Tidak ada produk ditemukan.</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = data.map(p => `
+      <tr>
+        <td>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <img src="${p.gambar}" style="width:48px; height:48px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
+            <div>
+              <div style="font-weight:700; color:var(--text-main); margin-bottom:2px;">${p.emoji} ${p.nama}</div>
+              <div style="font-size:12px; color:var(--text-muted); font-family:monospace;">ID: ${p.id}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="badge neutral">${p.kategori}</span></td>
+        <td style="font-weight:600;">Rp ${formatAngka(p.harga)}<span style="font-weight:400;color:var(--text-muted);font-size:12px;"> / ${p.satuan}</span></td>
+        <td>${getStockBadge(p.stok)}</td>
+        <td><button class="btn btn-danger-text" onclick="deleteProduct('${p.id}')">Hapus</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderOrders(data) {
+    const tbody = document.getElementById('order-tbody');
+    const recent = document.getElementById('recent-orders-tbody');
+    let totalOmzet = 0; let totalItems = 0;
+    
+    if(!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Belum ada riwayat pesanan.</td></tr>';
+      recent.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Belum ada riwayat pesanan.</td></tr>';
+      return;
+    }
+    
+    // Sort descending for recent
+    const sorted = [...data].reverse();
+    
+    let html = '';
+    let recentHtml = '';
+    
+    sorted.forEach((o, idx) => {
+      let items = [];
+      try { items = JSON.parse(o.items); } catch(e){}
+      
+      totalOmzet += Number(o.total) || 0;
+      totalItems += items.reduce((sum, i) => sum + (Number(i.qty) || 0), 0);
+      
+      const itemsList = items.map(i => `<div style="margin-bottom:2px">• ${i.qty}x <strong>${i.nama}</strong></div>`).join('');
+      const dateStr = new Date(o.tanggal).toLocaleString('id-ID', { dateStyle:'medium', timeStyle:'short'});
+      
+      html += `
+      <tr>
+        <td style="font-family:monospace; font-weight:700;">${o.idPesanan}</td>
+        <td style="color:var(--text-muted);">${dateStr}</td>
+        <td style="font-weight:700; color:var(--primary);">Rp ${formatAngka(o.total)}</td>
+        <td style="font-size:13px; line-height:1.4;">${itemsList}</td>
+        <td style="font-size:13px; font-style:italic; color:var(--text-muted)">${o.catatan || '-'}</td>
+      </tr>`;
+      
+      if(idx < 5) {
+        recentHtml += `
+        <tr>
+          <td style="font-family:monospace; font-weight:600;">${o.idPesanan}</td>
+          <td>${dateStr}</td>
+          <td style="font-weight:700;">Rp ${formatAngka(o.total)}</td>
+          <td><span class="badge success">Selesai</span></td>
+        </tr>`;
+      }
+    });
+    
+    tbody.innerHTML = html;
+    recent.innerHTML = recentHtml;
+    
+    // Update Dashboard Stats
+    document.getElementById('dash-omzet').textContent = 'Rp ' + formatAngka(totalOmzet);
+    document.getElementById('dash-trx').textContent = formatAngka(data.length);
+    document.getElementById('dash-items').textContent = formatAngka(totalItems);
+  }
+
+  async function submitProduct() {
+    const form = document.getElementById('addProductForm');
+    if(!form.checkValidity()) { form.reportValidity(); return; }
+    
+    const product = {
+      id: document.getElementById('p_id').value,
+      nama: document.getElementById('p_nama').value,
+      kategori: document.getElementById('p_kategori').value,
+      emoji: document.getElementById('p_emoji').value,
+      harga: document.getElementById('p_harga').value,
+      hargaCoret: document.getElementById('p_hargaCoret').value,
+      satuan: document.getElementById('p_satuan').value,
+      stok: document.getElementById('p_stok').value,
+      label: document.getElementById('p_label').value,
+      gambar: document.getElementById('p_gambar').value,
+      deskripsi: document.getElementById('p_deskripsi').value,
+      rating: 5.0
+    };
+
+    document.getElementById('loader').style.display = 'block';
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "addProduct", product: product })
+      }).then(r => r.json());
+      
+      if(res.success) {
+        form.reset();
+        closeSlideOver('slide-product');
+        loadData(); // refresh
+      } else alert("Gagal: " + res.error);
+    } catch(err) { alert("Error: " + err); } 
+    finally { document.getElementById('loader').style.display = 'none'; }
+  }
+
+  async function deleteProduct(id) {
+    if(!confirm("⚠️ PERINGATAN\nAnda yakin ingin menghapus produk ini secara permanen?")) return;
+    
+    document.getElementById('loader').style.display = 'block';
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "deleteProduct", id: id })
+      }).then(r => r.json());
+      
+      if(res.success) loadData();
+      else alert("Gagal: " + res.error);
+    } catch(err) { alert("Error: " + err); } 
+    finally { document.getElementById('loader').style.display = 'none'; }
+  }
+
+  // Load data automatically on start
+  loadData();
+</script>
+</body>
+</html>

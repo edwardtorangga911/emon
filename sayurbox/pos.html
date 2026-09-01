@@ -1,13 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="description" content="Pesan sayur, buah, dan kebutuhan dapur segar harian langsung ke pintu Anda. Belanja mudah, cepat, dan terpercaya!">
-<meta property="og:title" content="SayurBox - Belanja Sayur Segar Online">
-<meta property="og:description" content="Pesan kebutuhan dapur harianmu di sini! Harga terbaik, kualitas terjamin.">
-<meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1200&auto=format&fit=crop">
-<meta property="og:type" content="website">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#16a34a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -589,19 +585,19 @@
     .promo-strip { padding: 16px 24px 8px; }
     .section-wrap { padding: 14px 24px; }
 
-    /* Desktop: side drawer */
-    .cart-drawer {
+    /* Desktop: split screen cart */
+    #cart-modal { pointer-events: none; opacity: 1; background: transparent; backdrop-filter: none; z-index: 40; }
+    #cart-modal .cart-drawer {
       bottom: auto; right: 0; top: 0; left: auto;
-      width: 100%; max-width: 420px; height: 100%;
-      border-radius: 0; transform: translateX(100%);
-      max-height: none; box-shadow: none; border-left: none;
+      width: 100%; max-width: 360px; height: 100vh; position: fixed;
+      border-radius: 0; transform: translateX(0);
+      max-height: none; box-shadow: -4px 0 24px rgba(0,0,0,.05); border-left: 1px solid var(--border);
+      pointer-events: auto;
     }
-    .modal-overlay.show .cart-drawer { transform: translateX(0); }
+    #btn-tutup-cart { display: none; }
+    #app { padding-right: 360px; }
+    .header-cart-btn-desktop { display: none !important; }
     .sheet-handle { display: none; }
-    /* Revert padding and buttons */
-    #btn-tutup-cart { display: flex; }
-    #app { padding-right: 0; }
-    .header-cart-btn-desktop { display: flex !important; }
 
     /* Desktop: center modal */
     .modal-center {
@@ -1153,64 +1149,33 @@
     const n = new Date();
     return 'INV-' + n.toISOString().slice(2,10).replace(/-/g,'') + '-' + (Math.floor(Math.random()*900)+100);
   }
-  /* CHECKOUT WHATSAPP (PEMBELI) */
   async function prosesCheckout() {
-    if (cart.length === 0) return alert('Keranjang kosong!');
+    if (!cart.length) return;
+    const btn = document.getElementById('btn-checkout');
+    btn.disabled = true; btn.innerHTML = '⏳ Memproses...';
     
-    // Tampilkan prompt untuk nama pembeli dan alamat
-    const namaPembeli = prompt("Masukkan Nama Anda:");
-    if (!namaPembeli) return;
-    const alamatPembeli = prompt("Masukkan Alamat Pengiriman:");
-    if (!alamatPembeli) return;
-    
-    const idPesanan = 'INV-' + Date.now().toString().slice(-6);
-    let total = 0;
-    
-    let waText = `Halo *SayurBox*! 🌿\nSaya ingin memesan:\n\n*ID Pesanan:* ${idPesanan}\n*Nama:* ${namaPembeli}\n*Alamat:* ${alamatPembeli}\n\n*Rincian Pesanan:*\n`;
-    
-    cart.forEach(c => {
-      const p = KATALOG.find(x => x.id === c.id);
-      if (p) {
-        total += p.harga * c.qty;
-        waText += `▪️ ${c.qty}x ${p.nama} (Rp ${formatAngka(p.harga * c.qty)})\n`;
-      }
-    });
-    
-    waText += `\n*Total Bayar:* Rp ${formatAngka(total)}\n\nTerima kasih!`;
-    const waUrl = `https://api.whatsapp.com/send?phone=${CONFIG.NO_WHATSAPP}&text=${encodeURIComponent(waText)}`;
-    
-    document.getElementById('cart-modal').classList.remove('show');
-    tampilkanToast('🔄 Mengalihkan ke WhatsApp...');
-    playBeep();
-    
-    // Kirim juga ke database backend jika perlu (opsional)
-    const orderData = {
-      idPesanan: idPesanan,
-      tanggal: new Date().toISOString(),
-      total: total,
-      items: JSON.stringify(cart.map(c => {
-        const p = KATALOG.find(x => x.id === c.id);
-        return { id: c.id, nama: p ? p.nama : 'Item', qty: c.qty, harga: p ? p.harga : 0 };
-      })),
-      catatan: "Pesanan Online: " + namaPembeli
-    };
+    const idPesanan = generateOrderId();
+    const catatan = document.getElementById('catatan-pelanggan').value.trim();
+    pesananTerakhir = { idPesanan, items:[...cart], total:totalCart(), catatan };
     
     if (SCRIPT_URL) {
-      // Kita kirim pesanan di background, lalu buka WA
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'addOrder', order: orderData })
-      }).catch(e => console.log("Gagal simpan db", e));
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'addOrder', order: pesananTerakhir })
+        });
+      } catch (err) {
+        console.error("Gagal mengirim pesanan ke server", err);
+      }
     }
 
-    cart = [];
-    simpanCart();
-    renderIsiCart();
-    renderProduk();
-    
-    setTimeout(() => { window.open(waUrl, '_blank'); }, 1000);
+    tampilkanInvoice(pesananTerakhir);
+    cart = []; simpanCart(); renderProduk(); updateBadge();
+    document.getElementById('catatan-pelanggan').value = '';
+    btn.disabled = false; btn.innerHTML = 'Checkout 🚀';
+    tutupModal('cart-modal');
+    setTimeout(() => bukaModal('invoice-modal'), 250);
   }
-
   function tampilkanInvoice(p) {
     const waktu = new Date().toLocaleString('id-ID', { dateStyle:'medium', timeStyle:'short' });
     const baris = p.items.map(i => `<div class="baris"><span>${escapeHtml(i.nama)} (${i.qty} ${escapeHtml(i.satuan)})</span><span>Rp ${formatAngka(i.harga*i.qty)}</span></div>`).join('');
@@ -1318,32 +1283,14 @@
   updateBadge();
   
   async function initApp() {
-    // 1. Coba load dari cache lokal agar tampil INSTAN (0 detik)
-    const cachedKatalog = localStorage.getItem('sb_katalog_cache');
-    if (cachedKatalog) {
-      try {
-        KATALOG = JSON.parse(cachedKatalog);
-        isFetching = false;
-        renderKategori();
-        renderProduk();
-      } catch(e) {}
-    }
-
     if (SCRIPT_URL) {
       try {
-        // 2. Fetch data terbaru di belakang layar (Background Sync)
         const res = await fetch(SCRIPT_URL + "?action=getProducts");
-        const freshKatalog = await res.json();
-        
-        // 3. Update state & cache, lalu re-render diam-diam (Silent Update)
-        KATALOG = freshKatalog;
-        localStorage.setItem('sb_katalog_cache', JSON.stringify(KATALOG));
-        
+        KATALOG = await res.json();
       } catch (err) {
         console.error("Gagal memuat produk dari server", err);
       }
     }
-    
     isFetching = false;
     renderKategori();
     renderProduk();
