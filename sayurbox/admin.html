@@ -298,7 +298,14 @@
           <div class="form-group"><label>Label Tag</label><input type="text" id="p_label" class="form-control" placeholder="promo / organik"></div>
           <div class="form-group"><label>Harga Coret (Diskon)</label><input type="number" id="p_hargaCoret" class="form-control"></div>
           
-          <div class="form-group" style="grid-column: span 2;"><label>URL Gambar Thumbnail</label><input type="text" id="p_gambar" class="form-control" required placeholder="https://..."></div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>Gambar Produk</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="file" id="p_gambar_file" accept="image/*" class="form-control" style="flex:1;">
+              <input type="hidden" id="p_gambar">
+            </div>
+            <small style="color:var(--text-muted); display:block; margin-top:5px;">Pilih file gambar dari komputer Anda.</small>
+          </div>
           <div class="form-group" style="grid-column: span 2;"><label>Deskripsi Pendek</label><textarea id="p_deskripsi" class="form-control" rows="2" placeholder="Deskripsi produk untuk pelanggan..."></textarea></div>
         </div>
       </form>
@@ -402,7 +409,10 @@
     
     sorted.forEach((o, idx) => {
       let items = [];
-      try { items = JSON.parse(o.items); } catch(e){}
+      try { 
+        const parsed = JSON.parse(o.items); 
+        if (Array.isArray(parsed)) items = parsed;
+      } catch(e){}
       
       totalOmzet += Number(o.total) || 0;
       totalItems += items.reduce((sum, i) => sum + (Number(i.qty) || 0), 0);
@@ -443,23 +453,57 @@
     const form = document.getElementById('addProductForm');
     if(!form.checkValidity()) { form.reportValidity(); return; }
     
-    const product = {
-      id: document.getElementById('p_id').value,
-      nama: document.getElementById('p_nama').value,
-      kategori: document.getElementById('p_kategori').value,
-      emoji: document.getElementById('p_emoji').value,
-      harga: document.getElementById('p_harga').value,
-      hargaCoret: document.getElementById('p_hargaCoret').value,
-      satuan: document.getElementById('p_satuan').value,
-      stok: document.getElementById('p_stok').value,
-      label: document.getElementById('p_label').value,
-      gambar: document.getElementById('p_gambar').value,
-      deskripsi: document.getElementById('p_deskripsi').value,
-      rating: 5.0
-    };
-
     document.getElementById('loader').style.display = 'block';
+    
     try {
+      let imageUrl = document.getElementById('p_gambar').value;
+      const fileInput = document.getElementById('p_gambar_file');
+      
+      // Jika ada file yang dipilih, upload dulu ke Google Drive via Apps Script
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        
+        // Convert file to base64
+        const base64Data = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+        });
+
+        // Upload to Drive
+        const uploadRes = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "uploadImage",
+            filename: file.name,
+            mimeType: file.type,
+            base64: base64Data
+          })
+        }).then(r => r.json());
+        
+        if (uploadRes.success) {
+          imageUrl = uploadRes.url;
+        } else {
+          throw new Error("Gagal upload gambar: " + uploadRes.error);
+        }
+      }
+
+      const product = {
+        id: document.getElementById('p_id').value,
+        nama: document.getElementById('p_nama').value,
+        kategori: document.getElementById('p_kategori').value,
+        emoji: document.getElementById('p_emoji').value,
+        harga: document.getElementById('p_harga').value,
+        hargaCoret: document.getElementById('p_hargaCoret').value,
+        satuan: document.getElementById('p_satuan').value,
+        stok: document.getElementById('p_stok').value,
+        label: document.getElementById('p_label').value,
+        gambar: imageUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=200&auto=format&fit=crop', // default fallback
+        deskripsi: document.getElementById('p_deskripsi').value,
+        rating: 5.0
+      };
+
       const res = await fetch(SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify({ action: "addProduct", product: product })
@@ -470,6 +514,7 @@
         closeSlideOver('slide-product');
         loadData(); // refresh
       } else alert("Gagal: " + res.error);
+      
     } catch(err) { alert("Error: " + err); } 
     finally { document.getElementById('loader').style.display = 'none'; }
   }

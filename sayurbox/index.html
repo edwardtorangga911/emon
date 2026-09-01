@@ -793,10 +793,72 @@
       <div class="modal-body">
         <div id="area-print"></div>
         <button class="btn-utama" id="btn-kirim-wa">Kirim ke WhatsApp 💬</button>
-        <button class="btn-sekunder" id="btn-print">Cetak Struk 🖨️</button>
       </div>
     </div>
   </div>
+
+  <!-- ── CHECKOUT FORM MODAL ── -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-center">
+      <div class="modal-header">
+        <h2>📝 Data Pengiriman</h2>
+        <button class="modal-close" onclick="tutupModal('checkout-modal')">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div style="margin-bottom:15px;">
+          <label style="display:block; margin-bottom:5px; font-weight:600;">Nomor HP (WhatsApp)</label>
+          <input type="tel" id="co_phone" class="search-input" placeholder="081234..." style="width:100%;">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="display:block; margin-bottom:5px; font-weight:600;">Nama Lengkap</label>
+          <input type="text" id="co_name" class="search-input" placeholder="Nama Anda" style="width:100%;">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="display:block; margin-bottom:5px; font-weight:600;">Alamat Pengiriman</label>
+          <textarea id="co_address" class="search-input" rows="3" placeholder="Alamat lengkap..." style="width:100%; border-radius:12px;"></textarea>
+        </div>
+        <button class="btn-utama" onclick="submitCheckoutForm()">Kirim Pesanan 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROFIL & HISTORY MODAL ── -->
+  <div class="modal-overlay" id="profil-modal">
+    <div class="modal-center" style="max-height:80vh; display:flex; flex-direction:column;">
+      <div class="modal-header">
+        <h2>👤 Profil & Riwayat</h2>
+        <button class="modal-close" onclick="tutupModal('profil-modal')">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px; overflow-y:auto; flex:1;">
+        
+        <!-- State: Belum Login -->
+        <div id="profil-login" style="display:none; text-align:center;">
+          <div style="font-size:40px; margin-bottom:10px;">🔐</div>
+          <h3>Masuk ke Akun</h3>
+          <p style="color:#64748b; font-size:14px; margin-bottom:20px;">Masukkan nomor WhatsApp untuk melihat riwayat belanja Anda.</p>
+          <input type="tel" id="login_phone" class="search-input" placeholder="Nomor WhatsApp (Cth: 0812...)" style="width:100%; text-align:center; margin-bottom:15px;">
+          <button class="btn-utama" onclick="prosesLogin()">Masuk</button>
+        </div>
+
+        <!-- State: Sudah Login -->
+        <div id="profil-history" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:#f8fafc; padding:15px; border-radius:12px;">
+            <div>
+              <div style="font-size:12px; color:#64748b;">Login sebagai</div>
+              <div style="font-weight:700; font-size:16px;" id="lbl-logged-phone">0812...</div>
+            </div>
+            <button onclick="prosesLogout()" style="background:none; border:1px solid #ef4444; color:#ef4444; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">Keluar</button>
+          </div>
+          <h4 style="margin-bottom:15px;">Riwayat Pesanan</h4>
+          <div id="history-list">
+            <!-- Riwayat akan di-render di sini -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 
   <!-- ── TOAST ── -->
   <div class="toast" id="toast"></div>
@@ -826,6 +888,10 @@
         <span class="nav-icon">🛒</span>
         <span class="nav-lbl">Keranjang</span>
         <span class="nav-badge" id="nav-badge">0</span>
+      </button>
+      <button class="nav-item" id="nav-profil" onclick="bukaProfil()">
+        <span class="nav-icon">👤</span>
+        <span class="nav-lbl">Profil</span>
       </button>
     </div>
   </nav>
@@ -1153,50 +1219,138 @@
     const n = new Date();
     return 'INV-' + n.toISOString().slice(2,10).replace(/-/g,'') + '-' + (Math.floor(Math.random()*900)+100);
   }
+  /* PROFIL & LOGIN */
+  function bukaProfil() {
+    setNavActive('profil');
+    bukaModal('profil-modal');
+    
+    const loggedPhone = localStorage.getItem('sb_user_phone');
+    if (loggedPhone) {
+      document.getElementById('profil-login').style.display = 'none';
+      document.getElementById('profil-history').style.display = 'block';
+      document.getElementById('lbl-logged-phone').textContent = loggedPhone;
+      loadHistory(loggedPhone);
+    } else {
+      document.getElementById('profil-login').style.display = 'block';
+      document.getElementById('profil-history').style.display = 'none';
+    }
+  }
+
+  function prosesLogin() {
+    const phone = document.getElementById('login_phone').value.trim();
+    if (!phone || phone.length < 9) return alert('Masukkan nomor HP yang valid!');
+    localStorage.setItem('sb_user_phone', phone);
+    bukaProfil();
+  }
+
+  function prosesLogout() {
+    localStorage.removeItem('sb_user_phone');
+    localStorage.removeItem('sb_user_name');
+    localStorage.removeItem('sb_user_address');
+    bukaProfil();
+  }
+
+  async function loadHistory(phone) {
+    const list = document.getElementById('history-list');
+    list.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">⏳ Memuat riwayat...</div>';
+    
+    if (SCRIPT_URL) {
+      try {
+        const res = await fetch(SCRIPT_URL + "?action=getHistory&phone=" + encodeURIComponent(phone));
+        const data = await res.json();
+        
+        if (data.length === 0) {
+          list.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Belum ada pesanan.</div>';
+          return;
+        }
+        
+        list.innerHTML = data.map(o => {
+          let items = [];
+          try { 
+            const p = JSON.parse(o.items);
+            if (Array.isArray(p)) items = p;
+          } catch(e){}
+          
+          const itemsHtml = items.map(i => `<div style="font-size:13px; color:#475569;">• ${i.qty}x ${i.nama}</div>`).join('');
+          
+          return `
+            <div style="border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin-bottom:15px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-family:monospace; font-weight:700;">${o.idPesanan}</span>
+                <span style="font-size:12px; color:#64748b;">${new Date(o.tanggal).toLocaleDateString('id-ID')}</span>
+              </div>
+              <div style="margin-bottom:10px;">${itemsHtml}</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:10px;">
+                <span style="font-size:12px; font-weight:600;">Total Belanja</span>
+                <span style="font-weight:700; color:var(--primary);">Rp ${formatAngka(o.total)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        list.innerHTML = '<div style="color:#ef4444; text-align:center;">Gagal memuat data.</div>';
+      }
+    }
+  }
+
   /* CHECKOUT WHATSAPP (PEMBELI) */
-  async function prosesCheckout() {
+  function prosesCheckout() {
     if (cart.length === 0) return alert('Keranjang kosong!');
     
-    // Tampilkan prompt untuk nama pembeli dan alamat
-    const namaPembeli = prompt("Masukkan Nama Anda:");
-    if (!namaPembeli) return;
-    const alamatPembeli = prompt("Masukkan Alamat Pengiriman:");
-    if (!alamatPembeli) return;
+    // Auto-fill form from localStorage
+    document.getElementById('co_phone').value = localStorage.getItem('sb_user_phone') || '';
+    document.getElementById('co_name').value = localStorage.getItem('sb_user_name') || '';
+    document.getElementById('co_address').value = localStorage.getItem('sb_user_address') || '';
+    
+    tutupModal('cart-modal');
+    bukaModal('checkout-modal');
+  }
+
+  function submitCheckoutForm() {
+    const phone = document.getElementById('co_phone').value.trim();
+    const name = document.getElementById('co_name').value.trim();
+    const address = document.getElementById('co_address').value.trim();
+    
+    if (!phone || !name || !address) return alert("Harap lengkapi semua data pengiriman!");
+    
+    // Save to local storage for future orders
+    localStorage.setItem('sb_user_phone', phone);
+    localStorage.setItem('sb_user_name', name);
+    localStorage.setItem('sb_user_address', address);
     
     const idPesanan = 'INV-' + Date.now().toString().slice(-6);
     let total = 0;
     
-    let waText = `Halo *SayurBox*! 🌿\nSaya ingin memesan:\n\n*ID Pesanan:* ${idPesanan}\n*Nama:* ${namaPembeli}\n*Alamat:* ${alamatPembeli}\n\n*Rincian Pesanan:*\n`;
+    let waText = `Halo *SayurBox*! 🌿\nSaya ingin memesan:\n\n*ID Pesanan:* ${idPesanan}\n*Nama:* ${name}\n*No HP:* ${phone}\n*Alamat:* ${address}\n\n*Rincian Pesanan:*\n`;
     
-    cart.forEach(c => {
+    const orderItems = cart.map(c => {
       const p = KATALOG.find(x => x.id === c.id);
       if (p) {
         total += p.harga * c.qty;
         waText += `▪️ ${c.qty}x ${p.nama} (Rp ${formatAngka(p.harga * c.qty)})\n`;
+        return { id: c.id, nama: p.nama, qty: c.qty, harga: p.harga };
       }
-    });
+      return null;
+    }).filter(Boolean);
     
     waText += `\n*Total Bayar:* Rp ${formatAngka(total)}\n\nTerima kasih!`;
     const waUrl = `https://api.whatsapp.com/send?phone=${CONFIG.NO_WHATSAPP}&text=${encodeURIComponent(waText)}`;
     
-    document.getElementById('cart-modal').classList.remove('show');
+    tutupModal('checkout-modal');
     tampilkanToast('🔄 Mengalihkan ke WhatsApp...');
     playBeep();
     
-    // Kirim juga ke database backend jika perlu (opsional)
+    // Kirim pesanan ke Google Sheets (termasuk No HP pelanggan)
     const orderData = {
       idPesanan: idPesanan,
       tanggal: new Date().toISOString(),
       total: total,
-      items: JSON.stringify(cart.map(c => {
-        const p = KATALOG.find(x => x.id === c.id);
-        return { id: c.id, nama: p ? p.nama : 'Item', qty: c.qty, harga: p ? p.harga : 0 };
-      })),
-      catatan: "Pesanan Online: " + namaPembeli
+      items: orderItems,
+      catatan: "Pesan dari Web",
+      pelanggan: phone
     };
     
     if (SCRIPT_URL) {
-      // Kita kirim pesanan di background, lalu buka WA
       fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'addOrder', order: orderData })
@@ -1207,6 +1361,7 @@
     simpanCart();
     renderIsiCart();
     renderProduk();
+    updateBadge();
     
     setTimeout(() => { window.open(waUrl, '_blank'); }, 1000);
   }
