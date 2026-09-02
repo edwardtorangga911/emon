@@ -1,0 +1,9 @@
+sayurbox/:1414 Uncaught TypeError: Cannot read properties of null (reading 'addEventListener')
+    at sayurbox/:1414:39
+(anonymous) @ sayurbox/:1414
+content.js:16 Feature is disabled
+share-modal.js:1 Uncaught TypeError: Cannot read properties of null (reading 'addEventListener')
+    at share-modal.js:1:135
+(anonymous) @ share-modal.js:1
+setTimeout
+(anonymous) @ share-modal.js:1
