@@ -1483,7 +1483,391 @@
       box-shadow: 0 -2px 6px rgba(0,0,0,0.06);
     }
 
-    @media (max-width: 920px) {
+    /* ========================================================
+       MOBILE DUEL & TABLETOP FACE-TO-FACE MODE (HP LAYOUT)
+       Player 1 di atas, Neutral Center Bar + Arena di tengah,
+       Player 2 di bawah. Player 1 dapat diputar 180°.
+       ======================================================== */
+    .p1-rot-btn {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      color: white;
+      font-size: 0.72em;
+      font-weight: 800;
+      padding: 1px 7px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .p1-rot-btn:hover {
+      background: rgba(255, 255, 255, 0.45);
+    }
+    .p1-rot-btn:active {
+      transform: scale(0.92);
+    }
+    body:not(.mobile-duel-mode) .p1-rot-btn {
+      display: none !important;
+    }
+
+    /* Center Duel Bar (Mobile only) */
+    .center-duel-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 3px 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      box-sizing: border-box;
+      z-index: 10;
+      flex: 0 0 auto;
+      gap: 5px;
+    }
+
+    body.mobile-duel-mode .center-duel-bar {
+      display: flex !important;
+    }
+
+    .center-ctrl-btn {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border: 1px solid #94a3b8;
+      border-radius: 8px;
+      padding: 3px 7px;
+      font-size: 0.75em;
+      font-weight: 800;
+      color: #1e293b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: all 0.15s;
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+    .center-ctrl-btn:active {
+      transform: scale(0.94);
+    }
+    .center-ctrl-btn.active {
+      background: #0288d1;
+      color: white;
+      border-color: #0277bd;
+    }
+
+    .center-score-display {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 900;
+      font-size: 0.88em;
+    }
+    .center-p1-tag {
+      color: #0288d1;
+      max-width: 55px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .center-p2-tag {
+      color: #d32f2f;
+      max-width: 55px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .center-score-val {
+      font-size: 1.1em;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+    .center-p1-score {
+      background: #e1f5fe;
+      color: #0277bd;
+      border: 1px solid #81d4fa;
+    }
+    .center-p2-score {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ff8a80;
+    }
+    .center-score-sep {
+      color: #94a3b8;
+      font-weight: 800;
+    }
+    .center-ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* Mobile Duel Mode Active Layout */
+    body.mobile-duel-mode {
+      overflow: hidden;
+    }
+    body.mobile-duel-mode #game-content {
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+      padding: 3px 6px 4px 6px !important;
+      box-sizing: border-box !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+    body.mobile-duel-mode .game-main-title,
+    body.mobile-duel-mode .match-scoreboard,
+    body.mobile-duel-mode #status-message,
+    body.mobile-duel-mode #back-menu-btn,
+    body.mobile-duel-mode .top-bar-controls {
+      display: none !important;
+    }
+    body.mobile-duel-mode footer {
+      display: none !important;
+    }
+
+    body.mobile-duel-mode #game-container {
+      flex-direction: column !important;
+      width: 100% !important;
+      max-width: 440px !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      gap: 3px !important;
+      justify-content: space-between !important;
+      align-items: stretch !important;
+      flex: 1 !important;
+      overflow: hidden !important;
+      margin: 0 auto !important;
+    }
+
+    body.mobile-duel-mode .player-panel {
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 1 1 0 !important;
+      min-height: 0 !important;
+      padding: 4px 6px !important;
+      border-radius: 12px !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+      transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    }
+
+    /* Player 1 Face-to-Face Rotation (180deg) */
+    body.mobile-duel-mode #panel-p1.p1-rotated {
+      transform: rotate(180deg) !important;
+    }
+
+    body.mobile-duel-mode .panel-header-bar {
+      padding: 2px 6px !important;
+      margin: -4px -6px 2px -6px !important;
+      border-radius: 10px 10px 0 0 !important;
+      font-size: 0.82em !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.mobile-duel-mode .problem-box {
+      min-height: 28px !important;
+      padding: 2px 4px !important;
+      margin-bottom: 2px !important;
+      font-size: 1.15em !important;
+      border-radius: 8px !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.mobile-duel-mode .timer-bar-track {
+      height: 3px !important;
+      margin-bottom: 2px !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.mobile-duel-mode .hint-box {
+      font-size: 0.72em !important;
+      padding: 1px 4px !important;
+      margin-bottom: 2px !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.mobile-duel-mode .answer-display-container {
+      margin-bottom: 2px !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.mobile-duel-mode .answer-display {
+      height: 28px !important;
+      line-height: 26px !important;
+      font-size: 1.35em !important;
+      padding-right: 6px !important;
+      border-radius: 6px !important;
+    }
+
+    body.mobile-duel-mode .history-dots {
+      height: 5px !important;
+      gap: 3px !important;
+      margin-bottom: 2px !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.mobile-duel-mode .hist-dot {
+      width: 5px !important;
+      height: 5px !important;
+    }
+
+    body.mobile-duel-mode .keypad {
+      gap: 2.5px !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+    }
+
+    body.mobile-duel-mode .keypad button {
+      padding: 3px 1px !important;
+      font-size: 1.05em !important;
+      font-weight: 700 !important;
+      border-radius: 6px !important;
+      box-shadow: 0 2px 0 #cfd8dc !important;
+    }
+
+    body.mobile-duel-mode .action-btn {
+      padding: 4px 1px !important;
+      font-size: 0.95em !important;
+      box-shadow: 0 2px 0 #004d40 !important;
+    }
+
+    /* Mobile Arena Dimensions */
+    body.mobile-duel-mode #game-arena {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 95px !important;
+      min-height: 85px !important;
+      max-height: 105px !important;
+      margin: 1px 0 !important;
+      border-radius: 12px !important;
+      border-width: 2px !important;
+      flex: 0 0 auto !important;
+    }
+
+    body.mobile-duel-mode .arena-tension-meter {
+      top: 3px !important;
+      padding: 1px 8px !important;
+      font-size: 0.72em !important;
+      gap: 4px !important;
+    }
+    body.mobile-duel-mode .tension-bar {
+      width: 100px !important;
+      height: 6px !important;
+    }
+    body.mobile-duel-mode .tension-needle {
+      width: 8px !important;
+      height: 9px !important;
+      top: -2px !important;
+    }
+
+    /* Arena Themes Mobile Scaling */
+    body.mobile-duel-mode #arena-ground {
+      height: 16px !important;
+    }
+    body.mobile-duel-mode .character {
+      height: 55px !important;
+      bottom: 12px !important;
+    }
+    body.mobile-duel-mode #rope {
+      width: 190px !important;
+      height: 8px !important;
+      bottom: 26px !important;
+    }
+    body.mobile-duel-mode #marker {
+      width: 14px !important;
+      height: 22px !important;
+      bottom: -7px !important;
+    }
+    body.mobile-duel-mode #marker::after {
+      font-size: 10px !important;
+      bottom: -11px !important;
+    }
+
+    body.mobile-duel-mode .racetrack {
+      padding: 14px 4px 2px 4px !important;
+    }
+    body.mobile-duel-mode .race-lane {
+      height: 32px !important;
+    }
+    body.mobile-duel-mode .race-car-wrapper svg {
+      width: 60px !important;
+      height: 21px !important;
+    }
+    body.mobile-duel-mode .race-lane-tag {
+      font-size: 0.62em !important;
+    }
+    body.mobile-duel-mode .race-finish-line {
+      width: 14px !important;
+      top: 12px !important;
+      right: 10px !important;
+    }
+    body.mobile-duel-mode .finish-flag-label {
+      font-size: 0.55em !important;
+      top: -14px !important;
+    }
+
+    body.mobile-duel-mode .energy-caster {
+      bottom: 4px !important;
+      width: 36px !important;
+      height: 58px !important;
+    }
+    body.mobile-duel-mode .energy-caster svg {
+      width: 36px !important;
+      height: 58px !important;
+    }
+    body.mobile-duel-mode .energy-beam {
+      height: 10px !important;
+    }
+    body.mobile-duel-mode .energy-clash-orb {
+      width: 26px !important;
+      height: 26px !important;
+    }
+
+    body.mobile-duel-mode .space-arena-bg {
+      padding-top: 14px !important;
+    }
+    body.mobile-duel-mode .space-station-goal {
+      font-size: 0.62em !important;
+      top: 2px !important;
+      padding: 1px 6px !important;
+    }
+    body.mobile-duel-mode .rocket-wrapper svg {
+      width: 24px !important;
+      height: 38px !important;
+    }
+    body.mobile-duel-mode .launch-pad-base {
+      font-size: 0.6em !important;
+      padding: 1px 6px !important;
+    }
+
+    body.mobile-duel-mode .castle-tower {
+      bottom: 2px !important;
+      width: 42px !important;
+      height: 58px !important;
+    }
+    body.mobile-duel-mode .castle-tower svg {
+      width: 42px !important;
+      height: 58px !important;
+    }
+    body.mobile-duel-mode .castle-hp-tag {
+      font-size: 0.58em !important;
+      top: -13px !important;
+      padding: 1px 3px !important;
+    }
+
+    /* Standard Medium Responsive fallback */
+    @media (max-width: 920px) and (min-width: 769px) {
       .player-panel {
         width: 220px;
         padding: 9px;
@@ -1526,6 +1910,7 @@
     🏠 Pilihan Mode
   </button>
   <div class="top-bar-controls">
+    <button id="layout-toggle-btn" class="top-btn" title="Ganti Tata Letak: Mode HP (Atas-Bawah) / Meja (Kiri-Kanan)">📱 Mode HP</button>
     <button id="theme-quick-btn" class="top-btn" title="Ganti Tema Pertandingan">⚔️ Tema: 🪢</button>
     <button id="decimal-toggle-btn" class="top-btn" title="Aktifkan/Nonaktifkan Angka Desimal di Semua Soal">🔢 Desimal: OFF</button>
     <button id="sound-btn" class="top-btn" title="Suara Nyala / Mati">🔊</button>
@@ -1595,6 +1980,12 @@
           <strong>Opsi Desimal (,):</strong>
           <button class="opt-btn decimal-btn active" data-decimal="off">🔢 Standar</button>
           <button class="opt-btn decimal-btn" data-decimal="on" style="font-weight: 800; border-color: #fbc02d; background: #fffde7; color: #b78103;">✨ Terapkan ke Semua Mode</button>
+        </div>
+        <div class="setting-group layout-setting-group">
+          <strong>📱 Tata Letak:</strong>
+          <button class="opt-btn layout-btn active" data-layout="auto">⚡ Otomatis</button>
+          <button class="opt-btn layout-btn" data-layout="vertical">📱 HP (Atas-Bawah)</button>
+          <button class="opt-btn layout-btn" data-layout="horizontal">🖥️ Meja (Kiri-Kanan)</button>
         </div>
       </div>
 
@@ -1849,7 +2240,10 @@
       <!-- Player 1 -->
       <div class="player-panel" id="panel-p1">
         <div class="panel-header-bar">
-          <span class="player-name-tag" id="panel-name-p1">Player 1</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="player-name-tag" id="panel-name-p1">Player 1</span>
+            <button id="p1-rotate-btn-header" class="p1-rot-btn" title="Putar Layar P1 180° (Duel Meja Berhadapan)">🔄 180°</button>
+          </div>
           <span class="streak-badge" id="streak-badge-p1" style="display:none;">🔥 0x</span>
         </div>
         <div class="problem-box" id="problem-p1">Soal Muncul Disini</div>
@@ -1866,6 +2260,24 @@
           <span class="hist-dot"></span>
         </div>
         <div class="keypad" id="keypad-p1"></div>
+      </div>
+
+      <!-- Center Bar for Mobile Duel Mode (Score + Neutral Controls) -->
+      <div id="center-duel-bar" class="center-duel-bar">
+        <button id="mobile-back-menu-btn" class="center-ctrl-btn" title="Kembali ke Menu Utama">🏠 Menu</button>
+        <div class="center-score-display">
+          <span class="center-p1-tag" id="center-p1-name">P1</span>
+          <span class="center-score-val center-p1-score" id="center-p1-val">0</span>
+          <span class="center-score-sep">:</span>
+          <span class="center-score-val center-p2-score" id="center-p2-val">0</span>
+          <span class="center-p2-tag" id="center-p2-name">P2</span>
+        </div>
+        <div class="center-ctrl-group">
+          <button id="p1-rotate-btn-center" class="center-ctrl-btn" title="Putar Layar P1 (180°/0°)">🔄 Putar P1</button>
+          <button id="mobile-theme-btn" class="center-ctrl-btn" title="Ganti Tema">⚔️</button>
+          <button id="mobile-layout-btn" class="center-ctrl-btn" title="Ganti Tata Letak">↔️</button>
+          <button id="mobile-sound-btn" class="center-ctrl-btn" title="Suara">🔊</button>
+        </div>
       </div>
 
       <!-- Center Duel Battle Arena (5 Themes) -->
@@ -2376,6 +2788,22 @@
     const backMenuBtn = document.getElementById('back-menu-btn');
     const matchPointBanner = document.getElementById('match-point-banner');
 
+    const layoutToggleBtn = document.getElementById('layout-toggle-btn');
+    const layoutMenuButtons = document.querySelectorAll('.layout-btn');
+    const mobileBackMenuBtn = document.getElementById('mobile-back-menu-btn');
+    const mobileThemeBtn = document.getElementById('mobile-theme-btn');
+    const mobileLayoutBtn = document.getElementById('mobile-layout-btn');
+    const mobileSoundBtn = document.getElementById('mobile-sound-btn');
+    const p1RotateBtnHeader = document.getElementById('p1-rotate-btn-header');
+    const p1RotateBtnCenter = document.getElementById('p1-rotate-btn-center');
+    const centerP1Val = document.getElementById('center-p1-val');
+    const centerP2Val = document.getElementById('center-p2-val');
+    const centerP1Name = document.getElementById('center-p1-name');
+    const centerP2Name = document.getElementById('center-p2-name');
+
+    let currentLayoutSetting = 'auto'; // 'auto' | 'vertical' | 'horizontal'
+    let p1Rotated = true; // default true for mobile duel mode (tabletop face-to-face)
+
     const decimalToggleBtn = document.getElementById('decimal-toggle-btn');
     const decimalActiveBadge = document.getElementById('decimal-active-badge');
     const decimalMenuButtons = document.querySelectorAll('.decimal-btn');
@@ -2609,6 +3037,123 @@
         setGlobalDecimalMode(btn.dataset.decimal === 'on', false);
       });
     });
+
+    /* ========================================================
+       LAYOUT CONTROLLER (HP VERTICAL DUEL vs DESKTOP WIDE)
+       ======================================================== */
+    function setLayoutSetting(mode) {
+      currentLayoutSetting = mode;
+      layoutMenuButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.layout === mode);
+      });
+      applyLayout();
+    }
+
+    function applyLayout() {
+      const isPortraitScreen = (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) || (window.innerWidth <= 600);
+      const isMobileDuel = (currentLayoutSetting === 'vertical') || (currentLayoutSetting === 'auto' && isPortraitScreen);
+
+      if (document.body) {
+        if (isMobileDuel) {
+          document.body.classList.add('mobile-duel-mode');
+        } else {
+          document.body.classList.remove('mobile-duel-mode');
+        }
+      }
+
+      if (layoutToggleBtn) layoutToggleBtn.textContent = isMobileDuel ? '📱 HP: Atas-Bawah' : '🖥️ Meja: Kiri-Kanan';
+      if (mobileLayoutBtn) mobileLayoutBtn.textContent = isMobileDuel ? '↔️' : '↕️';
+
+      const panelP1 = document.getElementById('panel-p1');
+      if (panelP1) {
+        if (isMobileDuel) {
+          setP1Rotation(p1Rotated);
+        } else {
+          panelP1.classList.remove('p1-rotated');
+        }
+      }
+
+      updatePositions();
+      updateScoreboard();
+    }
+
+    function setP1Rotation(rotated) {
+      p1Rotated = rotated;
+      const panelP1 = document.getElementById('panel-p1');
+      if (!panelP1) return;
+      const isMobileDuel = document.body ? document.body.classList.contains('mobile-duel-mode') : false;
+
+      if (isMobileDuel && p1Rotated) {
+        panelP1.classList.add('p1-rotated');
+        if (p1RotateBtnCenter) {
+          p1RotateBtnCenter.textContent = '🔄 P1: 180°';
+          p1RotateBtnCenter.classList.add('active');
+        }
+        if (p1RotateBtnHeader) p1RotateBtnHeader.textContent = '🔄 180°';
+      } else {
+        panelP1.classList.remove('p1-rotated');
+        if (p1RotateBtnCenter) {
+          p1RotateBtnCenter.textContent = '🔄 P1: 0°';
+          p1RotateBtnCenter.classList.remove('active');
+        }
+        if (p1RotateBtnHeader) p1RotateBtnHeader.textContent = '🔄 0°';
+      }
+    }
+
+    function toggleP1Rotation() {
+      playClickSound();
+      setP1Rotation(!p1Rotated);
+    }
+
+    if (p1RotateBtnCenter) p1RotateBtnCenter.addEventListener('click', toggleP1Rotation);
+    if (p1RotateBtnHeader) p1RotateBtnHeader.addEventListener('click', toggleP1Rotation);
+
+    layoutMenuButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        setLayoutSetting(btn.dataset.layout);
+      });
+    });
+
+    if (layoutToggleBtn) {
+      layoutToggleBtn.addEventListener('click', () => {
+        playClickSound();
+        const isMobileDuel = document.body.classList.contains('mobile-duel-mode');
+        setLayoutSetting(isMobileDuel ? 'horizontal' : 'vertical');
+      });
+    }
+
+    if (mobileLayoutBtn) {
+      mobileLayoutBtn.addEventListener('click', () => {
+        playClickSound();
+        const isMobileDuel = document.body.classList.contains('mobile-duel-mode');
+        setLayoutSetting(isMobileDuel ? 'horizontal' : 'vertical');
+      });
+    }
+
+    if (mobileBackMenuBtn) {
+      mobileBackMenuBtn.addEventListener('click', () => {
+        playClickSound();
+        backMenuBtn.click();
+      });
+    }
+
+    if (mobileThemeBtn) {
+      mobileThemeBtn.addEventListener('click', () => {
+        playClickSound();
+        themeQuickBtn.click();
+      });
+    }
+
+    if (mobileSoundBtn) {
+      mobileSoundBtn.addEventListener('click', () => {
+        playClickSound();
+        soundBtn.click();
+      });
+    }
+
+    window.addEventListener('resize', applyLayout);
+    window.addEventListener('orientationchange', applyLayout);
 
     /* ========================================================
        THEME CONTROLLER & CANNON PROJECTILE SYSTEM
@@ -3005,6 +3550,11 @@
     function updateScoreboard() {
       scoreP1Val.textContent = scoreP1;
       scoreP2Val.textContent = scoreP2;
+      if (centerP1Val) centerP1Val.textContent = scoreP1;
+      if (centerP2Val) centerP2Val.textContent = scoreP2;
+      if (centerP1Name) centerP1Name.textContent = p1Name.slice(0, 10);
+      if (centerP2Name) centerP2Name.textContent = p2Name.slice(0, 10);
+
       const diff = Math.abs(scoreP1 - scoreP2);
       scoreDiffVal.textContent = `Selisih: ${diff} / ${winDifference}`;
 
@@ -3031,12 +3581,16 @@
 
     function updatePositions() {
       // 1. Tug Theme
-      const p1Offset = -150;
-      const p2Offset = 150;
-      rope.style.setProperty('--curr-offset', `${worldOffset}px`);
-      rope.style.transform = `translateX(calc(-50% + ${worldOffset}px))`;
-      characterP1.style.transform = `translateX(calc(-50% + ${p1Offset + worldOffset}px))`;
-      characterP2.style.transform = `translateX(calc(-50% + ${p2Offset + worldOffset}px)) scaleX(-1)`;
+      const isMobileDuel = document.body ? document.body.classList.contains('mobile-duel-mode') : false;
+      const p1Offset = isMobileDuel ? -75 : -150;
+      const p2Offset = isMobileDuel ? 75 : 150;
+      const scaledWorldOffset = isMobileDuel ? worldOffset * 0.55 : worldOffset;
+      if (rope && rope.style) {
+        if (rope.style.setProperty) rope.style.setProperty('--curr-offset', `${scaledWorldOffset}px`);
+        rope.style.transform = `translateX(calc(-50% + ${scaledWorldOffset}px))`;
+      }
+      if (characterP1 && characterP1.style) characterP1.style.transform = `translateX(calc(-50% + ${p1Offset + scaledWorldOffset}px))`;
+      if (characterP2 && characterP2.style) characterP2.style.transform = `translateX(calc(-50% + ${p2Offset + scaledWorldOffset}px)) scaleX(-1)`;
 
       // 2. Race Theme
       const carP1 = document.getElementById('race-car-p1');
@@ -4335,6 +4889,9 @@
         handleKeyPress(1, 'C');
       }
     });
+
+    // Initialize layout mode on launch
+    applyLayout();
   </script>
 </body>
 </html>

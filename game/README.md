@@ -68,16 +68,22 @@ Guru dan murid dapat memilih atau mengganti tema pertandingan kapan saja melalui
 
 7. **✨ Tombol Opsi Desimal Global (Diterapkan ke Semua Mode)**:
    - Terdapat tombol toggle cepat di **Bar Atas** (`🔢 Desimal: OFF` ↔ `✨ Desimal: ON (,)`) dan opsi di **Menu Utama**.
-   - Ketika aktif, seluruh 34 mode matematika secara cerdas menghasilkan soal dengan nilai desimal berkoma (misal: perkalian desimal `1,5 × 20`, luas persegi sisi desimal `4,5`, persentase desimal, dsb).
-   - Mode mandiri desimal yang terpisah di menu telah dihilangkan agar katalog mode rapi dan terorganisir, sementara kemampuan desimal tetap 100% tersedia dan dapat diterapkan ke mode apa pun secara fleksibel!
+   - Ketika aktif, seluruh 35 mode matematika secara cerdas menghasilkan soal dengan nilai desimal berkoma (misal: perkalian desimal `1,5 × 20`, luas persegi sisi desimal `4,5`, persentase desimal, pecahan desimal, dsb).
 
-8. **💡 Sistem Petunjuk Otomatis (Hint)**:
+8. **📱 Mode Duel HP / Meja (Player 1 di Atas & Player 2 di Bawah)**:
+   - Dirancang khusus agar **2 pemain dapat bertanding langsung di 1 layar smartphone (HP) atau tablet**:
+     - **Player 1 di Atas Layar**: Dilengkapi fitur rotasi 180° (`🔄 Putar P1`) sehingga ketika HP diletakkan di atas meja, Player 1 dan Player 2 dapat duduk saling berhadapan (*face-to-face tabletop duel*). Soal, keypad, dan kotak jawaban Player 1 otomatis menghadap ke arahnya. Jika duduk berdampingan, orientasi dapat diubah ke normal (0°) dengan 1 sentuhan.
+     - **Player 2 di Bawah Layar**: Berada di sisi bawah menghadap Player 2 secara natural.
+     - **Bilah Netral & Arena di Tengah (*Center Duel Bar*)**: Di antara kedua pemain terdapat bilah netral yang menampilkan skor langsung, selisih poin, tombol `🏠 Menu`, `🔄 Putar P1`, `⚔️ Tema`, `↔️ Tata Letak`, dan `🔊 Suara`. Tata letak ini menjamin seluruh tombol keypad bebas tanpa terhalang menu.
+     - **Deteksi Otomatis**: Otomatis mendeteksi layar HP/vertikal, dan pemain dapat beralih antara `📱 Mode HP (Atas-Bawah)` dan `🖥️ Mode Layar Lebar (Kiri-Kanan)` kapan saja melalui tombol cepat atau menu pengaturan.
+
+9. **💡 Sistem Petunjuk Otomatis (Hint)**:
    - Jika pemain salah menjawab 2 kali pada soal yang sama, petunjuk edukatif langsung muncul membantu memahami konsep.
 
-9. **🎯 Riwayat 3 Jawaban Terakhir (Mini Dots)**:
-   - Lampu indikator bulat mini (🟢 hijau untuk benar, 🔴 merah untuk salah) di bawah kotak jawaban memudahkan guru melihat konsistensi murid.
+10. **🎯 Riwayat 3 Jawaban Terakhir (Mini Dots)**:
+    - Lampu indikator bulat mini (🟢 hijau untuk benar, 🔴 merah untuk salah) di bawah kotak jawaban memudahkan guru melihat konsistensi murid.
 
-10. **📊 Statistik Pertandingan Lengkap & Tombol Tanding Ulang**:
+11. **📊 Statistik Pertandingan Lengkap & Tombol Tanding Ulang**:
     - Menampilkan: Durasi Waktu Bermain, Total Soal Terjawab, dan Rekor Combo Tertinggi.
     - Dilengkapi tombol **🔄 Tanding Ulang (Rematch)** untuk langsung memulai babak baru tanpa harus kembali ke menu.
 
