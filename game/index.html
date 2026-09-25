@@ -43,7 +43,9 @@
       min-height: 100vh;
       min-height: 100dvh;
       height: 100dvh;
-      background: radial-gradient(circle at 50% 20%, #e0f7fa 0%, #bbdefb 50%, #90caf9 100%);
+      background: linear-gradient(135deg, #090e17 0%, #0f172a 25%, #1e1b4b 50%, #0c2135 75%, #090e17 100%);
+      background-size: 300% 300%;
+      animation: dynamicGradientMove 16s ease-in-out infinite;
       margin: 0;
       overflow: hidden;
       user-select: none;
@@ -2286,9 +2288,1179 @@
         font-size: 13px;
       }
     }
+
+    /* ========================================================
+       INTERACTIVE DIALOG WIZARD & FRIENDLY MASCOT (KIKI)
+       ======================================================== */
+    .dialog-wizard-container {
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: left;
+    }
+
+    /* Mascot Row: Avatar + Speech Bubble */
+    .mascot-dialog-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #ede9fe 100%);
+      padding: 14px 18px;
+      border-radius: 18px;
+      border: 2px solid #c7d2fe;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.12);
+      position: relative;
+    }
+
+    .mascot-avatar-box {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kiki-mascot-svg {
+      width: 76px;
+      height: 76px;
+      animation: kikiFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.25));
+    }
+
+    .mascot-badge {
+      font-size: 0.68em;
+      font-weight: 800;
+      color: #4338ca;
+      background: #e0e7ff;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    @keyframes kikiFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes kikiBlink {
+      0%, 88%, 94%, 100% { transform: scaleY(1); }
+      91% { transform: scaleY(0.1); }
+    }
+
+    @keyframes kikiWave {
+      0%, 100% { transform: rotate(0deg); transform-origin: 72px 76px; }
+      50% { transform: rotate(-16deg); transform-origin: 72px 76px; }
+    }
+
+    @keyframes kikiSpark {
+      0%, 100% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .robot-eye {
+      transform-origin: center;
+      animation: kikiBlink 3.5s infinite;
+    }
+
+    .mascot-wave-arm {
+      animation: kikiWave 2.2s ease-in-out infinite;
+    }
+
+    .antenna-spark {
+      transform-origin: 50px 7px;
+      animation: kikiSpark 1.6s infinite alternate;
+    }
+
+    /* Speech Bubble */
+    .dialog-speech-bubble {
+      flex: 1;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 12px 16px;
+      border: 1.5px solid #cbd5e1;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+
+    .dialog-speech-bubble::before {
+      content: '';
+      position: absolute;
+      left: -9px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 9px solid #cbd5e1;
+    }
+
+    .dialog-speech-bubble::after {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-right: 8px solid #ffffff;
+    }
+
+    .bubble-speaker-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82em;
+      font-weight: 800;
+      color: #3b82f6;
+      margin-bottom: 4px;
+    }
+
+    .bubble-msg {
+      font-size: 1.05em;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.45;
+      animation: bubbleFade 0.25s ease-out;
+    }
+
+    @keyframes bubbleFade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Steps Tracker */
+    .wizard-steps-track {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      background: #f8fafc;
+      padding: 6px 12px;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      overflow-x: auto;
+    }
+
+    .wizard-step-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 0.8em;
+      font-weight: 700;
+      color: #64748b;
+      background: transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .wizard-step-pill.active {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);
+      transform: scale(1.04);
+    }
+
+    .wizard-step-pill.completed {
+      color: #10b981;
+      font-weight: 800;
+    }
+
+    .wizard-step-pill.completed::after {
+      content: '✓';
+      font-size: 0.9em;
+      margin-left: 2px;
+    }
+
+    .wizard-step-arrow {
+      color: #cbd5e1;
+      font-size: 0.8em;
+      flex-shrink: 0;
+    }
+
+    /* Step Panels */
+    .wizard-step-panel {
+      display: none;
+      animation: panelSlideUp 0.25s ease-out;
+    }
+
+    .wizard-step-panel.active {
+      display: block;
+    }
+
+    @keyframes panelSlideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Step 1: Names Customization */
+    .wizard-names-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 12px;
+    }
+
+    .wizard-player-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .wizard-player-box label {
+      font-size: 0.88em;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .wizard-player-box.p1-box label { color: #1565c0; }
+    .wizard-player-box.p2-box label { color: #c62828; }
+
+    .wizard-name-input {
+      padding: 10px 12px;
+      font-size: 1.05em;
+      font-weight: 700;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .wizard-player-box.p1-box .wizard-name-input:focus {
+      border-color: #2196f3;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+    }
+
+    .wizard-player-box.p2-box .wizard-name-input:focus {
+      border-color: #f44336;
+      box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2);
+    }
+
+    .wizard-vs-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: #ffeb3b;
+      font-weight: 900;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+
+    .wizard-quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .quick-chip-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.82em;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quick-chip-btn:hover {
+      background: #e0e7ff;
+      border-color: #818cf8;
+      color: #3730a3;
+      transform: translateY(-1px);
+    }
+
+    /* Cards Grid (Themes, Categories, Modes) */
+    .dialog-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .dialog-item-card {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      position: relative;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .dialog-item-card:hover {
+      transform: translateY(-2px);
+      border-color: #93c5fd;
+      box-shadow: 0 6px 12px rgba(59, 130, 246, 0.12);
+    }
+
+    .dialog-item-card:active {
+      transform: translateY(1px);
+    }
+
+    .dialog-item-card.active {
+      border-color: #4f46e5;
+      background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25), 0 6px 14px rgba(79, 70, 229, 0.15);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .dialog-item-card.active::after {
+      content: '✓';
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: #4f46e5;
+      color: white;
+      font-size: 0.72em;
+      font-weight: 900;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(79,70,229,0.4);
+    }
+
+    .card-icon {
+      font-size: 1.85em;
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+
+    .card-title {
+      font-size: 0.95em;
+      font-weight: 800;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .card-desc {
+      font-size: 0.74em;
+      color: #64748b;
+      line-height: 1.25;
+      margin-top: 2px;
+    }
+
+    .card-badge {
+      display: inline-block;
+      font-size: 0.7em;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: #e2e8f0;
+      color: #475569;
+      margin-top: 4px;
+    }
+
+    .dialog-item-card.active .card-badge {
+      background: #c7d2fe;
+      color: #3730a3;
+    }
+
+    /* Step 5: Summary Card & Fast Tweaks */
+    .duel-summary-banner {
+      background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%);
+      border-radius: 18px;
+      padding: 16px 20px;
+      color: #ffffff;
+      box-shadow: 0 8px 22px rgba(46, 16, 101, 0.25);
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .duel-summary-header {
+      font-size: 0.85em;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #a5b4fc;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .duel-summary-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .summary-item {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      backdrop-filter: blur(4px);
+    }
+
+    .summary-item-label {
+      font-size: 0.72em;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-item-value {
+      font-size: 1.05em;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    /* Fast Settings Bar in Step 5 */
+    .step5-settings-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .step5-setting-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .step5-setting-title {
+      font-size: 0.84em;
+      font-weight: 800;
+      color: #334155;
+      min-width: 105px;
+    }
+
+    .step5-opt-btn {
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 0.82em;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .step5-opt-btn.active {
+      border-color: #4f46e5;
+      background: #4f46e5;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Primary Launch Button */
+    .btn-launch-duel {
+      width: 100%;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      padding: 15px 24px;
+      font-size: 1.25em;
+      font-weight: 900;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.38);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      animation: pulseStartBtn 2s infinite alternate;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-launch-duel:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.55);
+    }
+
+    .btn-launch-duel:active {
+      transform: translateY(1px);
+    }
+
+    @keyframes pulseStartBtn {
+      0% { box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); }
+      100% { box-shadow: 0 8px 24px rgba(16, 185, 129, 0.65); }
+    }
+
+    /* Wizard Footer Navigation */
+    .wizard-footer-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 6px;
+    }
+
+    .wizard-nav-btn {
+      padding: 9px 18px;
+      font-size: 0.92em;
+      font-weight: 800;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .wizard-nav-btn.btn-prev {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1.5px solid #cbd5e1;
+    }
+
+    .wizard-nav-btn.btn-prev:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .wizard-nav-btn.btn-next {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.35);
+    }
+
+    .wizard-nav-btn.btn-next:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(79, 70, 229, 0.45);
+    }
+
+    .wizard-switch-btn {
+      background: transparent;
+      border: 1px dashed #94a3b8;
+      color: #64748b;
+      font-size: 0.78em;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .wizard-switch-btn:hover {
+      background: #f1f5f9;
+      color: #334155;
+      border-color: #64748b;
+    }
+
+    .wizard-creator-tag {
+      text-align: center;
+      font-size: 0.82em;
+      color: #64748b;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    /* Mobile Responsive for Wizard */
+    @media (max-width: 600px) {
+      .mascot-dialog-row {
+        padding: 10px 12px !important;
+        gap: 10px !important;
+      }
+      .kiki-mascot-svg {
+        width: 58px !important;
+        height: 58px !important;
+      }
+      .bubble-msg {
+        font-size: 0.9em !important;
+      }
+      .wizard-steps-track {
+        padding: 4px 6px !important;
+      }
+      .wizard-step-pill {
+        padding: 3px 6px !important;
+        font-size: 0.72em !important;
+      }
+      .wizard-names-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 10px !important;
+      }
+      .wizard-vs-circle {
+        margin: 0 auto;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.78em !important;
+      }
+      .dialog-cards-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      .dialog-item-card {
+        padding: 10px 6px !important;
+      }
+      .card-icon {
+        font-size: 1.5em !important;
+      }
+      .card-title {
+        font-size: 0.85em !important;
+      }
+      .card-desc {
+        font-size: 0.68em !important;
+      }
+      .btn-launch-duel {
+        font-size: 1.05em !important;
+        padding: 12px 16px !important;
+      }
+      .duel-summary-banner {
+        padding: 12px 14px !important;
+      }
+      .summary-item-value {
+        font-size: 0.95em !important;
+      }
+    }
+
+
+    /* ========================================================
+       REAL ARCADE GAME FEEL: ANIMATIONS, TRANSITIONS & JUICE
+       ======================================================== */
+    /* Camera Screen Shake */
+    @keyframes screenShakeLight {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-3px, 2px); }
+      40% { transform: translate(3px, -2px); }
+      60% { transform: translate(-2px, 1px); }
+      80% { transform: translate(2px, -1px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes screenShakeHeavy {
+      0% { transform: translate(0, 0) scale(1); }
+      15% { transform: translate(-7px, 5px) scale(1.01); filter: brightness(1.25); }
+      30% { transform: translate(7px, -4px) scale(1.01); }
+      45% { transform: translate(-5px, 4px); filter: brightness(1.15); }
+      60% { transform: translate(4px, -3px); }
+      75% { transform: translate(-2px, 2px); }
+      100% { transform: translate(0, 0) scale(1); filter: brightness(1); }
+    }
+    .arena-shake-light {
+      animation: screenShakeLight 0.22s ease-out;
+    }
+    .arena-shake-heavy {
+      animation: screenShakeHeavy 0.35s ease-out;
+    }
+
+    /* Floating Combat Text Popups */
+    .combat-text-popup {
+      position: absolute;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+      z-index: 60;
+      animation: combatFloatUp 0.85s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 16px rgba(255, 255, 255, 0.5);
+      white-space: nowrap;
+      user-select: none;
+    }
+    .combat-p1 {
+      left: 18%;
+      top: 30%;
+      color: #38bdf8;
+      font-size: 1.3em;
+    }
+    .combat-p2 {
+      right: 18%;
+      top: 30%;
+      color: #ff5252;
+      font-size: 1.3em;
+    }
+    .combat-streak {
+      font-size: 1.55em !important;
+      color: #ffea00 !important;
+      text-shadow: 0 0 12px #ff9100, 0 0 24px #ff3d00, 0 2px 4px rgba(0,0,0,0.8) !important;
+    }
+    .combat-miss {
+      color: #f43f5e !important;
+      font-size: 1.2em !important;
+      text-shadow: 0 0 10px rgba(244, 63, 94, 0.8) !important;
+    }
+    @keyframes combatFloatUp {
+      0% {
+        opacity: 0;
+        transform: translateY(12px) scale(0.65);
+      }
+      20% {
+        opacity: 1;
+        transform: translateY(-8px) scale(1.18);
+      }
+      70% {
+        opacity: 1;
+        transform: translateY(-24px) scale(1.0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-44px) scale(0.85);
+      }
+    }
+
+    /* Esports Lead Indicator */
+    .esports-lead-indicator {
+      display: flex;
+      justify-content: center;
+      margin: 2px 0 6px 0;
+    }
+    .lead-pill {
+      font-size: 0.78em;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: 12px;
+      letter-spacing: 0.4px;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .lead-tie {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+    }
+    .lead-p1 {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #7dd3fc;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      animation: leadPulse 1s infinite alternate;
+    }
+    .lead-p2 {
+      background: #ffe4e6;
+      color: #be123c;
+      border: 1px solid #fda4af;
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
+      animation: leadPulse 1s infinite alternate;
+    }
+    @keyframes leadPulse {
+      0% { transform: scale(0.98); }
+      100% { transform: scale(1.04); }
+    }
+
+    /* THEME 1: TUG OF WAR LIVING AMBIENCE */
+    .tug-clouds-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .tug-cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 20px;
+      filter: blur(1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      animation: cloudDrift linear infinite;
+    }
+    .tug-cloud-1 {
+      width: 85px;
+      height: 22px;
+      top: 8px;
+      animation-duration: 26s;
+      left: -90px;
+    }
+    .tug-cloud-2 {
+      width: 60px;
+      height: 18px;
+      top: 22px;
+      animation-duration: 20s;
+      left: -70px;
+      animation-delay: 9s;
+    }
+    @keyframes cloudDrift {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100vw + 200px)); }
+    }
+
+    .stadium-flags {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 16px;
+      display: flex;
+      justify-content: space-around;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .flag-pennant {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 13px solid;
+      transform-origin: top center;
+      animation: flagWiggle 1.4s ease-in-out infinite alternate;
+    }
+    .flag-1 { border-top-color: #2196f3; animation-delay: 0.1s; }
+    .flag-2 { border-top-color: #f44336; animation-delay: 0.3s; }
+    .flag-3 { border-top-color: #ffeb3b; animation-delay: 0.5s; }
+    .flag-4 { border-top-color: #4caf50; animation-delay: 0.2s; }
+    .flag-5 { border-top-color: #9c27b0; animation-delay: 0.4s; }
+    @keyframes flagWiggle {
+      0% { transform: rotate(-9deg) skewX(-4deg); }
+      100% { transform: rotate(9deg) skewX(4deg); }
+    }
+
+    .dust-puff {
+      position: absolute;
+      bottom: 22px;
+      width: 26px;
+      height: 14px;
+      background: radial-gradient(ellipse at center, rgba(141, 110, 99, 0.75) 0%, transparent 75%);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 4;
+    }
+    .dust-p1 { left: calc(50% - 140px); }
+    .dust-p2 { right: calc(50% - 140px); }
+    .dust-active {
+      animation: dustPop 0.35s ease-out forwards;
+    }
+    @keyframes dustPop {
+      0% { opacity: 0.85; transform: scale(0.6) translateY(0); }
+      100% { opacity: 0; transform: scale(1.6) translateY(-9px); }
+    }
+
+    /* THEME 2: BALAP MOBIL RACETRACK STRIPES */
+    .road-scrolling-stripe {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 200%;
+      height: 3px;
+      background: repeating-linear-gradient(90deg, #facc15 0px, #facc15 22px, transparent 22px, transparent 44px);
+      animation: roadScroll 0.35s linear infinite;
+      opacity: 0.65;
+      z-index: 2;
+    }
+    @keyframes roadScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-44px); }
+    }
+
+    .speed-lines-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 38px, rgba(255, 255, 255, 0.08) 38px, rgba(255, 255, 255, 0.16) 42px);
+      animation: speedLinesRush 0.22s linear infinite;
+      display: none;
+      z-index: 3;
+    }
+    .nitro-active ~ .speed-lines-overlay,
+    .nitro-active .speed-lines-overlay {
+      display: block;
+    }
+    @keyframes speedLinesRush {
+      from { transform: translateX(0); }
+      to { transform: translateX(-84px); }
+    }
+
+    /* THEME 3: ADU ENERGI PLASMA & SPARK */
+    .energy-shockwave-ring {
+      position: absolute;
+      top: 54%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 235, 59, 0.85);
+      box-shadow: 0 0 16px #ffea00;
+      animation: shockwavePulse 0.8s ease-out infinite;
+      pointer-events: none;
+      z-index: 4;
+    }
+    @keyframes shockwavePulse {
+      0% { width: 30px; height: 30px; opacity: 1; border-width: 4px; }
+      100% { width: 120px; height: 120px; opacity: 0; border-width: 1px; }
+    }
+
+    /* THEME 4: BALAP ROKET PARALLAX STARFIELD */
+    .space-starfield-parallax {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                  radial-gradient(2px 2px at 50px 80px, #38bdf8, rgba(0,0,0,0)),
+                  radial-gradient(1px 1px at 100px 45px, #ffffff, rgba(0,0,0,0)),
+                  radial-gradient(2px 2px at 170px 130px, #fbc02d, rgba(0,0,0,0)),
+                  radial-gradient(1.5px 1.5px at 240px 70px, #e0e7ff, rgba(0,0,0,0)),
+                  radial-gradient(2px 2px at 300px 160px, #818cf8, rgba(0,0,0,0));
+      background-size: 320px 200px;
+      animation: starStream 1.5s linear infinite;
+      opacity: 0.88;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes starStream {
+      from { background-position: 0 0; }
+      to { background-position: 0 200px; }
+    }
+
+    /* THEME 5: PERANG MERIAM BATTLE EMBERS & MUZZLE FLASH */
+    .cannon-muzzle-flash {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      background: radial-gradient(circle, #ffffff 0%, #ffea00 40%, #ff3d00 80%, transparent 100%);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 16px #ff3d00);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 5;
+    }
+    .flash-p1 { left: 90px; top: 32px; }
+    .flash-p2 { right: 90px; top: 32px; }
+    .flash-active {
+      animation: muzzleFlashPop 0.25s ease-out forwards;
+    }
+    @keyframes muzzleFlashPop {
+      0% { opacity: 1; transform: scale(0.6); }
+      50% { opacity: 1; transform: scale(1.4); }
+      100% { opacity: 0; transform: scale(1.9); }
+    }
+
+    /* VICTORY OVERLAY: GAME CEREMONY JUICE */
+    .victory-sunburst-rays {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: repeating-conic-gradient(from 0deg, rgba(255, 235, 59, 0.3) 0deg 15deg, transparent 15deg 30deg);
+      border-radius: 50%;
+      animation: sunburstSpin 12s linear infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+    @keyframes sunburstSpin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* WIZARD MASCOT CHEER REACTION */
+    .kiki-cheer-anim {
+      animation: kikiCheer 0.4s ease-out !important;
+    }
+    @keyframes kikiCheer {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      30% { transform: translateY(-12px) rotate(-8deg) scale(1.1); }
+      65% { transform: translateY(-10px) rotate(8deg) scale(1.1); }
+    }
+
+    /* ARCADE COUNTDOWN OVERHAUL */
+    .arcade-countdown-pop {
+      animation: arcadeNumberPop 0.75s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards !important;
+    }
+    @keyframes arcadeNumberPop {
+      0% { opacity: 0; transform: scale(2.5); filter: blur(4px); }
+      35% { opacity: 1; transform: scale(1.12); filter: blur(0); }
+      75% { transform: scale(1.0); }
+      100% { opacity: 0.92; transform: scale(0.96); }
+    }
+
+
+    /* ========================================================
+       LIVING ANIMATED BACKGROUND (GRADIENTS, ORBS, PARTICLES)
+       ======================================================== */
+    .living-game-background {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    @keyframes dynamicGradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .cyber-grid-mesh {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 38px 38px;
+      animation: cyberGridDrift 28s linear infinite;
+    }
+
+    @keyframes cyberGridDrift {
+      0% { background-position: 0 0; }
+      100% { background-position: 38px 38px; }
+    }
+
+    /* Ambient Glowing Light Orbs */
+    .ambient-glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(65px);
+      pointer-events: none;
+      opacity: 0.65;
+    }
+
+    .orb-cyan {
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.35) 0%, transparent 70%);
+      top: -100px;
+      left: -80px;
+      animation: floatOrbCyan 18s ease-in-out infinite alternate;
+    }
+
+    .orb-violet {
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+      bottom: -120px;
+      right: -100px;
+      animation: floatOrbViolet 22s ease-in-out infinite alternate;
+    }
+
+    .orb-amber {
+      width: 340px;
+      height: 340px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%);
+      top: 40%;
+      left: 55%;
+      animation: floatOrbAmber 16s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatOrbCyan {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(120px, 80px) scale(1.15); }
+      100% { transform: translate(60px, 160px) scale(0.9); }
+    }
+
+    @keyframes floatOrbViolet {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-140px, -90px) scale(1.2); }
+      100% { transform: translate(-70px, -180px) scale(0.95); }
+    }
+
+    @keyframes floatOrbAmber {
+      0% { transform: translate(0, 0) scale(0.9); }
+      50% { transform: translate(-90px, 70px) scale(1.1); }
+      100% { transform: translate(80px, -60px) scale(1); }
+    }
+
+    /* Floating Math Symbols Stream */
+    .floating-math-stream {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .math-particle {
+      position: absolute;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.12);
+      user-select: none;
+      animation: mathDriftUp linear infinite;
+    }
+
+    .p-1 { left: 8%; font-size: 2.2em; animation-duration: 16s; animation-delay: 0s; }
+    .p-2 { left: 22%; font-size: 1.8em; animation-duration: 21s; animation-delay: 3s; }
+    .p-3 { left: 38%; font-size: 2.5em; animation-duration: 18s; animation-delay: 7s; }
+    .p-4 { left: 54%; font-size: 2.0em; animation-duration: 14s; animation-delay: 2s; }
+    .p-5 { left: 68%; font-size: 2.4em; animation-duration: 23s; animation-delay: 5s; }
+    .p-6 { left: 82%; font-size: 1.9em; animation-duration: 19s; animation-delay: 1s; }
+    .p-7 { left: 92%; font-size: 2.1em; animation-duration: 15s; animation-delay: 8s; }
+    .p-8 { left: 15%; font-size: 1.7em; animation-duration: 25s; animation-delay: 11s; }
+    .p-9 { left: 45%; font-size: 2.0em; animation-duration: 17s; animation-delay: 12s; }
+    .p-10 { left: 75%; font-size: 2.3em; animation-duration: 20s; animation-delay: 4s; }
+
+    @keyframes mathDriftUp {
+      0% {
+        transform: translateY(105vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.16;
+      }
+      85% {
+        opacity: 0.16;
+      }
+      100% {
+        transform: translateY(-10vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
   </style>
 </head>
 <body oncontextmenu="return false">
+
+  <!-- DYNAMIC ANIMATED LIVING GAME BACKGROUND -->
+  <div class="living-game-background" aria-hidden="true">
+    <div class="cyber-grid-mesh"></div>
+    <div class="ambient-glow-orb orb-cyan"></div>
+    <div class="ambient-glow-orb orb-violet"></div>
+    <div class="ambient-glow-orb orb-amber"></div>
+    <div class="floating-math-stream">
+      <span class="math-particle p-1">+</span>
+      <span class="math-particle p-2">×</span>
+      <span class="math-particle p-3">÷</span>
+      <span class="math-particle p-4">−</span>
+      <span class="math-particle p-5">√</span>
+      <span class="math-particle p-6">½</span>
+      <span class="math-particle p-7">%</span>
+      <span class="math-particle p-8">π</span>
+      <span class="math-particle p-9">★</span>
+      <span class="math-particle p-10">x²</span>
+    </div>
+  </div>
 
   <!-- Top Bar Controls -->
   <button id="back-menu-btn" class="top-btn" title="Kembali ke Pilihan Mode" style="display:none;">
@@ -2314,9 +3486,12 @@
       <h1>⚔️ ARENA DUEL MATEMATIKA 🏆</h1>
       <h2>5 Pilihan Tema: Tarik Tambang • Balap Mobil • Adu Energi • Balap Roket • Perang Meriam</h2>
       <h5>Dirancang interaktif untuk Layar Sentuh (IFP), Smart Board, Tablet & Komputer.</h5>
+      <div style="font-size: 0.82em; color: #0284c7; background: #e0f2fe; border: 1px solid #bae6fd; padding: 4px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 10px 0; font-weight: 700;">
+        📱 Di HP: Layar Penuh (Fullscreen) otomatis aktif saat disentuh
+      </div>
       <button id="ok-btn" class="btn-primary">Mulai Bermain 🚀</button>
       <div id="popup-creator-info" style="text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-        <h4 style="margin: 0; color: #444; font-weight: 700;">Creator: Edo</h4>
+        <h4 style="margin: 0; color: #444; font-weight: 700;">Creator: Maria Desy Tania</h4>
       </div>
     </div>
   </div>
@@ -2324,280 +3499,236 @@
   <!-- Main Menu (Mode Selection) -->
   <div id="main-menu" class="modal" style="display:none;">
     <div class="modal-content" style="max-width: 880px;">
-      <h2>Arena Duel Matematika<br><span style="font-size: 0.8em; color: #555;">Pilih Mode & Pengaturan Pertandingan</span></h2>
 
-      <!-- Player Names Customization Bar -->
-      <div class="player-custom-bar">
-        <div class="player-input-card p1-card">
-          <label>P1 (Biru):</label>
-          <input type="text" id="input-p1-name" value="Player 1" maxlength="14" placeholder="Nama Player 1">
+      <!-- INTERACTIVE DIALOG WIZARD VIEW (DEFAULT: CLEAN & NO CLUTTER) -->
+      <div id="dialog-wizard-view" class="dialog-wizard-container">
+        <!-- Mascot Row: Animated Robot Kiki + Dialogue Speech Bubble -->
+        <div class="mascot-dialog-row">
+          <div class="mascot-avatar-box">
+            <svg viewBox="0 0 100 100" class="kiki-mascot-svg">
+              <defs>
+                <linearGradient id="kikiBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4f46e5"/>
+                  <stop offset="100%" stop-color="#7c3aed"/>
+                </linearGradient>
+                <linearGradient id="kikiScreenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#0f172a"/>
+                  <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+              </defs>
+              <line x1="50" y1="20" x2="50" y2="8" stroke="#818cf8" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="50" cy="7" r="5" fill="#f59e0b" class="antenna-spark"/>
+              <rect x="18" y="32" width="6" height="16" rx="3" fill="#6366f1"/>
+              <rect x="76" y="32" width="6" height="16" rx="3" fill="#6366f1"/>
+              <rect x="22" y="20" width="56" height="44" rx="14" fill="url(#kikiBodyGrad)" stroke="#a5b4fc" stroke-width="2"/>
+              <rect x="28" y="26" width="44" height="32" rx="9" fill="url(#kikiScreenGrad)"/>
+              <circle cx="39" cy="40" r="5" fill="#38bdf8" class="robot-eye"/>
+              <circle cx="61" cy="40" r="5" fill="#38bdf8" class="robot-eye"/>
+              <circle cx="41" cy="38" r="1.8" fill="#ffffff"/>
+              <circle cx="63" cy="38" r="1.8" fill="#ffffff"/>
+              <path d="M 42 49 Q 50 55 58 49" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M 42 64 L 58 64 L 62 76 L 38 76 Z" fill="#4338ca"/>
+              <rect x="30" y="75" width="40" height="20" rx="6" fill="url(#kikiBodyGrad)" stroke="#818cf8" stroke-width="1.5"/>
+              <circle cx="50" cy="84" r="4" fill="#10b981"/>
+              <g class="mascot-wave-arm">
+                <path d="M 70 78 Q 84 72 88 62" stroke="#6366f1" stroke-width="4" stroke-linecap="round" fill="none"/>
+                <circle cx="89" cy="60" r="4" fill="#f59e0b"/>
+              </g>
+            </svg>
+            <span class="mascot-badge">Kiki • Pemandu Cerdas</span>
+          </div>
+          <div class="dialog-speech-bubble">
+            <div class="bubble-speaker-header">
+              <span>🤖</span> <strong>Kiki Si Pemandu</strong>
+            </div>
+            <div class="bubble-msg" id="wizard-dialog-msg">
+              Halo para pejuang matematika! 👋 Siapakah dua jagoan hebat yang akan berduel hari ini?
+            </div>
+          </div>
         </div>
-        <div class="vs-pill">VS</div>
-        <div class="player-input-card p2-card">
-          <label>P2 (Merah):</label>
-          <input type="text" id="input-p2-name" value="Player 2" maxlength="14" placeholder="Nama Player 2">
+
+        <!-- Step Indicator Track -->
+        <div class="wizard-steps-track">
+          <div class="wizard-step-pill active" data-step="1" id="step-pill-1">1. 👥 Pemain</div>
+          <span class="wizard-step-arrow">›</span>
+          <div class="wizard-step-pill" data-step="2" id="step-pill-2">2. ⚔️ Arena</div>
+          <span class="wizard-step-arrow">›</span>
+          <div class="wizard-step-pill" data-step="3" id="step-pill-3">3. 📚 Kategori</div>
+          <span class="wizard-step-arrow">›</span>
+          <div class="wizard-step-pill" data-step="4" id="step-pill-4">4. 🎯 Tantangan</div>
+          <span class="wizard-step-arrow">›</span>
+          <div class="wizard-step-pill" data-step="5" id="step-pill-5">5. 🚀 Siap Duel!</div>
+        </div>
+
+        <!-- STEP 1: NAMA PEMAIN -->
+        <div class="wizard-step-panel active" id="wizard-step-1">
+          <div class="wizard-names-grid">
+            <div class="wizard-player-box p1-box">
+              <label>🔵 Player 1 (Biru):</label>
+              <input type="text" id="wizard-p1-input" class="wizard-name-input" value="Player 1" maxlength="14" placeholder="Ketik nama P1">
+            </div>
+            <div class="wizard-vs-circle">VS</div>
+            <div class="wizard-player-box p2-box">
+              <label>🔴 Player 2 (Merah):</label>
+              <input type="text" id="wizard-p2-input" class="wizard-name-input" value="Player 2" maxlength="14" placeholder="Ketik nama P2">
+            </div>
+          </div>
+          <div class="wizard-quick-chips">
+            <span style="font-size:0.8em; font-weight:700; color:#64748b;">⚡ Pilihan Cepat:</span>
+            <button type="button" class="quick-chip-btn" data-p1="Player 1" data-p2="Player 2">Player 1 & 2</button>
+            <button type="button" class="quick-chip-btn" data-p1="Kakak" data-p2="Adik">Kakak vs Adik</button>
+            <button type="button" class="quick-chip-btn" data-p1="Juara 1" data-p2="Juara 2">Juara 1 vs Juara 2</button>
+            <button type="button" class="quick-chip-btn" data-p1="Budi" data-p2="Siti">Budi vs Siti</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: ARENA DUEL (THEME) -->
+        <div class="wizard-step-panel" id="wizard-step-2">
+          <div class="dialog-cards-grid" id="wizard-theme-grid">
+            <div class="dialog-item-card active" data-theme="tug">
+              <span class="card-icon">🪢</span>
+              <h4 class="card-title">Tarik Tambang</h4>
+              <span class="card-desc">Tarik tambang seru klasik</span>
+              <span class="card-badge">Klasik</span>
+            </div>
+            <div class="dialog-item-card" data-theme="race">
+              <span class="card-icon">🏎️</span>
+              <h4 class="card-title">Balap Mobil</h4>
+              <span class="card-desc">Pacu mobil ke finish</span>
+              <span class="card-badge">Balapan</span>
+            </div>
+            <div class="dialog-item-card" data-theme="energy">
+              <span class="card-icon">⚡</span>
+              <h4 class="card-title">Adu Energi</h4>
+              <span class="card-desc">Benturan laser berkekuatan</span>
+              <span class="card-badge">Heroik</span>
+            </div>
+            <div class="dialog-item-card" data-theme="space">
+              <span class="card-icon">🚀</span>
+              <h4 class="card-title">Balap Roket</h4>
+              <span class="card-desc">Luncurkan ke antariksa</span>
+              <span class="card-badge">Galaksi</span>
+            </div>
+            <div class="dialog-item-card" data-theme="cannon">
+              <span class="card-icon">🏰</span>
+              <h4 class="card-title">Perang Meriam</h4>
+              <span class="card-desc">Hancurkan benteng lawan</span>
+              <span class="card-badge">Strategi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: KATEGORI MATERI -->
+        <div class="wizard-step-panel" id="wizard-step-3">
+          <div class="dialog-cards-grid" id="wizard-cat-grid">
+            <div class="dialog-item-card active" data-cat="dasar">
+              <span class="card-icon">🌱</span>
+              <h4 class="card-title">Materi Dasar</h4>
+              <span class="card-desc">SD 1-2 • Tambah, Kurang, Buah & Pola</span>
+              <span class="card-badge">Pemula</span>
+            </div>
+            <div class="dialog-item-card" data-cat="aritmatika">
+              <span class="card-icon">⚡</span>
+              <h4 class="card-title">Aritmatika Cepat</h4>
+              <span class="card-desc">SD 3-4 • Kali, Bagi, Campuran & Pecahan</span>
+              <span class="card-badge">Populer</span>
+            </div>
+            <div class="dialog-item-card" data-cat="lanjutan">
+              <span class="card-icon">🚀</span>
+              <h4 class="card-title">Tingkat Lanjutan</h4>
+              <span class="card-desc">SD 5-6 • Pangkat, Akar, Negatif & Aljabar</span>
+              <span class="card-badge">Tantangan</span>
+            </div>
+            <div class="dialog-item-card" data-cat="pengukuran">
+              <span class="card-icon">📐</span>
+              <h4 class="card-title">Pengukuran & Geometri</h4>
+              <span class="card-desc">Waktu, Jarak, Berat, Volume, Uang, Sudut</span>
+              <span class="card-badge">Terapan</span>
+            </div>
+            <div class="dialog-item-card" data-cat="campuran">
+              <span class="card-icon">🎲</span>
+              <h4 class="card-title">Tantangan Acak</h4>
+              <span class="card-desc">Semua kurikulum matematika diacak!</span>
+              <span class="card-badge">Seru</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: MODE SOAL SPESIFIK -->
+        <div class="wizard-step-panel" id="wizard-step-4">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.85em; font-weight:800; color:#475569;" id="wizard-cat-label">Pilihan Soal di Kategori Dasar:</span>
+            <button type="button" id="wizard-random-mode-btn" class="quick-chip-btn" style="background:#e0e7ff; color:#4338ca; border-color:#818cf8;">🎲 Pilihkan Acak</button>
+          </div>
+          <div class="dialog-cards-grid" id="wizard-modes-container">
+            <!-- Populated dynamically based on category -->
+          </div>
+        </div>
+
+        <!-- STEP 5: KONFIRMASI DUEL & PENGATURAN CEPAT -->
+        <div class="wizard-step-panel" id="wizard-step-5">
+          <div class="duel-summary-banner">
+            <div class="duel-summary-header">
+              <span>⚔️</span> Ringkasan Duel Matematika
+            </div>
+            <div class="duel-summary-details">
+              <div class="summary-item">
+                <div class="summary-item-label">Petarung</div>
+                <div class="summary-item-value" id="summary-players-text">Player 1 VS Player 2</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-item-label">Arena Pertandingan</div>
+                <div class="summary-item-value" id="summary-theme-text">🪢 Tarik Tambang</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-item-label">Materi Tantangan</div>
+                <div class="summary-item-value" id="summary-mode-text">➕ Tambah 1 Digit</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step5-settings-box">
+            <div class="step5-setting-row">
+              <span class="step5-setting-title">🎯 Target Menang:</span>
+              <button type="button" class="step5-opt-btn" data-diff="3">⚡ Kilat (3 Poin)</button>
+              <button type="button" class="step5-opt-btn active" data-diff="5">⚖️ Standar (5 Poin)</button>
+              <button type="button" class="step5-opt-btn" data-diff="8">🔥 Maraton (8 Poin)</button>
+            </div>
+            <div class="step5-setting-row">
+              <span class="step5-setting-title">⏱️ Batas Waktu:</span>
+              <button type="button" class="step5-opt-btn active" data-timer="0">♾️ Santai (Off)</button>
+              <button type="button" class="step5-opt-btn" data-timer="20">⏱️ 20 Detik</button>
+              <button type="button" class="step5-opt-btn" data-timer="12">⚡ 12 Detik</button>
+            </div>
+            <div class="step5-setting-row">
+              <span class="step5-setting-title">🔢 Opsi Desimal:</span>
+              <button type="button" class="step5-opt-btn active" data-decimal="off">Standar</button>
+              <button type="button" class="step5-opt-btn" data-decimal="on" style="color:#b78103; font-weight:800;">✨ Terapkan ke Semua Mode</button>
+            </div>
+          </div>
+
+          <button type="button" id="wizard-start-btn" class="btn-launch-duel">
+            <span>🚀 MULAI PERTANDINGAN SEKARANG! 🏆</span>
+          </button>
+        </div>
+
+        <!-- WIZARD FOOTER NAVIGATION -->
+        <div class="wizard-footer-nav">
+          <button type="button" id="wizard-prev-btn" class="wizard-nav-btn btn-prev" style="visibility:hidden;">
+            ⬅️ Kembali
+          </button>
+          <button type="button" id="wizard-next-btn" class="wizard-nav-btn btn-next">
+            Lanjut Pilih Arena ➡️
+          </button>
+        </div>
+
+        <div class="wizard-creator-tag">
+          Creator: Maria Desy Tania
         </div>
       </div>
 
-      <!-- Match Setting Bar (Theme + Win Difference + Timer + Global Decimal Option) -->
-      <div class="match-settings-bar">
-        <div class="setting-group theme-setting-group" style="width: 100%; justify-content: center; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dashed #cbd5e1;">
-          <strong style="color: #1a237e; font-size: 0.92em;">⚔️ Pilih Tema Duel:</strong>
-          <button class="opt-btn theme-btn active" data-theme="tug">🪢 Tarik Tambang</button>
-          <button class="opt-btn theme-btn" data-theme="race">🏎️ Balap Mobil</button>
-          <button class="opt-btn theme-btn" data-theme="energy">⚡ Adu Energi</button>
-          <button class="opt-btn theme-btn" data-theme="space">🚀 Balap Roket</button>
-          <button class="opt-btn theme-btn" data-theme="cannon">🏰 Perang Meriam</button>
-        </div>
-        <div class="setting-group">
-          <strong>Target Menang:</strong>
-          <button class="opt-btn diff-btn" data-diff="3">⚡ Kilat (3)</button>
-          <button class="opt-btn diff-btn active" data-diff="5">⚖️ Standar (5)</button>
-          <button class="opt-btn diff-btn" data-diff="8">🔥 Maraton (8)</button>
-        </div>
-        <div class="setting-group">
-          <strong>Batas Waktu:</strong>
-          <button class="opt-btn timer-btn active" data-timer="0">♾️ Santai (Off)</button>
-          <button class="opt-btn timer-btn" data-timer="20">⏱️ 20 Detik</button>
-          <button class="opt-btn timer-btn" data-timer="12">⚡ 12 Detik</button>
-        </div>
-        <div class="setting-group">
-          <strong>Opsi Desimal (,):</strong>
-          <button class="opt-btn decimal-btn active" data-decimal="off">🔢 Standar</button>
-          <button class="opt-btn decimal-btn" data-decimal="on" style="font-weight: 800; border-color: #fbc02d; background: #fffde7; color: #b78103;">✨ Terapkan ke Semua Mode</button>
-        </div>
-        <div class="setting-group layout-setting-group">
-          <strong>📱 Tata Letak:</strong>
-          <button class="opt-btn layout-btn active" data-layout="auto">⚡ Otomatis</button>
-          <button class="opt-btn layout-btn" data-layout="vertical">📱 HP (Atas-Bawah)</button>
-          <button class="opt-btn layout-btn" data-layout="horizontal">🖥️ Meja (Kiri-Kanan)</button>
-        </div>
+
       </div>
-
-      <!-- Category Filter Tabs (35 Mode) -->
-      <div class="category-tabs">
-        <button class="cat-tab active" data-cat="all">🌟 Semua (35)</button>
-        <button class="cat-tab" data-cat="dasar">🌱 Dasar (SD 1-2)</button>
-        <button class="cat-tab" data-cat="aritmatika">⚡ Aritmatika (SD 3-4)</button>
-        <button class="cat-tab" data-cat="lanjutan">🚀 Lanjutan (SD 5-6)</button>
-        <button class="cat-tab" data-cat="pengukuran">📐 Satuan & Geometri</button>
-      </div>
-
-      <!-- 34 Mode Cards Grid -->
-      <div class="mode-selection-grid">
-        <!-- 1. Tambah -->
-        <div class="mode-card" data-op="+" data-cat="dasar">
-          <span class="mode-symbol">+</span> <h3>Tambah</h3>
-          <span class="mode-badge">1 Digit</span>
-        </div>
-
-        <!-- 2. Kurang -->
-        <div class="mode-card" data-op="-" data-cat="dasar">
-          <span class="mode-symbol">−</span> <h3>Kurang</h3>
-          <span class="mode-badge">1 Digit</span>
-        </div>
-
-        <!-- 3. Kali -->
-        <div class="mode-card" data-op="*" data-cat="aritmatika">
-          <span class="mode-symbol">×</span> <h3>Kali</h3>
-          <span class="mode-badge">Dasar</span>
-        </div>
-
-        <!-- 4. Bagi -->
-        <div class="mode-card" data-op="/" data-cat="aritmatika">
-          <span class="mode-symbol">÷</span> <h3>Bagi</h3>
-          <span class="mode-badge">Dasar</span>
-        </div>
-
-        <!-- 5. Campuran -->
-        <div class="mode-card" data-op="campuran" data-cat="aritmatika">
-          <span class="mode-symbol">±</span> <h3>+−×÷</h3>
-          <span class="mode-badge">Campuran</span>
-        </div>
-
-        <!-- 6. Bilangan Bulat Negatif -->
-        <div class="mode-card" data-op="negatif" data-cat="aritmatika">
-          <span class="mode-symbol" style="font-size: 1.8rem; color: #512da8;">−/+</span>
-          <h3>Bil. Negatif</h3>
-          <span class="mode-badge" style="background:#d1c4e9; color:#4527a0;">Positif & Negatif</span>
-        </div>
-
-        <!-- 7. Pangkat 2 -->
-        <div class="mode-card" data-op="pangkat" data-cat="lanjutan">
-          <span class="mode-symbol">x²</span> <h3>Pangkat 2</h3>
-          <span class="mode-badge">Kuadrat</span>
-        </div>
-
-        <!-- 8. Pangkat 3 -->
-        <div class="mode-card" data-op="pangkat3" data-cat="lanjutan">
-          <span class="mode-symbol">x³</span> <h3>Pangkat 3</h3>
-          <span class="mode-badge">Kubik</span>
-        </div>
-
-        <!-- 9. Akar -->
-        <div class="mode-card" data-op="akar" data-cat="lanjutan">
-          <span class="mode-symbol">√</span> <h3>Akar</h3>
-          <span class="mode-badge">Akar 2</span>
-        </div>
-
-        <!-- 10. Akar Pangkat 3 -->
-        <div class="mode-card" data-op="akar3" data-cat="lanjutan">
-          <span class="mode-symbol">∛</span> <h3>Akar Pangkat 3</h3>
-          <span class="mode-badge">Akar 3</span>
-        </div>
-
-        <!-- 11. Semua -->
-        <div class="mode-card" data-op="semua" data-cat="aritmatika">
-          <span class="mode-symbol">?</span> <h3>+−×÷x²√</h3>
-          <span class="mode-badge">Acak</span>
-        </div>
-
-        <!-- 12. 2 Digit Tambah -->
-        <div class="mode-card" data-op="+2" data-cat="dasar">
-          <span class="mode-symbol" style="font-size: 1.8rem;">+2</span> <h3>2 Digit</h3>
-          <span class="mode-badge">Puluhan</span>
-        </div>
-
-        <!-- 13. 2 Digit Kurang -->
-        <div class="mode-card" data-op="-2" data-cat="dasar">
-          <span class="mode-symbol" style="font-size: 1.8rem;">-2</span> <h3>-2 Digit</h3>
-          <span class="mode-badge">Puluhan</span>
-        </div>
-
-        <!-- 14. Tambah Kurang -->
-        <div class="mode-card" data-op="tambahkurang" data-cat="aritmatika">
-          <span class="mode-symbol">+−</span> <h3>Tambah Kurang</h3>
-          <span class="mode-badge">3 Angka</span>
-        </div>
-
-        <!-- 15. Kali Bagi -->
-        <div class="mode-card" data-op="kalibagi" data-cat="aritmatika">
-          <span class="mode-symbol">×÷</span> <h3>Kali Bagi</h3>
-          <span class="mode-badge">3 Angka</span>
-        </div>
-
-        <!-- 16. Persen -->
-        <div class="mode-card" data-op="persen" data-cat="aritmatika">
-          <span class="mode-symbol">%</span> <h3>Persen</h3>
-          <span class="mode-badge">Persentase</span>
-        </div>
-
-        <!-- 17. FPB -->
-        <div class="mode-card" data-op="fpb" data-cat="lanjutan">
-          <span class="mode-symbol" style="font-size: 1.6rem;">FPB</span> <h3>FPB</h3>
-          <span class="mode-badge">Faktor</span>
-        </div>
-
-        <!-- 18. KPK -->
-        <div class="mode-card" data-op="kpk" data-cat="lanjutan">
-          <span class="mode-symbol" style="font-size: 1.6rem;">KPK</span> <h3>KPK</h3>
-          <span class="mode-badge">Kelipatan</span>
-        </div>
-
-        <!-- 19. Waktu -->
-        <div class="mode-card" data-op="waktu" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🕐</span> <h3>Waktu</h3>
-          <span class="mode-badge">Jam/Menit</span>
-        </div>
-
-        <!-- 20. Jarak -->
-        <div class="mode-card" data-op="jarak" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">📏</span> <h3>Jarak</h3>
-          <span class="mode-badge">km, m, cm</span>
-        </div>
-
-        <!-- 21. Hitung Buah -->
-        <div class="mode-card" data-op="buah" data-cat="dasar">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🍉</span> <h3>Hitung Buah</h3>
-          <span class="mode-badge">Visual TK/SD</span>
-        </div>
-
-        <!-- 22. Satuan Berat -->
-        <div class="mode-card" data-op="berat" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">⚖️</span> <h3>Berat</h3>
-          <span class="mode-badge">kg, gram, ton</span>
-        </div>
-
-        <!-- 23. Satuan Volume -->
-        <div class="mode-card" data-op="volume" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🧪</span> <h3>Volume</h3>
-          <span class="mode-badge">liter, ml</span>
-        </div>
-
-        <!-- 24. Pola Bilangan -->
-        <div class="mode-card" data-op="pola" data-cat="dasar">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🔢</span> <h3>Pola Angka</h3>
-          <span class="mode-badge">Deret Bilangan</span>
-        </div>
-
-        <!-- 25. Luas Bangun Datar -->
-        <div class="mode-card" data-op="luas" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🟩</span> <h3>Luas</h3>
-          <span class="mode-badge">Persegi/Panjang</span>
-        </div>
-
-        <!-- 26. Keliling Bangun Datar -->
-        <div class="mode-card" data-op="keliling" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🔲</span> <h3>Keliling</h3>
-          <span class="mode-badge">Bangun Datar</span>
-        </div>
-
-        <!-- 27. Segitiga -->
-        <div class="mode-card" data-op="segitiga" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🔺</span> <h3>Segitiga</h3>
-          <span class="mode-badge">Luas & Keliling</span>
-        </div>
-
-        <!-- 28. Kecepatan -->
-        <div class="mode-card" data-op="kecepatan" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🚀</span> <h3>Kecepatan</h3>
-          <span class="mode-badge">km/jam, Jarak</span>
-        </div>
-
-        <!-- 29. Debit Air -->
-        <div class="mode-card" data-op="debit" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🚰</span> <h3>Debit Air</h3>
-          <span class="mode-badge">liter/detik</span>
-        </div>
-
-        <!-- 30. Aljabar X -->
-        <div class="mode-card" data-op="aljabar" data-cat="lanjutan">
-          <span class="mode-symbol" style="font-size: 2.1rem;">🧩</span> <h3>Aljabar X</h3>
-          <span class="mode-badge">Nilai x = ?</span>
-        </div>
-
-        <!-- 31. Angka Romawi -->
-        <div class="mode-card" data-op="romawi" data-cat="dasar">
-          <span class="mode-symbol" style="font-size: 1.8rem;">XVIII</span> <h3>Romawi</h3>
-          <span class="mode-badge">Angka Romawi</span>
-        </div>
-
-        <!-- 32. Sisa Pembagian / Modulus -->
-        <div class="mode-card" data-op="sisa" data-cat="aritmatika">
-          <span class="mode-symbol" style="font-size: 2.1rem;">➗</span> <h3>Sisa Bagi</h3>
-          <span class="mode-badge">Sisa ÷</span>
-        </div>
-
-        <!-- 33. Hitung Kembalian Uang -->
-        <div class="mode-card" data-op="uang" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">💵</span> <h3>Uang Belanja</h3>
-          <span class="mode-badge">Kembalian</span>
-        </div>
-
-        <!-- 34. Sudut Geometri -->
-        <div class="mode-card" data-op="sudut" data-cat="pengukuran">
-          <span class="mode-symbol" style="font-size: 2.1rem;">📐</span> <h3>Sudut</h3>
-          <span class="mode-badge">Derajat (°)</span>
-        </div>
-
-        <!-- 35. Operasi Hitung Pecahan -->
-        <div class="mode-card" data-op="pecahan" data-cat="aritmatika">
-          <span class="mode-symbol" style="font-size: 1.85rem; color: #0288d1;">½±¼</span>
-          <h3>Pecahan</h3>
-          <span class="mode-badge" style="background:#e0f2fe; color:#0369a1;">+ − × ÷</span>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Countdown Overlay -->
@@ -2610,6 +3741,9 @@
     <h1 class="game-main-title">⚡ TARIK TAMBANG MATEMATIKA 🏆</h1>
 
     <!-- Scoreboard Live -->
+    <div class="esports-lead-indicator" id="esports-lead-indicator">
+      <span class="lead-pill lead-tie">⚖️ Skor Imbang</span>
+    </div>
     <div class="match-scoreboard">
       <div class="score-badge p1-score-badge">
         <span id="scoreboard-name-p1">Player 1</span>: <span id="score-p1-val">0</span>
@@ -2678,6 +3812,19 @@
 
         <!-- 1. TEMA: TARIK TAMBANG (Tug of War) -->
         <div class="theme-layer" id="layer-tug">
+          <div class="tug-clouds-track">
+            <div class="tug-cloud tug-cloud-1"></div>
+            <div class="tug-cloud tug-cloud-2"></div>
+          </div>
+          <div class="stadium-flags">
+            <div class="flag-pennant flag-1"></div>
+            <div class="flag-pennant flag-2"></div>
+            <div class="flag-pennant flag-3"></div>
+            <div class="flag-pennant flag-4"></div>
+            <div class="flag-pennant flag-5"></div>
+          </div>
+          <div id="dust-p1" class="dust-puff dust-p1"></div>
+          <div id="dust-p2" class="dust-puff dust-p2"></div>
           <div id="center-line"></div>
           <div id="arena-ground"></div>
           <img alt="Player 1" id="character-p1" class="character">
@@ -2690,6 +3837,7 @@
         <!-- 2. TEMA: BALAP MOBIL NITRO (Sprint Racing) -->
         <div class="theme-layer" id="layer-race" style="display:none;">
           <div class="racetrack">
+            <div class="road-scrolling-stripe"></div>
             <div class="race-lane lane-p1">
               <span class="race-lane-tag" id="race-tag-p1">P1</span>
               <div class="race-car-wrapper" id="race-car-p1">
@@ -2804,6 +3952,7 @@
         <!-- 4. TEMA: BALAP ROKET (Space Race) -->
         <div class="theme-layer" id="layer-space" style="display:none;">
           <div class="space-arena-bg">
+            <div class="space-starfield-parallax"></div>
             <div class="space-station-goal">🛰️ STASIUN ORBIT JUARA 🏆</div>
             <div class="launch-column">
               <div class="rocket-wrapper" id="rocket-p1">
@@ -2925,7 +4074,7 @@
   <!-- Footer -->
   <footer>
     <div class="social-links">
-      <span>Creator: Edo</span>
+      <span>Creator: Maria Desy Tania</span>
     </div>
   </footer>
 
@@ -3646,8 +4795,7 @@
       getAudioContext();
       playClickSound();
       infoPopup.style.display = 'none';
-      mainMenu.style.display = 'flex';
-      backMenuBtn.style.display = 'none';
+      openMainMenu(1);
 
       // Request fullscreen if supported
       if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
@@ -3679,9 +4827,8 @@
       countdownOverlay.style.display = 'none';
       gameContent.style.display = 'none';
       winPopup.style.display = 'none';
-      mainMenu.style.display = 'flex';
-      backMenuBtn.style.display = 'none';
       matchPointBanner.style.display = 'none';
+      openMainMenu(wizardStep || 1);
     });
 
     fullscreenBtn.addEventListener('click', () => {
@@ -3701,8 +4848,7 @@
       playClickSound();
       winPopup.style.display = 'none';
       gameContent.style.display = 'none';
-      mainMenu.style.display = 'flex';
-      backMenuBtn.style.display = 'none';
+      openMainMenu(wizardStep || 1);
     });
 
     btnRematch.addEventListener('click', () => {
@@ -3942,6 +5088,7 @@
 
       const diff = Math.abs(scoreP1 - scoreP2);
       scoreDiffVal.textContent = `Selisih: ${diff} / ${winDifference}`;
+      updateLeadIndicator();
 
       tensionLabelP1.textContent = p1Name.slice(0, 8);
       tensionLabelP2.textContent = p2Name.slice(0, 8);
@@ -4113,6 +5260,23 @@
 
           playThemeActionSound(1, streakP1 >= 3);
 
+          triggerArenaShake(streakP1 >= 3 ? 'heavy' : 'light');
+          if (currentTheme === 'tug') triggerDustPuff(1);
+          if (currentTheme === 'cannon') triggerMuzzleFlash(1);
+
+          let hitTextP1 = '+1 POIN! 💥';
+          if (currentTheme === 'tug') hitTextP1 = streakP1 >= 3 ? '⚡ SUPER TARIKAN!' : '+1 TARIKAN! 🪢';
+          else if (currentTheme === 'race') hitTextP1 = streakP1 >= 3 ? '⚡ SUPER NITRO!' : '🏎️ NITRO BOOST!';
+          else if (currentTheme === 'energy') hitTextP1 = streakP1 >= 3 ? '⚡ PLASMA BLAST!' : '⚡ POWER SURGE!';
+          else if (currentTheme === 'space') hitTextP1 = streakP1 >= 3 ? '🚀 HYPER DRIVE!' : '🚀 THRUST BOOST!';
+          else if (currentTheme === 'cannon') hitTextP1 = streakP1 >= 3 ? '💥 CRITICAL BOMB!' : '💣 CANNON HIT!';
+
+          if (streakP1 >= 3) {
+            spawnCombatText(1, `🔥 COMBO x${streakP1}! ${hitTextP1}`, true);
+          } else {
+            spawnCombatText(1, hitTextP1, false);
+          }
+
           scoreP1++;
           const pullDist = streakP1 >= 3 ? moveDistance * 1.3 : moveDistance;
           worldOffset -= pullDist;
@@ -4151,6 +5315,7 @@
         } else {
           playWrongSound();
           streakP1 = 0;
+          spawnCombatText(1, '❌ SALAH!', false, true);
           updateStreakBadge(1);
           recordHistory(1, false);
           wrongCountP1++;
@@ -4180,6 +5345,23 @@
           else playCorrectSound(streakP2);
 
           playThemeActionSound(2, streakP2 >= 3);
+
+          triggerArenaShake(streakP2 >= 3 ? 'heavy' : 'light');
+          if (currentTheme === 'tug') triggerDustPuff(2);
+          if (currentTheme === 'cannon') triggerMuzzleFlash(2);
+
+          let hitTextP2 = '+1 POIN! 💥';
+          if (currentTheme === 'tug') hitTextP2 = streakP2 >= 3 ? '⚡ SUPER TARIKAN!' : '+1 TARIKAN! 🪢';
+          else if (currentTheme === 'race') hitTextP2 = streakP2 >= 3 ? '⚡ SUPER NITRO!' : '🏎️ NITRO BOOST!';
+          else if (currentTheme === 'energy') hitTextP2 = streakP2 >= 3 ? '⚡ PLASMA BLAST!' : '⚡ POWER SURGE!';
+          else if (currentTheme === 'space') hitTextP2 = streakP2 >= 3 ? '🚀 HYPER DRIVE!' : '🚀 THRUST BOOST!';
+          else if (currentTheme === 'cannon') hitTextP2 = streakP2 >= 3 ? '💥 CRITICAL BOMB!' : '💣 CANNON HIT!';
+
+          if (streakP2 >= 3) {
+            spawnCombatText(2, `🔥 COMBO x${streakP2}! ${hitTextP2}`, true);
+          } else {
+            spawnCombatText(2, hitTextP2, false);
+          }
 
           scoreP2++;
           const pullDist = streakP2 >= 3 ? moveDistance * 1.3 : moveDistance;
@@ -4219,6 +5401,7 @@
         } else {
           playWrongSound();
           streakP2 = 0;
+          spawnCombatText(2, '❌ SALAH!', false, true);
           updateStreakBadge(2);
           recordHistory(2, false);
           wrongCountP2++;
@@ -5310,6 +6493,516 @@
 
     // Initialize layout mode on launch
     applyLayout();
+  
+    /* ========================================================
+       INTERACTIVE DIALOG WIZARD CONTROLLER (KIKI MASCOT)
+       ======================================================== */
+    const MODES_CATALOG = [
+      { op: '+', cat: 'dasar', symbol: '+', name: 'Tambah 1 Digit', badge: '1 Digit', desc: 'Penjumlahan dasar 1-10' },
+      { op: '-', cat: 'dasar', symbol: '−', name: 'Kurang 1 Digit', badge: '1 Digit', desc: 'Pengurangan dasar 1-10' },
+      { op: '+2', cat: 'dasar', symbol: '+2', name: 'Tambah 2 Digit', badge: 'Puluhan', desc: 'Penjumlahan puluhan' },
+      { op: '-2', cat: 'dasar', symbol: '-2', name: 'Kurang 2 Digit', badge: 'Puluhan', desc: 'Pengurangan puluhan' },
+      { op: 'buah', cat: 'dasar', symbol: '🍉', name: 'Hitung Buah', badge: 'Visual TK/SD', desc: 'Menghitung buah bergambar' },
+      { op: 'pola', cat: 'dasar', symbol: '🔢', name: 'Pola Angka', badge: 'Deret', desc: 'Melengkapi deret bilangan' },
+      { op: 'romawi', cat: 'dasar', symbol: 'XVIII', name: 'Angka Romawi', badge: 'Romawi', desc: 'Konversi angka Romawi' },
+
+      { op: '*', cat: 'aritmatika', symbol: '×', name: 'Perkalian Dasar', badge: 'Dasar', desc: 'Tabel perkalian 1-10' },
+      { op: '/', cat: 'aritmatika', symbol: '÷', name: 'Pembagian Dasar', badge: 'Dasar', desc: 'Pembagian bulat tepat' },
+      { op: 'campuran', cat: 'aritmatika', symbol: '±', name: 'Operasi Campuran', badge: '+−×÷', desc: 'Berganti operasi hitung' },
+      { op: 'pecahan', cat: 'aritmatika', symbol: '½±¼', name: 'Operasi Pecahan', badge: 'Pecahan', desc: 'Hitung pecahan biasa & campuran' },
+      { op: 'tambahkurang', cat: 'aritmatika', symbol: '+−', name: 'Tambah Kurang', badge: '3 Angka', desc: 'Kombinasi 3 bilangan' },
+      { op: 'kalibagi', cat: 'aritmatika', symbol: '×÷', name: 'Kali Bagi', badge: '3 Angka', desc: 'Kombinasi perkalian & pembagian' },
+      { op: 'persen', cat: 'aritmatika', symbol: '%', name: 'Persentase', badge: 'Persen', desc: 'Menghitung persen' },
+      { op: 'sisa', cat: 'aritmatika', symbol: '➗', name: 'Sisa Bagi', badge: 'Modulo', desc: 'Sisa hasil bagi (contoh: 17÷5 sisa 2)' },
+
+      { op: 'negatif', cat: 'lanjutan', symbol: '−/+', name: 'Bilangan Negatif', badge: 'Positif/Negatif', desc: 'Operasi bilangan bulat bertanda' },
+      { op: 'pangkat', cat: 'lanjutan', symbol: 'x²', name: 'Pangkat 2', badge: 'Kuadrat', desc: 'Kuadrat bilangan 1-25' },
+      { op: 'pangkat3', cat: 'lanjutan', symbol: 'x³', name: 'Pangkat 3', badge: 'Kubik', desc: 'Pangkat tiga bilangan 1-10' },
+      { op: 'akar', cat: 'lanjutan', symbol: '√', name: 'Akar Kuadrat', badge: 'Akar 2', desc: 'Akar kuadrat bilangan bulat' },
+      { op: 'akar3', cat: 'lanjutan', symbol: '∛', name: 'Akar Pangkat 3', badge: 'Akar 3', desc: 'Akar kubik bilangan bulat' },
+      { op: 'fpb', cat: 'lanjutan', symbol: 'FPB', name: 'FPB', badge: 'Faktor', desc: 'Faktor Persekutuan Terbesar' },
+      { op: 'kpk', cat: 'lanjutan', symbol: 'KPK', name: 'KPK', badge: 'Kelipatan', desc: 'Kelipatan Persekutuan Terkecil' },
+      { op: 'aljabar', cat: 'lanjutan', symbol: '🧩', name: 'Aljabar Dasar', badge: 'Nilai x', desc: 'Persamaan mencari nilai x' },
+
+      { op: 'waktu', cat: 'pengukuran', symbol: '🕐', name: 'Waktu & Jam', badge: 'Jam/Menit', desc: 'Konversi dan durasi waktu' },
+      { op: 'jarak', cat: 'pengukuran', symbol: '📏', name: 'Jarak', badge: 'km, m, cm', desc: 'Konversi satuan panjang' },
+      { op: 'berat', cat: 'pengukuran', symbol: '⚖️', name: 'Berat', badge: 'kg, gram, ton', desc: 'Konversi satuan berat' },
+      { op: 'volume', cat: 'pengukuran', symbol: '🧪', name: 'Volume', badge: 'liter, ml', desc: 'Konversi satuan volume' },
+      { op: 'uang', cat: 'pengukuran', symbol: '💵', name: 'Uang Belanja', badge: 'Kembalian', desc: 'Hitung kembalian uang belanja' },
+      { op: 'luas', cat: 'pengukuran', symbol: '🟩', name: 'Luas Bangun', badge: 'Persegi/Panjang', desc: 'Hitung luas bangun datar' },
+      { op: 'keliling', cat: 'pengukuran', symbol: '🔲', name: 'Keliling Bangun', badge: 'Keliling', desc: 'Hitung keliling bangun datar' },
+      { op: 'segitiga', cat: 'pengukuran', symbol: '🔺', name: 'Segitiga', badge: 'Segitiga', desc: 'Luas dan keliling segitiga' },
+      { op: 'kecepatan', cat: 'pengukuran', symbol: '🚀', name: 'Kecepatan', badge: 'km/jam', desc: 'Rumus kecepatan, jarak & waktu' },
+      { op: 'debit', cat: 'pengukuran', symbol: '🚰', name: 'Debit Air', badge: 'liter/detik', desc: 'Volume air per satuan waktu' },
+      { op: 'sudut', cat: 'pengukuran', symbol: '📐', name: 'Sudut Geometri', badge: 'Derajat (°)', desc: 'Besar sudut bidang geometri' },
+
+      { op: 'semua', cat: 'campuran', symbol: '🎲', name: 'Semua Soal Acak', badge: 'Campuran', desc: 'Soal acak dari seluruh kurikulum!' }
+    ];
+
+    let wizardStep = 1;
+    let wizardTheme = 'tug';
+    let wizardCat = 'dasar';
+    let wizardOp = '+';
+
+    const wizardDialogMsg = document.getElementById('wizard-dialog-msg');
+    const wizardP1Input = document.getElementById('wizard-p1-input');
+    const wizardP2Input = document.getElementById('wizard-p2-input');
+    const wizardPrevBtn = document.getElementById('wizard-prev-btn');
+    const wizardNextBtn = document.getElementById('wizard-next-btn');
+    const wizardStartBtn = document.getElementById('wizard-start-btn');
+    const dialogWizardView = document.getElementById('dialog-wizard-view');
+    const wizardModesContainer = document.getElementById('wizard-modes-container');
+    const wizardRandomModeBtn = document.getElementById('wizard-random-mode-btn');
+    const wizardCatLabel = document.getElementById('wizard-cat-label');
+
+    const summaryPlayersText = document.getElementById('summary-players-text');
+    const summaryThemeText = document.getElementById('summary-theme-text');
+    const summaryModeText = document.getElementById('summary-mode-text');
+
+    const dialogMessages = {
+      1: "Halo para pejuang matematika! 👋 Siapakah dua jagoan hebat yang akan berduel hari ini?",
+      2: "Keren! Di arena mana kalian ingin bertanding seru hari ini?",
+      3: "Materi tantangan apa yang ingin kalian taklukkan hari ini?",
+      4: "Pilih salah satu tantangan spesifik di bawah ini yang ingin kalian mainkan:",
+      5: "Luar biasa! Semua persiapan duel sudah lengkap. Cek pengaturannya dan mari mulai bertanding!"
+    };
+
+    function setWizardSpeech(text) {
+      if (!wizardDialogMsg) return;
+      wizardDialogMsg.style.animation = 'none';
+      void wizardDialogMsg.offsetWidth;
+      wizardDialogMsg.textContent = text;
+      wizardDialogMsg.style.animation = 'bubbleFade 0.25s ease-out';
+    }
+
+    function syncWizardNamesToInputs() {
+      if (wizardP1Input && inputP1Name && wizardP1Input.value) {
+        inputP1Name.value = wizardP1Input.value.trim() || 'Player 1';
+      }
+      if (wizardP2Input && inputP2Name && wizardP2Input.value) {
+        inputP2Name.value = wizardP2Input.value.trim() || 'Player 2';
+      }
+    }
+
+    function syncInputsToWizardNames() {
+      if (wizardP1Input && inputP1Name && inputP1Name.value) {
+        wizardP1Input.value = inputP1Name.value.trim() || 'Player 1';
+      }
+      if (wizardP2Input && inputP2Name && inputP2Name.value) {
+        wizardP2Input.value = inputP2Name.value.trim() || 'Player 2';
+      }
+    }
+
+    function renderWizardModes(cat) {
+      if (!wizardModesContainer) return;
+      wizardModesContainer.innerHTML = '';
+
+      let modes = [];
+      if (cat === 'campuran') {
+        modes = MODES_CATALOG.filter(m => m.op === 'semua');
+      } else {
+        modes = MODES_CATALOG.filter(m => m.cat === cat);
+      }
+
+      if (wizardCatLabel) {
+        const catNames = {
+          dasar: 'Kategori Dasar (SD 1-2)',
+          aritmatika: 'Aritmatika Cepat (SD 3-4)',
+          lanjutan: 'Tingkat Lanjutan (SD 5-6)',
+          pengukuran: 'Pengukuran & Geometri',
+          campuran: 'Tantangan Acak'
+        };
+        wizardCatLabel.textContent = `Pilihan Soal di ${catNames[cat] || 'Kategori Terpilih'}:`;
+      }
+
+      // If current wizardOp is not in this category, default to first mode in this category
+      const foundCurrent = modes.find(m => m.op === wizardOp);
+      if (!foundCurrent && modes.length > 0) {
+        wizardOp = modes[0].op;
+      }
+
+      modes.forEach(mode => {
+        const card = document.createElement('div');
+        card.className = 'dialog-item-card' + (mode.op === wizardOp ? ' active' : '');
+        card.dataset.op = mode.op;
+        card.innerHTML = `
+          <span class="card-icon" style="font-weight:900;">${mode.symbol}</span>
+          <h4 class="card-title">${mode.name}</h4>
+          <span class="card-desc">${mode.desc}</span>
+          <span class="card-badge">${mode.badge}</span>
+        `;
+
+        card.addEventListener('click', () => {
+          playClickSound();
+          wizardOp = mode.op;
+          wizardModesContainer.querySelectorAll('.dialog-item-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          setWizardSpeech(`Siap! Mode "${mode.name}" dipilih. Klik Lanjut untuk konfirmasi duel!`);
+        });
+
+        wizardModesContainer.appendChild(card);
+      });
+    }
+
+    function updateWizardSummary() {
+      syncWizardNamesToInputs();
+      const p1 = (wizardP1Input && wizardP1Input.value) ? wizardP1Input.value.trim() || 'Player 1' : 'Player 1';
+      const p2 = (wizardP2Input && wizardP2Input.value) ? wizardP2Input.value.trim() || 'Player 2' : 'Player 2';
+      if (summaryPlayersText) summaryPlayersText.textContent = `${p1} VS ${p2}`;
+
+      const th = THEMES[wizardTheme] || THEMES.tug;
+      if (summaryThemeText) summaryThemeText.textContent = `${th.icon} ${th.name}`;
+
+      const m = MODES_CATALOG.find(x => x.op === wizardOp) || MODES_CATALOG[0];
+      if (summaryModeText) summaryModeText.textContent = `${m.symbol} ${m.name}`;
+    }
+
+    function goToWizardStep(step) {
+      const mascot = document.querySelector('.kiki-mascot-svg');
+      if (mascot && mascot.classList) {
+        mascot.classList.remove('kiki-cheer-anim');
+        void mascot.offsetWidth;
+        mascot.classList.add('kiki-cheer-anim');
+        setTimeout(() => { if (mascot.classList) mascot.classList.remove('kiki-cheer-anim'); }, 420);
+      }
+      wizardStep = step;
+
+      // Update step tracker pills
+      for (let s = 1; s <= 5; s++) {
+        const pill = document.getElementById(`step-pill-${s}`);
+        const panel = document.getElementById(`wizard-step-${s}`);
+        if (pill) {
+          pill.classList.toggle('active', s === step);
+          pill.classList.toggle('completed', s < step);
+        }
+        if (panel) {
+          panel.classList.toggle('active', s === step);
+        }
+      }
+
+      const p1 = (wizardP1Input && wizardP1Input.value) ? wizardP1Input.value.trim() || 'Player 1' : 'Player 1';
+      const p2 = (wizardP2Input && wizardP2Input.value) ? wizardP2Input.value.trim() || 'Player 2' : 'Player 2';
+
+      if (step === 1) {
+        setWizardSpeech(dialogMessages[1]);
+        if (wizardPrevBtn) wizardPrevBtn.style.visibility = 'hidden';
+        if (wizardNextBtn) {
+          wizardNextBtn.style.display = 'inline-flex';
+          wizardNextBtn.textContent = 'Lanjut Pilih Arena ➡️';
+        }
+      } else if (step === 2) {
+        syncWizardNamesToInputs();
+        setWizardSpeech(`Keren, ${p1} & ${p2}! Di arena mana kalian ingin bertanding seru hari ini?`);
+        if (wizardPrevBtn) wizardPrevBtn.style.visibility = 'visible';
+        if (wizardNextBtn) {
+          wizardNextBtn.style.display = 'inline-flex';
+          wizardNextBtn.textContent = 'Lanjut Pilih Materi ➡️';
+        }
+      } else if (step === 3) {
+        setWizardSpeech(dialogMessages[3]);
+        if (wizardPrevBtn) wizardPrevBtn.style.visibility = 'visible';
+        if (wizardNextBtn) {
+          wizardNextBtn.style.display = 'inline-flex';
+          wizardNextBtn.textContent = 'Lanjut Pilih Soal ➡️';
+        }
+      } else if (step === 4) {
+        renderWizardModes(wizardCat);
+        setWizardSpeech(dialogMessages[4]);
+        if (wizardPrevBtn) wizardPrevBtn.style.visibility = 'visible';
+        if (wizardNextBtn) {
+          wizardNextBtn.style.display = 'inline-flex';
+          wizardNextBtn.textContent = 'Lanjut ke Ringkasan Duel ➡️';
+        }
+      } else if (step === 5) {
+        updateWizardSummary();
+        setWizardSpeech(dialogMessages[5]);
+        if (wizardPrevBtn) wizardPrevBtn.style.visibility = 'visible';
+        if (wizardNextBtn) {
+          wizardNextBtn.style.display = 'none'; // Step 5 has the big start button
+        }
+      }
+    }
+
+    // Step 1: Quick chip names
+    document.querySelectorAll('.quick-chip-btn[data-p1]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        if (wizardP1Input) wizardP1Input.value = btn.dataset.p1;
+        if (wizardP2Input) wizardP2Input.value = btn.dataset.p2;
+        syncWizardNamesToInputs();
+        setWizardSpeech(`Bagus! Duel ${btn.dataset.p1} vs ${btn.dataset.p2} siap dimulai!`);
+      });
+    });
+
+    // Step 2: Theme selection cards
+    const wizardThemeCards = document.querySelectorAll('#wizard-theme-grid .dialog-item-card');
+    wizardThemeCards.forEach(card => {
+      card.addEventListener('click', () => {
+        playClickSound();
+        wizardThemeCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        wizardTheme = card.dataset.theme;
+        setTheme(wizardTheme);
+        const th = THEMES[wizardTheme];
+        setWizardSpeech(`Pilihan hebat! Arena ${th.name} (${th.icon}) siap menyambut duel kalian!`);
+      });
+    });
+
+    // Step 3: Category selection cards
+    const wizardCatCards = document.querySelectorAll('#wizard-cat-grid .dialog-item-card');
+    wizardCatCards.forEach(card => {
+      card.addEventListener('click', () => {
+        playClickSound();
+        wizardCatCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        wizardCat = card.dataset.cat;
+
+        if (wizardCat === 'campuran') {
+          wizardOp = 'semua';
+          setWizardSpeech(`Wah, kamu berani sekali mengambil Tantangan Campuran! Ayo kita cek pengaturannya!`);
+          setTimeout(() => goToWizardStep(5), 400);
+        } else {
+          setWizardSpeech(`Mantap! Ayo pilih jenis soal favorit kalian di kategori ini!`);
+          setTimeout(() => goToWizardStep(4), 350);
+        }
+      });
+    });
+
+    // Step 4: Random mode button
+    if (wizardRandomModeBtn) {
+      wizardRandomModeBtn.addEventListener('click', () => {
+        playClickSound();
+        const cards = wizardModesContainer ? wizardModesContainer.querySelectorAll('.dialog-item-card') : [];
+        if (cards.length > 0) {
+          const randIdx = Math.floor(Math.random() * cards.length);
+          cards[randIdx].click();
+        }
+      });
+    }
+
+    // Step 5: Fast Settings Bar
+    const step5DiffBtns = document.querySelectorAll('.step5-opt-btn[data-diff]');
+    step5DiffBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        step5DiffBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        winDifference = parseInt(btn.dataset.diff, 10);
+        // Sync with classic grid diff buttons
+        diffButtons.forEach(b => b.classList.toggle('active', b.dataset.diff === btn.dataset.diff));
+      });
+    });
+
+    const step5TimerBtns = document.querySelectorAll('.step5-opt-btn[data-timer]');
+    step5TimerBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        step5TimerBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        questionTimeLimit = parseInt(btn.dataset.timer, 10);
+        // Sync with classic grid timer buttons
+        timerButtons.forEach(b => b.classList.toggle('active', b.dataset.timer === btn.dataset.timer));
+      });
+    });
+
+    const step5DecimalBtns = document.querySelectorAll('.step5-opt-btn[data-decimal]');
+    step5DecimalBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        step5DecimalBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const enableDec = btn.dataset.decimal === 'on';
+        setGlobalDecimalMode(enableDec, false);
+      });
+    });
+
+    // Step Navigation Buttons
+    if (wizardNextBtn) {
+      wizardNextBtn.addEventListener('click', () => {
+        playClickSound();
+        if (wizardStep === 1) {
+          goToWizardStep(2);
+        } else if (wizardStep === 2) {
+          goToWizardStep(3);
+        } else if (wizardStep === 3) {
+          if (wizardCat === 'campuran') {
+            wizardOp = 'semua';
+            goToWizardStep(5);
+          } else {
+            goToWizardStep(4);
+          }
+        } else if (wizardStep === 4) {
+          goToWizardStep(5);
+        }
+      });
+    }
+
+    if (wizardPrevBtn) {
+      wizardPrevBtn.addEventListener('click', () => {
+        playClickSound();
+        if (wizardStep === 5) {
+          if (wizardCat === 'campuran') {
+            goToWizardStep(3);
+          } else {
+            goToWizardStep(4);
+          }
+        } else if (wizardStep > 1) {
+          goToWizardStep(wizardStep - 1);
+        }
+      });
+    }
+
+    // Step Pills Direct Clicking
+    for (let s = 1; s <= 5; s++) {
+      const pill = document.getElementById(`step-pill-${s}`);
+      if (pill) {
+        pill.addEventListener('click', () => {
+          playClickSound();
+          goToWizardStep(s);
+        });
+      }
+    }
+
+    // Start Button (Step 5)
+    if (wizardStartBtn) {
+      wizardStartBtn.addEventListener('click', () => {
+        getAudioContext();
+        playClickSound();
+
+        syncWizardNamesToInputs();
+        p1Name = wizardP1Input ? wizardP1Input.value.trim() || 'Player 1' : 'Player 1';
+        p2Name = wizardP2Input ? wizardP2Input.value.trim() || 'Player 2' : 'Player 2';
+        selectedOperation = wizardOp;
+        setTheme(wizardTheme);
+
+        mainMenu.style.display = 'none';
+        startCountdown();
+      });
+    }
+
+
+
+    function openMainMenu(preferStep = 1) {
+      mainMenu.style.display = 'flex';
+      backMenuBtn.style.display = 'none';
+      if (dialogWizardView) {
+        dialogWizardView.style.display = 'flex';
+        goToWizardStep(preferStep || 1);
+      }
+    }
+
+    // Initial setup on load
+    goToWizardStep(1);
+
+  
+    /* ========================================================
+       REAL ARCADE GAME FEEL: COMBAT POPUPS, SHAKES, & ANIMATIONS
+       ======================================================== */
+    function triggerArenaShake(intensity = 'light') {
+      if (!gameArena) return;
+      const cls = intensity === 'heavy' ? 'arena-shake-heavy' : 'arena-shake-light';
+      gameArena.classList.remove('arena-shake-light', 'arena-shake-heavy');
+      void gameArena.offsetWidth;
+      gameArena.classList.add(cls);
+      setTimeout(() => gameArena.classList.remove(cls), intensity === 'heavy' ? 360 : 230);
+    }
+
+    function spawnCombatText(player, text, isStreak = false, isMiss = false) {
+      if (!gameArena) return;
+      const el = document.createElement('div');
+      el.className = `combat-text-popup ${player === 1 ? 'combat-p1' : 'combat-p2'}` +
+                     (isStreak ? ' combat-streak' : '') +
+                     (isMiss ? ' combat-miss' : '');
+      el.textContent = text;
+      gameArena.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+
+    function triggerDustPuff(player) {
+      const dust = document.getElementById(player === 1 ? 'dust-p1' : 'dust-p2');
+      if (!dust) return;
+      dust.classList.remove('dust-active');
+      void dust.offsetWidth;
+      dust.classList.add('dust-active');
+      setTimeout(() => dust.classList.remove('dust-active'), 360);
+    }
+
+    function triggerMuzzleFlash(player) {
+      const flash = document.getElementById(player === 1 ? 'muzzle-flash-p1' : 'muzzle-flash-p2');
+      if (!flash) return;
+      flash.classList.remove('flash-active');
+      void flash.offsetWidth;
+      flash.classList.add('flash-active');
+      setTimeout(() => flash.classList.remove('flash-active'), 260);
+    }
+
+    function updateLeadIndicator() {
+      const leadEl = document.getElementById('esports-lead-indicator');
+      if (!leadEl) return;
+      if (scoreP1 > scoreP2) {
+        leadEl.innerHTML = `<span class="lead-pill lead-p1">🔵 ${p1Name} Memimpin +${scoreP1 - scoreP2}!</span>`;
+      } else if (scoreP2 > scoreP1) {
+        leadEl.innerHTML = `<span class="lead-pill lead-p2">🔴 ${p2Name} Memimpin +${scoreP2 - scoreP1}!</span>`;
+      } else {
+        leadEl.innerHTML = `<span class="lead-pill lead-tie">⚖️ Pertarungan Sengit (${scoreP1} - ${scoreP2})</span>`;
+      }
+    }
+
+  
+    /* ========================================================
+       MOBILE AUTO FULLSCREEN ENGINE (HP AUTO FULLSCREEN)
+       ======================================================== */
+    function isMobileScreen() {
+      return (window.innerWidth <= 768) ||
+             /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+             ('ontouchstart' in window) ||
+             (navigator.maxTouchPoints > 0);
+    }
+
+    function requestGameFullscreen() {
+      const el = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+        try {
+          if (el.requestFullscreen) {
+            el.requestFullscreen().catch(() => {});
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+          } else if (el.webkitEnterFullscreen) {
+            el.webkitEnterFullscreen();
+          } else if (el.msRequestFullscreen) {
+            el.msRequestFullscreen();
+          }
+        } catch (err) {}
+      }
+    }
+
+    // Auto-enter fullscreen on mobile upon user first touch or tap
+    let autoFsTriggered = false;
+    function triggerAutoMobileFs() {
+      if (autoFsTriggered) return;
+      if (isMobileScreen()) {
+        requestGameFullscreen();
+        autoFsTriggered = true;
+      }
+    }
+
+    window.addEventListener('touchstart', triggerAutoMobileFs, { passive: true });
+    window.addEventListener('pointerdown', triggerAutoMobileFs, { passive: true });
+    window.addEventListener('click', triggerAutoMobileFs, { passive: true });
+
+    // Also trigger whenever start buttons or mode selections are clicked
+    if (okButton) {
+      okButton.addEventListener('click', () => {
+        if (isMobileScreen()) requestGameFullscreen();
+      });
+    }
+
+    if (wizardStartBtn) {
+      wizardStartBtn.addEventListener('click', () => {
+        if (isMobileScreen()) requestGameFullscreen();
+      });
+    }
+
   </script>
 </body>
 </html>
