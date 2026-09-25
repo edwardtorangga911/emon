@@ -1,0 +1,3227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tarik Tambang Matematika - Arena Juara</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --p1-color: #0288d1;
+      --p1-dark: #01579b;
+      --p1-light: #e1f5fe;
+      --p1-glow: rgba(2, 136, 209, 0.45);
+      --p2-color: #d32f2f;
+      --p2-dark: #b71c1c;
+      --p2-light: #ffebee;
+      --p2-glow: rgba(211, 47, 47, 0.45);
+      --gold: #ffb300;
+      --turf-green: #43a047;
+      --accent-orange: #ff9800;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #e0f7fa 0%, #bbdefb 50%, #90caf9 100%);
+      margin: 0;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Top Controls Bar */
+    .top-bar-controls {
+      position: fixed;
+      top: 10px;
+      right: 12px;
+      z-index: 1000;
+      display: flex;
+      gap: 8px;
+    }
+
+    .top-btn {
+      padding: 6px 12px;
+      font-size: 15px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border: 1px solid #90a4ae;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #37474f;
+    }
+
+    .top-btn:hover {
+      background-color: #ffffff;
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    #decimal-toggle-btn.active {
+      background: linear-gradient(180deg, #fff9c4 0%, #fff176 100%) !important;
+      color: #e65100 !important;
+      border-color: #fbc02d !important;
+      font-weight: 800 !important;
+      box-shadow: 0 3px 8px rgba(251, 192, 45, 0.4) !important;
+    }
+
+    #back-menu-btn {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      z-index: 1000;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e3c72;
+      gap: 6px;
+      background: linear-gradient(180deg, #ffffff 0%, #f0f4f8 100%);
+    }
+
+    /* Match Point Banner Alert */
+    #match-point-banner {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #ff1744 0%, #d50000 100%);
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      padding: 5px 18px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(213, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+      animation: dangerPulse 0.8s infinite alternate;
+    }
+
+    @keyframes dangerPulse {
+      0% { transform: translateX(-50%) scale(0.96); opacity: 0.9; }
+      100% { transform: translateX(-50%) scale(1.04); opacity: 1; box-shadow: 0 4px 20px rgba(255, 23, 68, 0.8); }
+    }
+
+    /* Game Header Title */
+    .game-main-title {
+      color: #1a237e;
+      margin: 0 0 2px 0;
+      font-size: 1.75rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Modern Arena Scoreboard */
+    .match-scoreboard {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      z-index: 10;
+      flex-wrap: wrap;
+    }
+
+    .score-badge {
+      padding: 5px 18px;
+      border-radius: 24px;
+      font-weight: 800;
+      font-size: 1.1em;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+      letter-spacing: 0.5px;
+      transition: transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .p1-score-badge {
+      background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+      border: 2px solid #81d4fa;
+      box-shadow: 0 4px 12px var(--p1-glow);
+    }
+
+    .p2-score-badge {
+      background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+      border: 2px solid #ff8a80;
+      box-shadow: 0 4px 12px var(--p2-glow);
+    }
+
+    .score-diff-badge {
+      background: #ffffff;
+      border: 2px solid #4fc3f7;
+      color: #0277bd;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 800;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* Main Game Layout */
+    #game-container {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      width: 96%;
+      max-width: 1280px;
+      gap: 12px;
+    }
+
+    /* Player Panels */
+    .player-panel {
+      width: 285px;
+      padding: 12px;
+      border-radius: 18px;
+      background: #ffffff;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      position: relative;
+      border: 3px solid transparent;
+    }
+
+    #panel-p1 {
+      border-color: #81d4fa;
+      box-shadow: 0 8px 24px var(--p1-glow);
+    }
+
+    #panel-p2 {
+      border-color: #ff8a80;
+      box-shadow: 0 8px 24px var(--p2-glow);
+    }
+
+    /* Player Panel Header Bar (Name + Streak) */
+    .panel-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+      margin: -12px -12px 8px -12px;
+      border-radius: 15px 15px 0 0;
+      font-weight: 800;
+      font-size: 0.95em;
+      color: white;
+    }
+
+    #panel-p1 .panel-header-bar {
+      background: linear-gradient(90deg, #0288d1 0%, #0277bd 100%);
+    }
+
+    #panel-p2 .panel-header-bar {
+      background: linear-gradient(90deg, #d32f2f 0%, #c2185b 100%);
+    }
+
+    .player-name-tag {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .streak-badge {
+      background: #ffb300;
+      color: #212121;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.78em;
+      font-weight: 900;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      animation: streakPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes streakPop {
+      0% { transform: scale(0.6); }
+      100% { transform: scale(1); }
+    }
+
+    /* Problem Text Box */
+    .problem-box {
+      background: #f8fafc;
+      border: 1.5px solid #cfd8dc;
+      border-radius: 12px;
+      padding: 8px 6px;
+      margin-bottom: 6px;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4em;
+      font-weight: 900;
+      color: #1e293b;
+      word-break: break-word;
+      letter-spacing: 0.5px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+      position: relative;
+    }
+
+    /* Per-question Timer Bar */
+    .timer-bar-track {
+      width: 100%;
+      height: 5px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      margin-bottom: 6px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .timer-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #4caf50 0%, #ffeb3b 70%, #f44336 100%);
+      transition: width 0.1s linear;
+      border-radius: 3px;
+    }
+
+    /* Hint Box */
+    .hint-box {
+      font-size: 0.78em;
+      color: #b78103;
+      background: #fffde7;
+      border: 1px solid #ffe082;
+      border-radius: 6px;
+      padding: 3px 6px;
+      margin-bottom: 6px;
+      display: none;
+      font-weight: 700;
+      animation: fadeIn 0.25s;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-4px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Answer Display */
+    .answer-display-container {
+      position: relative;
+      margin-bottom: 6px;
+    }
+
+    .answer-display {
+      width: 100%;
+      height: 46px;
+      border: 2px solid #cfd8dc;
+      border-radius: 10px;
+      font-size: 2.1em;
+      font-weight: 900;
+      text-align: right;
+      padding-right: 12px;
+      line-height: 42px;
+      box-sizing: border-box;
+      background: #fafafa;
+      color: #212121;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .answer-display.shake {
+      animation: shakeWrong 0.35s cubic-bezier(.36,.07,.19,.97) both;
+      background-color: #ffcdd2 !important;
+      border-color: #e53935 !important;
+    }
+
+    @keyframes shakeWrong {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+      40%, 60% { transform: translate3d(6px, 0, 0); }
+    }
+
+    /* Mini Answer History Bullets */
+    .history-dots {
+      display: flex;
+      justify-content: flex-end;
+      gap: 5px;
+      margin-bottom: 6px;
+      padding-right: 4px;
+      height: 12px;
+    }
+
+    .hist-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cfd8dc;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    .hist-dot.correct { background: #4caf50; box-shadow: 0 0 5px rgba(76, 175, 80, 0.7); }
+    .hist-dot.wrong { background: #f44336; box-shadow: 0 0 5px rgba(244, 67, 54, 0.7); }
+
+    /* Keypad Grid (3 Columns, 5 Rows) */
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      flex: 1;
+    }
+
+    .keypad button {
+      padding: 10px 2px;
+      font-size: 1.3em;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid #b0bec5;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff 0%, #f1f3f4 100%);
+      color: #37474f;
+      box-shadow: 0 4px 0 #cfd8dc, 0 3px 6px rgba(0,0,0,0.08);
+      transition: all 0.1s ease;
+      touch-action: manipulation;
+    }
+
+    .keypad button:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #cfd8dc;
+    }
+
+    /* Special Keypad Buttons */
+    .sign-btn {
+      background: linear-gradient(180deg, #ede7f6 0%, #d1c4e9 100%) !important;
+      color: #512da8 !important;
+      border-color: #b39ddb !important;
+      box-shadow: 0 4px 0 #b39ddb !important;
+      font-size: 1.35em !important;
+      font-weight: 900 !important;
+    }
+
+    .comma-btn {
+      background: linear-gradient(180deg, #fff9c4 0%, #fff176 100%) !important;
+      color: #f57f17 !important;
+      border-color: #fbc02d !important;
+      box-shadow: 0 4px 0 #fbc02d !important;
+      font-size: 1.55em !important;
+      font-weight: 900 !important;
+    }
+
+    .backspace-btn {
+      background: linear-gradient(180deg, #ffe0b2 0%, #ffcc80 100%) !important;
+      color: #e65100 !important;
+      border-color: #ffa726 !important;
+      box-shadow: 0 4px 0 #ffa726 !important;
+      font-size: 1.2em !important;
+    }
+
+    .clear-btn {
+      background: linear-gradient(180deg, #ef5350 0%, #d32f2f 100%) !important;
+      color: white !important;
+      border-color: #b71c1c !important;
+      box-shadow: 0 4px 0 #b71c1c !important;
+      font-size: 1.15em !important;
+    }
+
+    .action-btn {
+      background: linear-gradient(180deg, #26a69a 0%, #00897b 100%) !important;
+      color: white !important;
+      border-color: #004d40 !important;
+      box-shadow: 0 4px 0 #004d40 !important;
+      font-size: 1.1em !important;
+      letter-spacing: 0.5px;
+      font-weight: 800 !important;
+    }
+
+    /* Tug of War Arena Pitch */
+    #game-arena {
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      flex: 1;
+      height: 230px;
+      margin: 0 8px;
+      background: radial-gradient(ellipse at 50% 100%, #ffffff 0%, #f1f8e9 60%, #e8f5e9 100%);
+      border-radius: 20px;
+      border: 3px solid #c8e6c9;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08), inset 0 2px 8px rgba(0,0,0,0.04);
+      overflow: hidden;
+      transition: box-shadow 0.3s, border-color 0.3s;
+    }
+
+    #game-arena.danger-tension {
+      border-color: #ff5252;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08), 0 0 20px rgba(255, 23, 68, 0.4);
+    }
+
+    /* Stadium Pitch Markings */
+    #arena-ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 34px;
+      background: linear-gradient(180deg, #66bb6a 0%, #388e3c 100%);
+      border-top: 4px solid #81c784;
+      z-index: 1;
+    }
+
+    #center-line {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      height: 100%;
+      width: 4px;
+      border-left: 3px dashed rgba(67, 160, 71, 0.45);
+      z-index: 1;
+    }
+
+    /* Tension / Distance Meter */
+    .arena-tension-meter {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 4px 14px;
+      border-radius: 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+      z-index: 6;
+      font-size: 0.85em;
+      font-weight: 800;
+      color: #37474f;
+    }
+
+    .tension-bar {
+      width: 170px;
+      height: 10px;
+      background: linear-gradient(90deg, #29b6f6 0%, #e0e0e0 50%, #ef5350 100%);
+      border-radius: 5px;
+      position: relative;
+      border: 1px solid #b0bec5;
+    }
+
+    .tension-needle {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      width: 12px;
+      height: 14px;
+      background: #ffb300;
+      transform: translateX(-50%);
+      transition: left 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: 1.5px solid #fff;
+    }
+
+    /* Tug of War Rope */
+    #rope {
+      position: absolute;
+      left: 50%;
+      width: 330px;
+      height: 14px;
+      background: repeating-linear-gradient(
+        45deg,
+        #8d6e63,
+        #8d6e63 10px,
+        #d7ccc8 10px,
+        #d7ccc8 20px
+      );
+      border-radius: 7px;
+      z-index: 4;
+      bottom: 55px;
+      transform: translateX(-50%);
+      transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    #rope.rope-danger {
+      animation: ropeShake 0.15s infinite alternate;
+    }
+
+    @keyframes ropeShake {
+      0% { transform: translateX(calc(-50% + var(--curr-offset, 0px))) translateY(-2px); }
+      100% { transform: translateX(calc(-50% + var(--curr-offset, 0px))) translateY(2px); }
+    }
+
+    /* Center Ribbon Flag */
+    #marker {
+      position: absolute;
+      left: 50%;
+      width: 22px;
+      height: 38px;
+      background: #ff1744;
+      border: 2px solid #ffffff;
+      border-radius: 3px;
+      bottom: -12px;
+      z-index: 5;
+      transform: translateX(-50%);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.35);
+    }
+
+    #marker::after {
+      content: '▲';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: #ff1744;
+    }
+
+    /* Character Sprites */
+    .character {
+      position: absolute;
+      left: 50%;
+      height: 145px;
+      width: auto;
+      bottom: 25px;
+      z-index: 3;
+      transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+    }
+
+    #character-p1 {
+      transform: translateX(calc(-50% - 150px));
+    }
+
+    #character-p2 {
+      transform: translateX(calc(-50% + 150px)) scaleX(-1);
+    }
+
+    /* Tug vibration animation */
+    @keyframes tugP1 {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.1) translate(-10px, -3px); }
+      100% { transform: scale(1); }
+    }
+    @keyframes tugP2 {
+      0% { transform: scaleX(-1) scale(1); }
+      40% { transform: scaleX(-1) scale(1.1) translate(-10px, -3px); }
+      100% { transform: scaleX(-1) scale(1); }
+    }
+    .tug-active-p1 { animation: tugP1 0.28s ease-out; }
+    .tug-active-p2 { animation: tugP2 0.28s ease-out; }
+
+    #status-message {
+      color: #263238;
+      font-size: 1.15em;
+      margin-top: 8px;
+      font-weight: 700;
+      text-align: center;
+      min-height: 24px;
+    }
+
+    #reset-button {
+      background: linear-gradient(180deg, #4caf50 0%, #2e7d32 100%);
+      color: white;
+      padding: 9px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.05em;
+      font-weight: 700;
+      margin-top: 4px;
+      box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+      transition: all 0.2s;
+    }
+
+    #reset-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(46, 125, 50, 0.4);
+    }
+
+    /* Modal Windows */
+    .modal {
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      background-color: rgba(10, 25, 50, 0.72);
+      backdrop-filter: blur(5px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      margin: auto;
+      padding: 22px;
+      border: 1px solid #e0e0e0;
+      width: 92%;
+      max-width: 880px;
+      max-height: 92vh;
+      overflow-y: auto;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+      animation: modalPop 0.25s ease-out;
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-content img {
+      width: 250px;
+      max-width: 85%;
+      height: auto;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .modal-content h1 {
+      color: #1a237e;
+      margin: 0 0 6px 0;
+      font-size: 1.9em;
+      font-weight: 900;
+    }
+
+    .modal-content h2 {
+      color: #37474f;
+      font-size: 1.25em;
+      margin: 4px 0 10px 0;
+      font-weight: 700;
+    }
+
+    .modal-content h5 {
+      color: #546e7a;
+      font-size: 0.95em;
+      margin: 4px 0 16px 0;
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #43a047 0%, #2e7d32 100%);
+      color: white;
+      padding: 11px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.15em;
+      font-weight: 800;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(46, 125, 50, 0.45);
+    }
+
+    /* Player Custom Names Row */
+    .player-custom-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      background: #f1f8fe;
+      border-radius: 12px;
+      border: 1.5px solid #bbdefb;
+    }
+
+    .player-input-card {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid #cfd8dc;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .player-input-card.p1-card { border-left: 4px solid #0288d1; }
+    .player-input-card.p2-card { border-left: 4px solid #d32f2f; }
+
+    .player-input-card label {
+      font-weight: 800;
+      font-size: 0.85em;
+      color: #37474f;
+    }
+
+    .player-input-card input {
+      border: 1px solid #b0bec5;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.9em;
+      font-weight: 700;
+      width: 125px;
+      outline: none;
+      color: #263238;
+    }
+
+    .player-input-card input:focus {
+      border-color: #0288d1;
+      box-shadow: 0 0 5px rgba(2, 136, 209, 0.3);
+    }
+
+    .vs-pill {
+      background: #ffb300;
+      color: #212121;
+      font-weight: 900;
+      font-size: 0.78em;
+      padding: 3px 8px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    /* Settings Bar (Target Difference, Timer & Decimal Mode) */
+    .match-settings-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-size: 0.88em;
+      color: #334155;
+    }
+
+    .setting-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .setting-group strong {
+      font-size: 0.9em;
+      color: #1e293b;
+    }
+
+    .opt-btn {
+      padding: 5px 11px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 0.84em;
+      font-weight: 700;
+      cursor: pointer;
+      color: #475569;
+      transition: all 0.15s;
+    }
+
+    .opt-btn.active {
+      background: #0288d1;
+      color: white;
+      border-color: #0277bd;
+      box-shadow: 0 2px 6px rgba(2, 136, 209, 0.3);
+    }
+
+    /* Category Filter Tabs (34 Mode) */
+    .category-tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .cat-tab {
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1.5px solid #90caf9;
+      background: #ffffff;
+      color: #1565c0;
+      font-size: 0.86em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .cat-tab.active, .cat-tab:hover {
+      background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+      color: #ffffff;
+      border-color: #0d47a1;
+      box-shadow: 0 3px 8px rgba(21, 101, 192, 0.35);
+    }
+
+    /* Mode Selection Grid */
+    .mode-selection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+      gap: 9px;
+      margin-top: 4px;
+      justify-items: center;
+      max-height: 48vh;
+      overflow-y: auto;
+      padding: 6px 2px;
+    }
+
+    .mode-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f7f9fa 100%);
+      border: 2px solid #cfd8dc;
+      border-radius: 14px;
+      padding: 7px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      width: 115px;
+      height: 90px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+      touch-action: manipulation;
+    }
+
+    .mode-card:hover {
+      background: #e3f2fd;
+      border-color: #1976d2;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(25, 118, 210, 0.25);
+    }
+
+    .mode-card:active {
+      transform: scale(0.96);
+    }
+
+    .mode-card .mode-symbol {
+      width: 70px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #263238;
+      line-height: 1;
+    }
+
+    .mode-card h3 {
+      margin: 2px 0 0 0;
+      color: #37474f;
+      font-size: 0.81em;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    .mode-card .mode-badge {
+      font-size: 0.65em;
+      background: #e0e0e0;
+      color: #424242;
+      padding: 1px 7px;
+      border-radius: 8px;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* Highlight Negative Mode */
+    .mode-card[data-op="negatif"] {
+      border-color: #b39ddb;
+      background: linear-gradient(180deg, #ede7f6 0%, #d1c4e9 100%);
+    }
+
+    /* Countdown Overlay */
+    #countdown-overlay {
+      background-color: rgba(10, 25, 50, 0.9);
+      z-index: 1001;
+    }
+
+    #countdown-text {
+      font-size: 10em;
+      color: #ffeb3b;
+      font-weight: 900;
+      animation: pulse 1s infinite;
+      text-shadow: 0 0 30px rgba(255, 235, 59, 0.7);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    /* Fruit Mode */
+    #panel-p1.fruit-mode .problem-box,
+    #panel-p2.fruit-mode .problem-box {
+      font-size: 2.2em;
+      letter-spacing: 4px;
+      justify-content: center;
+      background: #ffffff;
+    }
+
+    /* Victory Stats Box */
+    .win-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      margin: 14px 0 20px 0;
+      text-align: center;
+    }
+
+    .win-stat-item h4 {
+      margin: 0;
+      font-size: 0.82em;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .win-stat-item p {
+      margin: 4px 0 0 0;
+      font-size: 1.25em;
+      font-weight: 900;
+      color: #1e293b;
+    }
+
+    .win-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-rematch {
+      background: linear-gradient(180deg, #0288d1 0%, #01579b 100%);
+      color: white;
+      padding: 11px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(2, 136, 209, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-rematch:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(2, 136, 209, 0.45);
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    /* Footer */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #f5f5f5;
+      color: #616161;
+      text-align: center;
+      padding: 5px 8px;
+      font-size: 0.88em;
+      font-weight: 600;
+      z-index: 90;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.06);
+    }
+
+    @media (max-width: 920px) {
+      .player-panel {
+        width: 220px;
+        padding: 9px;
+      }
+      .keypad button {
+        padding: 8px 1px;
+        font-size: 1.15em;
+      }
+      .answer-display {
+        height: 38px;
+        font-size: 1.7em;
+        line-height: 34px;
+      }
+      #rope {
+        width: 220px;
+      }
+      .character {
+        height: 110px;
+      }
+      #character-p1 {
+        transform: translateX(calc(-50% - 110px));
+      }
+      #character-p2 {
+        transform: translateX(calc(-50% + 110px)) scaleX(-1);
+      }
+      .game-main-title {
+        font-size: 1.4rem;
+      }
+      .top-btn {
+        padding: 5px 8px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+
+  <!-- Top Bar Controls -->
+  <button id="back-menu-btn" class="top-btn" title="Kembali ke Pilihan Mode" style="display:none;">
+    🏠 Pilihan Mode
+  </button>
+  <div class="top-bar-controls">
+    <button id="decimal-toggle-btn" class="top-btn" title="Aktifkan/Nonaktifkan Angka Desimal di Semua Soal">🔢 Desimal: OFF</button>
+    <button id="sound-btn" class="top-btn" title="Suara Nyala / Mati">🔊</button>
+    <button id="fullscreen-btn" class="top-btn" title="Layar Penuh">⛶</button>
+  </div>
+
+  <!-- Match Point Warning Banner -->
+  <div id="match-point-banner">⚠️ MATCH POINT! KEMENANGAN SUDAH DEKAT! ⚠️</div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Info Popup Modal -->
+  <div id="info-popup" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <h1>⚡ TARIK TAMBANG MATEMATIKA 🏆</h1>
+      <h2>Permainan Edukasi Interaktif Kelas & Layar Sentuh (IFP)</h2>
+      <h5>Boleh digunakan di smartphone/tablet dengan view mendatar (landscape).</h5>
+      <button id="ok-btn" class="btn-primary">Mulai Bermain 🚀</button>
+      <div id="popup-creator-info" style="text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+        <h4 style="margin: 0; color: #444; font-weight: 700;">Creator: Edo</h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Menu (Mode Selection) -->
+  <div id="main-menu" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 880px;">
+      <h2>Tarik Tambang Matematika<br><span style="font-size: 0.8em; color: #555;">Pilih Mode & Pengaturan Pertandingan</span></h2>
+
+      <!-- Player Names Customization Bar -->
+      <div class="player-custom-bar">
+        <div class="player-input-card p1-card">
+          <label>P1 (Biru):</label>
+          <input type="text" id="input-p1-name" value="Player 1" maxlength="14" placeholder="Nama Player 1">
+        </div>
+        <div class="vs-pill">VS</div>
+        <div class="player-input-card p2-card">
+          <label>P2 (Merah):</label>
+          <input type="text" id="input-p2-name" value="Player 2" maxlength="14" placeholder="Nama Player 2">
+        </div>
+      </div>
+
+      <!-- Match Setting Bar (Win Difference + Timer + Global Decimal Option) -->
+      <div class="match-settings-bar">
+        <div class="setting-group">
+          <strong>Target Menang:</strong>
+          <button class="opt-btn diff-btn" data-diff="3">⚡ Kilat (3)</button>
+          <button class="opt-btn diff-btn active" data-diff="5">⚖️ Standar (5)</button>
+          <button class="opt-btn diff-btn" data-diff="8">🔥 Maraton (8)</button>
+        </div>
+        <div class="setting-group">
+          <strong>Batas Waktu:</strong>
+          <button class="opt-btn timer-btn active" data-timer="0">♾️ Santai (Off)</button>
+          <button class="opt-btn timer-btn" data-timer="20">⏱️ 20 Detik</button>
+          <button class="opt-btn timer-btn" data-timer="12">⚡ 12 Detik</button>
+        </div>
+        <div class="setting-group">
+          <strong>Opsi Desimal (,):</strong>
+          <button class="opt-btn decimal-btn active" data-decimal="off">🔢 Standar</button>
+          <button class="opt-btn decimal-btn" data-decimal="on" style="font-weight: 800; border-color: #fbc02d; background: #fffde7; color: #b78103;">✨ Terapkan ke Semua Mode</button>
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs (34 Mode) -->
+      <div class="category-tabs">
+        <button class="cat-tab active" data-cat="all">🌟 Semua (34)</button>
+        <button class="cat-tab" data-cat="dasar">🌱 Dasar (SD 1-2)</button>
+        <button class="cat-tab" data-cat="aritmatika">⚡ Aritmatika (SD 3-4)</button>
+        <button class="cat-tab" data-cat="lanjutan">🚀 Lanjutan (SD 5-6)</button>
+        <button class="cat-tab" data-cat="pengukuran">📐 Satuan & Geometri</button>
+      </div>
+
+      <!-- 34 Mode Cards Grid -->
+      <div class="mode-selection-grid">
+        <!-- 1. Tambah -->
+        <div class="mode-card" data-op="+" data-cat="dasar">
+          <span class="mode-symbol">+</span> <h3>Tambah</h3>
+          <span class="mode-badge">1 Digit</span>
+        </div>
+
+        <!-- 2. Kurang -->
+        <div class="mode-card" data-op="-" data-cat="dasar">
+          <span class="mode-symbol">−</span> <h3>Kurang</h3>
+          <span class="mode-badge">1 Digit</span>
+        </div>
+
+        <!-- 3. Kali -->
+        <div class="mode-card" data-op="*" data-cat="aritmatika">
+          <span class="mode-symbol">×</span> <h3>Kali</h3>
+          <span class="mode-badge">Dasar</span>
+        </div>
+
+        <!-- 4. Bagi -->
+        <div class="mode-card" data-op="/" data-cat="aritmatika">
+          <span class="mode-symbol">÷</span> <h3>Bagi</h3>
+          <span class="mode-badge">Dasar</span>
+        </div>
+
+        <!-- 5. Campuran -->
+        <div class="mode-card" data-op="campuran" data-cat="aritmatika">
+          <span class="mode-symbol">±</span> <h3>+−×÷</h3>
+          <span class="mode-badge">Campuran</span>
+        </div>
+
+        <!-- 6. Bilangan Bulat Negatif -->
+        <div class="mode-card" data-op="negatif" data-cat="aritmatika">
+          <span class="mode-symbol" style="font-size: 1.8rem; color: #512da8;">−/+</span>
+          <h3>Bil. Negatif</h3>
+          <span class="mode-badge" style="background:#d1c4e9; color:#4527a0;">Positif & Negatif</span>
+        </div>
+
+        <!-- 7. Pangkat 2 -->
+        <div class="mode-card" data-op="pangkat" data-cat="lanjutan">
+          <span class="mode-symbol">x²</span> <h3>Pangkat 2</h3>
+          <span class="mode-badge">Kuadrat</span>
+        </div>
+
+        <!-- 8. Pangkat 3 -->
+        <div class="mode-card" data-op="pangkat3" data-cat="lanjutan">
+          <span class="mode-symbol">x³</span> <h3>Pangkat 3</h3>
+          <span class="mode-badge">Kubik</span>
+        </div>
+
+        <!-- 9. Akar -->
+        <div class="mode-card" data-op="akar" data-cat="lanjutan">
+          <span class="mode-symbol">√</span> <h3>Akar</h3>
+          <span class="mode-badge">Akar 2</span>
+        </div>
+
+        <!-- 10. Akar Pangkat 3 -->
+        <div class="mode-card" data-op="akar3" data-cat="lanjutan">
+          <span class="mode-symbol">∛</span> <h3>Akar Pangkat 3</h3>
+          <span class="mode-badge">Akar 3</span>
+        </div>
+
+        <!-- 11. Semua -->
+        <div class="mode-card" data-op="semua" data-cat="aritmatika">
+          <span class="mode-symbol">?</span> <h3>+−×÷x²√</h3>
+          <span class="mode-badge">Acak</span>
+        </div>
+
+        <!-- 12. 2 Digit Tambah -->
+        <div class="mode-card" data-op="+2" data-cat="dasar">
+          <span class="mode-symbol" style="font-size: 1.8rem;">+2</span> <h3>2 Digit</h3>
+          <span class="mode-badge">Puluhan</span>
+        </div>
+
+        <!-- 13. 2 Digit Kurang -->
+        <div class="mode-card" data-op="-2" data-cat="dasar">
+          <span class="mode-symbol" style="font-size: 1.8rem;">-2</span> <h3>-2 Digit</h3>
+          <span class="mode-badge">Puluhan</span>
+        </div>
+
+        <!-- 14. Tambah Kurang -->
+        <div class="mode-card" data-op="tambahkurang" data-cat="aritmatika">
+          <span class="mode-symbol">+−</span> <h3>Tambah Kurang</h3>
+          <span class="mode-badge">3 Angka</span>
+        </div>
+
+        <!-- 15. Kali Bagi -->
+        <div class="mode-card" data-op="kalibagi" data-cat="aritmatika">
+          <span class="mode-symbol">×÷</span> <h3>Kali Bagi</h3>
+          <span class="mode-badge">3 Angka</span>
+        </div>
+
+        <!-- 16. Persen -->
+        <div class="mode-card" data-op="persen" data-cat="aritmatika">
+          <span class="mode-symbol">%</span> <h3>Persen</h3>
+          <span class="mode-badge">Persentase</span>
+        </div>
+
+        <!-- 17. FPB -->
+        <div class="mode-card" data-op="fpb" data-cat="lanjutan">
+          <span class="mode-symbol" style="font-size: 1.6rem;">FPB</span> <h3>FPB</h3>
+          <span class="mode-badge">Faktor</span>
+        </div>
+
+        <!-- 18. KPK -->
+        <div class="mode-card" data-op="kpk" data-cat="lanjutan">
+          <span class="mode-symbol" style="font-size: 1.6rem;">KPK</span> <h3>KPK</h3>
+          <span class="mode-badge">Kelipatan</span>
+        </div>
+
+        <!-- 19. Waktu -->
+        <div class="mode-card" data-op="waktu" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🕐</span> <h3>Waktu</h3>
+          <span class="mode-badge">Jam/Menit</span>
+        </div>
+
+        <!-- 20. Jarak -->
+        <div class="mode-card" data-op="jarak" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">📏</span> <h3>Jarak</h3>
+          <span class="mode-badge">km, m, cm</span>
+        </div>
+
+        <!-- 21. Hitung Buah -->
+        <div class="mode-card" data-op="buah" data-cat="dasar">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🍉</span> <h3>Hitung Buah</h3>
+          <span class="mode-badge">Visual TK/SD</span>
+        </div>
+
+        <!-- 22. Satuan Berat -->
+        <div class="mode-card" data-op="berat" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">⚖️</span> <h3>Berat</h3>
+          <span class="mode-badge">kg, gram, ton</span>
+        </div>
+
+        <!-- 23. Satuan Volume -->
+        <div class="mode-card" data-op="volume" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🧪</span> <h3>Volume</h3>
+          <span class="mode-badge">liter, ml</span>
+        </div>
+
+        <!-- 24. Pola Bilangan -->
+        <div class="mode-card" data-op="pola" data-cat="dasar">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🔢</span> <h3>Pola Angka</h3>
+          <span class="mode-badge">Deret Bilangan</span>
+        </div>
+
+        <!-- 25. Luas Bangun Datar -->
+        <div class="mode-card" data-op="luas" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🟩</span> <h3>Luas</h3>
+          <span class="mode-badge">Persegi/Panjang</span>
+        </div>
+
+        <!-- 26. Keliling Bangun Datar -->
+        <div class="mode-card" data-op="keliling" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🔲</span> <h3>Keliling</h3>
+          <span class="mode-badge">Bangun Datar</span>
+        </div>
+
+        <!-- 27. Segitiga -->
+        <div class="mode-card" data-op="segitiga" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🔺</span> <h3>Segitiga</h3>
+          <span class="mode-badge">Luas & Keliling</span>
+        </div>
+
+        <!-- 28. Kecepatan -->
+        <div class="mode-card" data-op="kecepatan" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🚀</span> <h3>Kecepatan</h3>
+          <span class="mode-badge">km/jam, Jarak</span>
+        </div>
+
+        <!-- 29. Debit Air -->
+        <div class="mode-card" data-op="debit" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🚰</span> <h3>Debit Air</h3>
+          <span class="mode-badge">liter/detik</span>
+        </div>
+
+        <!-- 30. Aljabar X -->
+        <div class="mode-card" data-op="aljabar" data-cat="lanjutan">
+          <span class="mode-symbol" style="font-size: 2.1rem;">🧩</span> <h3>Aljabar X</h3>
+          <span class="mode-badge">Nilai x = ?</span>
+        </div>
+
+        <!-- 31. Angka Romawi -->
+        <div class="mode-card" data-op="romawi" data-cat="dasar">
+          <span class="mode-symbol" style="font-size: 1.8rem;">XVIII</span> <h3>Romawi</h3>
+          <span class="mode-badge">Angka Romawi</span>
+        </div>
+
+        <!-- 32. Sisa Pembagian / Modulus -->
+        <div class="mode-card" data-op="sisa" data-cat="aritmatika">
+          <span class="mode-symbol" style="font-size: 2.1rem;">➗</span> <h3>Sisa Bagi</h3>
+          <span class="mode-badge">Sisa ÷</span>
+        </div>
+
+        <!-- 33. Hitung Kembalian Uang -->
+        <div class="mode-card" data-op="uang" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">💵</span> <h3>Uang Belanja</h3>
+          <span class="mode-badge">Kembalian</span>
+        </div>
+
+        <!-- 34. Sudut Geometri -->
+        <div class="mode-card" data-op="sudut" data-cat="pengukuran">
+          <span class="mode-symbol" style="font-size: 2.1rem;">📐</span> <h3>Sudut</h3>
+          <span class="mode-badge">Derajat (°)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Countdown Overlay -->
+  <div id="countdown-overlay" class="modal" style="display:none;">
+    <h1 id="countdown-text">3</h1>
+  </div>
+
+  <!-- Main Game Content -->
+  <div id="game-content" style="display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%;">
+    <h1 class="game-main-title">⚡ TARIK TAMBANG MATEMATIKA 🏆</h1>
+
+    <!-- Scoreboard Live -->
+    <div class="match-scoreboard">
+      <div class="score-badge p1-score-badge">
+        <span id="scoreboard-name-p1">Player 1</span>: <span id="score-p1-val">0</span>
+      </div>
+      <div class="score-diff-badge" id="score-diff-val">Selisih: 0 / 5</div>
+      <div class="score-diff-badge" id="decimal-active-badge" style="display:none; background:#fff9c4; border-color:#fbc02d; color:#b78103; font-weight:800;">✨ Desimal ON (,)</div>
+      <div class="score-badge p2-score-badge">
+        <span id="scoreboard-name-p2">Player 2</span>: <span id="score-p2-val">0</span>
+      </div>
+    </div>
+
+    <div id="game-container">
+      <!-- Player 1 -->
+      <div class="player-panel" id="panel-p1">
+        <div class="panel-header-bar">
+          <span class="player-name-tag" id="panel-name-p1">Player 1</span>
+          <span class="streak-badge" id="streak-badge-p1" style="display:none;">🔥 0x</span>
+        </div>
+        <div class="problem-box" id="problem-p1">Soal Muncul Disini</div>
+        <div class="timer-bar-track" id="timer-track-p1">
+          <div class="timer-bar-fill" id="timer-fill-p1"></div>
+        </div>
+        <div class="hint-box" id="hint-p1"></div>
+        <div class="answer-display-container">
+          <div class="answer-display" id="answer-p1"></div>
+        </div>
+        <div class="history-dots" id="history-p1">
+          <span class="hist-dot"></span>
+          <span class="hist-dot"></span>
+          <span class="hist-dot"></span>
+        </div>
+        <div class="keypad" id="keypad-p1"></div>
+      </div>
+
+      <!-- Center Tug of War Arena -->
+      <div id="game-arena">
+        <!-- Tension Gauge -->
+        <div class="arena-tension-meter">
+          <span id="tension-label-p1">P1</span>
+          <div class="tension-bar">
+            <div class="tension-needle" id="tension-needle"></div>
+          </div>
+          <span id="tension-label-p2">P2</span>
+        </div>
+
+        <div id="center-line"></div>
+        <div id="arena-ground"></div>
+        <img alt="Player 1" id="character-p1" class="character">
+        <div id="rope">
+          <div id="marker"></div>
+        </div>
+        <img alt="Player 2" id="character-p2" class="character">
+      </div>
+
+      <!-- Player 2 -->
+      <div class="player-panel" id="panel-p2">
+        <div class="panel-header-bar">
+          <span class="player-name-tag" id="panel-name-p2">Player 2</span>
+          <span class="streak-badge" id="streak-badge-p2" style="display:none;">🔥 0x</span>
+        </div>
+        <div class="problem-box" id="problem-p2">Soal Muncul Disini</div>
+        <div class="timer-bar-track" id="timer-track-p2">
+          <div class="timer-bar-fill" id="timer-fill-p2"></div>
+        </div>
+        <div class="hint-box" id="hint-p2"></div>
+        <div class="answer-display-container">
+          <div class="answer-display" id="answer-p2"></div>
+        </div>
+        <div class="history-dots" id="history-p2">
+          <span class="hist-dot"></span>
+          <span class="hist-dot"></span>
+          <span class="hist-dot"></span>
+        </div>
+        <div class="keypad" id="keypad-p2"></div>
+      </div>
+    </div>
+
+    <h2 id="status-message">Jawab soal untuk menarik tali!</h2>
+    <button id="reset-button" style="display:none;">Main Lagi</button>
+  </div>
+
+  <!-- Unified Win Popup with Full Match Summary -->
+  <div id="win-popup" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 640px;">
+      <img alt="Juara Tarik Tambang" id="win-trophy-img" src="trophy.jpg">
+      <h2 id="win-title" style="font-size: 2em; font-weight: 900; margin: 0 0 6px 0;">🎉 PEMENANG! 🎉</h2>
+      <p id="win-subtitle" style="font-size: 1.15em; font-weight: 700; color: #37474f; margin-bottom: 12px;"></p>
+
+      <div class="win-stats-grid">
+        <div class="win-stat-item">
+          <h4>⏱️ Durasi</h4>
+          <p id="stat-duration">00:00</p>
+        </div>
+        <div class="win-stat-item">
+          <h4>🎯 Total Soal</h4>
+          <p id="stat-total-q">0</p>
+        </div>
+        <div class="win-stat-item">
+          <h4>🔥 Combo Maks</h4>
+          <p id="stat-max-streak">0x</p>
+        </div>
+      </div>
+
+      <div class="win-actions">
+        <button class="btn-rematch" id="btn-rematch">🔄 Tanding Ulang</button>
+        <button class="btn-primary" id="btn-back-menu">🏠 Ganti Mode</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="social-links">
+      <span>Creator: Edo</span>
+    </div>
+  </footer>
+
+  <!-- Assets script (if present) -->
+  <script src="assets.js"></script>
+
+  <script>
+    /* ========================================================
+       ASSETS RESOLVER (High-Res Images with Local Fallback)
+       ======================================================== */
+    const p1Img = document.getElementById('character-p1');
+    const p2Img = document.getElementById('character-p2');
+    const winTrophyImg = document.getElementById('win-trophy-img');
+
+    p1Img.src = 'p1_new.jpg';
+    p1Img.onerror = () => { p1Img.src = 'p1.png'; };
+
+    p2Img.src = 'p2_new.jpg';
+    p2Img.onerror = () => { p2Img.src = 'p2.png'; };
+
+    winTrophyImg.src = 'trophy.jpg';
+    winTrophyImg.onerror = () => { winTrophyImg.src = 'win_p1.png'; };
+
+    /* ========================================================
+       WEB AUDIO SYNTHESIS
+       ======================================================== */
+    let audioEnabled = true;
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    const soundBtn = document.getElementById('sound-btn');
+    soundBtn.addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      soundBtn.textContent = audioEnabled ? '🔊' : '🔇';
+      if (audioEnabled) playTone(520, 0.1, 'sine');
+    });
+
+    function playTone(freq, duration, type = 'sine', gainVal = 0.15) {
+      if (!audioEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(gainVal, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playClickSound() {
+      playTone(600, 0.04, 'triangle', 0.08);
+    }
+
+    function playCountdownSound(num) {
+      if (num > 0) {
+        playTone(440, 0.18, 'sine', 0.22);
+      } else {
+        playTone(660, 0.12, 'triangle', 0.25);
+        setTimeout(() => playTone(880, 0.28, 'triangle', 0.3), 110);
+      }
+    }
+
+    function playCorrectSound(streak = 1) {
+      const baseFreq = 523.25;
+      const step = Math.min(streak - 1, 4) * 80;
+      playTone(baseFreq + step, 0.08, 'sine', 0.22);
+      setTimeout(() => playTone(baseFreq + step + 130, 0.15, 'sine', 0.26), 75);
+    }
+
+    function playComboSound() {
+      if (!audioEnabled) return;
+      const notes = [659.25, 783.99, 987.77, 1318.51];
+      notes.forEach((f, idx) => {
+        setTimeout(() => playTone(f, 0.12, 'triangle', 0.28), idx * 80);
+      });
+    }
+
+    function playTimeoutSound() {
+      playTone(280, 0.12, 'sawtooth', 0.25);
+      setTimeout(() => playTone(200, 0.2, 'sawtooth', 0.25), 100);
+    }
+
+    function playWrongSound() {
+      playTone(180, 0.22, 'sawtooth', 0.2);
+    }
+
+    function playWinSound() {
+      if (!audioEnabled) return;
+      const notes = [
+        { f: 523.25, d: 0.14, t: 0 },
+        { f: 659.25, d: 0.14, t: 140 },
+        { f: 783.99, d: 0.16, t: 280 },
+        { f: 1046.50, d: 0.6, t: 440 }
+      ];
+      notes.forEach(n => setTimeout(() => playTone(n.f, n.d, 'triangle', 0.32), n.t));
+    }
+
+    /* ========================================================
+       CONFETTI SYSTEM
+       ======================================================== */
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confettiPieces = [];
+    let confettiAnimationId = null;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function launchConfetti() {
+      confettiPieces = [];
+      const colors = ['#f44336', '#e91e63', '#9c27b0', '#2196f3', '#4caf50', '#ffeb3b', '#ff9800'];
+      for (let i = 0; i < 150; i++) {
+        confettiPieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height * 0.5,
+          size: Math.random() * 8 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 6,
+          vy: Math.random() * 4 + 3,
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 10
+        });
+      }
+      if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      confettiPieces.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotationSpeed;
+        if (p.y < canvas.height + 20) {
+          alive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        }
+      });
+      if (alive) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    /* ========================================================
+       GAME STATE & NAVIGATION
+       ======================================================== */
+    const infoPopup = document.getElementById('info-popup');
+    const okButton = document.getElementById('ok-btn');
+    const mainMenu = document.getElementById('main-menu');
+    const modeButtons = document.querySelectorAll('.mode-card');
+    const countdownOverlay = document.getElementById('countdown-overlay');
+    const countdownText = document.getElementById('countdown-text');
+    const gameContent = document.getElementById('game-content');
+    const statusMessage = document.getElementById('status-message');
+    const resetButton = document.getElementById('reset-button');
+    const backMenuBtn = document.getElementById('back-menu-btn');
+    const matchPointBanner = document.getElementById('match-point-banner');
+
+    const decimalToggleBtn = document.getElementById('decimal-toggle-btn');
+    const decimalActiveBadge = document.getElementById('decimal-active-badge');
+    const decimalMenuButtons = document.querySelectorAll('.decimal-btn');
+
+    const scoreP1Val = document.getElementById('score-p1-val');
+    const scoreP2Val = document.getElementById('score-p2-val');
+    const scoreDiffVal = document.getElementById('score-diff-val');
+    const tensionNeedle = document.getElementById('tension-needle');
+    const gameArena = document.getElementById('game-arena');
+
+    const inputP1Name = document.getElementById('input-p1-name');
+    const inputP2Name = document.getElementById('input-p2-name');
+    const scoreboardNameP1 = document.getElementById('scoreboard-name-p1');
+    const scoreboardNameP2 = document.getElementById('scoreboard-name-p2');
+    const panelNameP1 = document.getElementById('panel-name-p1');
+    const panelNameP2 = document.getElementById('panel-name-p2');
+    const tensionLabelP1 = document.getElementById('tension-label-p1');
+    const tensionLabelP2 = document.getElementById('tension-label-p2');
+
+    const streakBadgeP1 = document.getElementById('streak-badge-p1');
+    const streakBadgeP2 = document.getElementById('streak-badge-p2');
+    const hintP1 = document.getElementById('hint-p1');
+    const hintP2 = document.getElementById('hint-p2');
+
+    const timerTrackP1 = document.getElementById('timer-track-p1');
+    const timerTrackP2 = document.getElementById('timer-track-p2');
+    const timerFillP1 = document.getElementById('timer-fill-p1');
+    const timerFillP2 = document.getElementById('timer-fill-p2');
+
+    const problemP1 = document.getElementById('problem-p1');
+    const answerP1 = document.getElementById('answer-p1');
+    const keypadP1 = document.getElementById('keypad-p1');
+    const historyP1 = document.getElementById('history-p1');
+
+    const problemP2 = document.getElementById('problem-p2');
+    const answerP2 = document.getElementById('answer-p2');
+    const keypadP2 = document.getElementById('keypad-p2');
+    const historyP2 = document.getElementById('history-p2');
+
+    const characterP1 = document.getElementById('character-p1');
+    const characterP2 = document.getElementById('character-p2');
+    const rope = document.getElementById('rope');
+
+    const winPopup = document.getElementById('win-popup');
+    const winTitle = document.getElementById('win-title');
+    const winSubtitle = document.getElementById('win-subtitle');
+    const statDuration = document.getElementById('stat-duration');
+    const statTotalQ = document.getElementById('stat-total-q');
+    const statMaxStreak = document.getElementById('stat-max-streak');
+    const btnRematch = document.getElementById('btn-rematch');
+    const btnBackMenu = document.getElementById('btn-back-menu');
+
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const docElement = document.documentElement;
+
+    let scoreP1 = 0;
+    let scoreP2 = 0;
+    let worldOffset = 0;
+    const moveDistance = 22;
+    let winDifference = 5;
+    let questionTimeLimit = 0; // 0 = off, else seconds
+    let globalDecimalMode = false; // Toggle to apply decimals across all modes
+    let gameOver = false;
+    let countdownInterval = null;
+    let matchStartTime = 0;
+
+    let p1Name = 'Player 1';
+    let p2Name = 'Player 2';
+
+    let streakP1 = 0;
+    let streakP2 = 0;
+    let maxStreakP1 = 0;
+    let maxStreakP2 = 0;
+    let totalQuestionsP1 = 0;
+    let totalQuestionsP2 = 0;
+    let wrongCountP1 = 0;
+    let wrongCountP2 = 0;
+
+    let timerIntervalP1 = null;
+    let timerIntervalP2 = null;
+    let timeRemainingP1 = 0;
+    let timeRemainingP2 = 0;
+
+    let p1HistoryArr = [];
+    let p2HistoryArr = [];
+
+    let currentProblemP1 = {};
+    let currentProblemP2 = {};
+    let currentAnswerP1 = '';
+    let currentAnswerP2 = '';
+
+    let selectedOperation = '+'; // Default standard addition
+    let operationCycle = ['+', '-', '*', '/'];
+    let currentCycleIndex = 0;
+
+    /* Category Tab Filtering */
+    const catTabs = document.querySelectorAll('.cat-tab');
+    catTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        playClickSound();
+        catTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const selectedCat = tab.dataset.cat;
+
+        modeButtons.forEach(card => {
+          if (selectedCat === 'all' || card.dataset.cat === selectedCat) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    /* Win Difference Selection */
+    const diffButtons = document.querySelectorAll('.diff-btn');
+    diffButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        diffButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        winDifference = parseInt(btn.dataset.diff, 10);
+      });
+    });
+
+    /* Question Timer Selection */
+    const timerButtons = document.querySelectorAll('.timer-btn');
+    timerButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        timerButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        questionTimeLimit = parseInt(btn.dataset.timer, 10);
+      });
+    });
+
+    /* Global Decimal Mode Controller */
+    function setGlobalDecimalMode(enable, refreshProblems = true) {
+      globalDecimalMode = enable;
+      if (globalDecimalMode) {
+        decimalToggleBtn.textContent = '✨ Desimal: ON (,)';
+        decimalToggleBtn.classList.add('active');
+        if (decimalActiveBadge) decimalActiveBadge.style.display = 'inline-block';
+      } else {
+        decimalToggleBtn.textContent = '🔢 Desimal: OFF';
+        decimalToggleBtn.classList.remove('active');
+        if (decimalActiveBadge) decimalActiveBadge.style.display = 'none';
+      }
+
+      decimalMenuButtons.forEach(btn => {
+        if ((btn.dataset.decimal === 'on' && globalDecimalMode) || (btn.dataset.decimal === 'off' && !globalDecimalMode)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      if (refreshProblems && gameContent.style.display === 'flex' && !gameOver) {
+        displayNewProblem(1);
+        displayNewProblem(2);
+      }
+    }
+
+    decimalToggleBtn.addEventListener('click', () => {
+      playClickSound();
+      setGlobalDecimalMode(!globalDecimalMode, true);
+    });
+
+    decimalMenuButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playClickSound();
+        setGlobalDecimalMode(btn.dataset.decimal === 'on', false);
+      });
+    });
+
+    okButton.addEventListener('click', () => {
+      getAudioContext();
+      playClickSound();
+      infoPopup.style.display = 'none';
+      mainMenu.style.display = 'flex';
+      backMenuBtn.style.display = 'none';
+
+      // Request fullscreen if supported
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+        if (docElement.requestFullscreen) docElement.requestFullscreen().catch(() => {});
+        else if (docElement.webkitRequestFullscreen) docElement.webkitRequestFullscreen();
+        else if (docElement.msRequestFullscreen) docElement.msRequestFullscreen();
+      }
+    });
+
+    modeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        getAudioContext();
+        playClickSound();
+        selectedOperation = button.dataset.op;
+
+        // Save Player Names
+        p1Name = inputP1Name.value.trim() || 'Player 1';
+        p2Name = inputP2Name.value.trim() || 'Player 2';
+
+        mainMenu.style.display = 'none';
+        startCountdown();
+      });
+    });
+
+    backMenuBtn.addEventListener('click', () => {
+      playClickSound();
+      stopTimers();
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownOverlay.style.display = 'none';
+      gameContent.style.display = 'none';
+      winPopup.style.display = 'none';
+      mainMenu.style.display = 'flex';
+      backMenuBtn.style.display = 'none';
+      matchPointBanner.style.display = 'none';
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      playClickSound();
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+        if (docElement.requestFullscreen) docElement.requestFullscreen().catch(() => {});
+        else if (docElement.webkitRequestFullscreen) docElement.webkitRequestFullscreen();
+        else if (docElement.msRequestFullscreen) docElement.msRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      }
+    });
+
+    btnBackMenu.addEventListener('click', () => {
+      playClickSound();
+      winPopup.style.display = 'none';
+      gameContent.style.display = 'none';
+      mainMenu.style.display = 'flex';
+      backMenuBtn.style.display = 'none';
+    });
+
+    btnRematch.addEventListener('click', () => {
+      playClickSound();
+      winPopup.style.display = 'none';
+      startCountdown();
+    });
+
+    resetButton.addEventListener('click', () => {
+      playClickSound();
+      initGame();
+    });
+
+    /* ========================================================
+       COUNTDOWN
+       ======================================================== */
+    function startCountdown() {
+      countdownOverlay.style.display = 'flex';
+      let count = 3;
+      countdownText.textContent = count;
+      playCountdownSound(count);
+
+      countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownText.textContent = count;
+          playCountdownSound(count);
+        } else if (count === 0) {
+          countdownText.textContent = 'Mulai!';
+          playCountdownSound(0);
+        } else {
+          clearInterval(countdownInterval);
+          countdownOverlay.style.display = 'none';
+          gameContent.style.display = 'flex';
+          backMenuBtn.style.display = 'flex';
+          initGame();
+        }
+      }, 1000);
+    }
+
+    /* ========================================================
+       GAME INITIALIZATION
+       ======================================================== */
+    function initGame() {
+      stopTimers();
+
+      const panelP1 = document.getElementById('panel-p1');
+      const panelP2 = document.getElementById('panel-p2');
+
+      if (selectedOperation === 'buah') {
+        panelP1.classList.add('fruit-mode');
+        panelP2.classList.add('fruit-mode');
+      } else {
+        panelP1.classList.remove('fruit-mode');
+        panelP2.classList.remove('fruit-mode');
+      }
+
+      scoreP1 = 0;
+      scoreP2 = 0;
+      worldOffset = 0;
+      gameOver = false;
+      currentCycleIndex = 0;
+      matchStartTime = Date.now();
+
+      streakP1 = 0;
+      streakP2 = 0;
+      maxStreakP1 = 0;
+      maxStreakP2 = 0;
+      totalQuestionsP1 = 0;
+      totalQuestionsP2 = 0;
+      wrongCountP1 = 0;
+      wrongCountP2 = 0;
+
+      p1HistoryArr = [];
+      p2HistoryArr = [];
+      renderHistoryDots(1);
+      renderHistoryDots(2);
+
+      updateStreakBadge(1);
+      updateStreakBadge(2);
+
+      scoreboardNameP1.textContent = p1Name;
+      scoreboardNameP2.textContent = p2Name;
+      panelNameP1.textContent = p1Name;
+      panelNameP2.textContent = p2Name;
+      tensionLabelP1.textContent = p1Name.substring(0, 5);
+      tensionLabelP2.textContent = p2Name.substring(0, 5);
+
+      winPopup.style.display = 'none';
+      matchPointBanner.style.display = 'none';
+      gameArena.classList.remove('danger-tension');
+      rope.classList.remove('rope-danger');
+
+      if (globalDecimalMode) {
+        decimalActiveBadge.style.display = 'inline-block';
+      } else {
+        decimalActiveBadge.style.display = 'none';
+      }
+
+      if (questionTimeLimit > 0) {
+        timerTrackP1.style.display = 'block';
+        timerTrackP2.style.display = 'block';
+      } else {
+        timerTrackP1.style.display = 'none';
+        timerTrackP2.style.display = 'none';
+      }
+
+      keypadP1.innerHTML = '';
+      keypadP2.innerHTML = '';
+      createKeypad(keypadP1, 1);
+      createKeypad(keypadP2, 2);
+
+      displayNewProblem(1);
+      displayNewProblem(2);
+
+      updatePositions();
+      updateScoreboard();
+      statusMessage.textContent = 'Jawab soal untuk menarik tali!';
+      resetButton.style.display = 'none';
+    }
+
+    function stopTimers() {
+      if (timerIntervalP1) { clearInterval(timerIntervalP1); timerIntervalP1 = null; }
+      if (timerIntervalP2) { clearInterval(timerIntervalP2); timerIntervalP2 = null; }
+    }
+
+    function startTimerForPlayer(player) {
+      if (questionTimeLimit <= 0 || gameOver) return;
+
+      if (player === 1) {
+        if (timerIntervalP1) clearInterval(timerIntervalP1);
+        timeRemainingP1 = questionTimeLimit;
+        timerFillP1.style.width = '100%';
+
+        timerIntervalP1 = setInterval(() => {
+          if (gameOver) { clearInterval(timerIntervalP1); return; }
+          timeRemainingP1 -= 0.1;
+          const pct = Math.max(0, (timeRemainingP1 / questionTimeLimit) * 100);
+          timerFillP1.style.width = `${pct}%`;
+
+          if (timeRemainingP1 <= 0) {
+            clearInterval(timerIntervalP1);
+            handleTimeOut(1);
+          }
+        }, 100);
+      } else {
+        if (timerIntervalP2) clearInterval(timerIntervalP2);
+        timeRemainingP2 = questionTimeLimit;
+        timerFillP2.style.width = '100%';
+
+        timerIntervalP2 = setInterval(() => {
+          if (gameOver) { clearInterval(timerIntervalP2); return; }
+          timeRemainingP2 -= 0.1;
+          const pct = Math.max(0, (timeRemainingP2 / questionTimeLimit) * 100);
+          timerFillP2.style.width = `${pct}%`;
+
+          if (timeRemainingP2 <= 0) {
+            clearInterval(timerIntervalP2);
+            handleTimeOut(2);
+          }
+        }, 100);
+      }
+    }
+
+    function handleTimeOut(player) {
+      playTimeoutSound();
+      if (player === 1) {
+        streakP1 = 0;
+        updateStreakBadge(1);
+        recordHistory(1, false);
+        answerP1.textContent = '⏳';
+        answerP1.classList.add('shake');
+        setTimeout(() => {
+          answerP1.classList.remove('shake');
+          displayNewProblem(1);
+        }, 400);
+      } else {
+        streakP2 = 0;
+        updateStreakBadge(2);
+        recordHistory(2, false);
+        answerP2.textContent = '⏳';
+        answerP2.classList.add('shake');
+        setTimeout(() => {
+          answerP2.classList.remove('shake');
+          displayNewProblem(2);
+        }, 400);
+      }
+    }
+
+    function updateStreakBadge(player) {
+      if (player === 1) {
+        if (streakP1 >= 2) {
+          streakBadgeP1.style.display = 'inline-block';
+          streakBadgeP1.textContent = streakP1 >= 5 ? `⚡ ${streakP1}x COMBO!` : `🔥 ${streakP1}x`;
+        } else {
+          streakBadgeP1.style.display = 'none';
+        }
+      } else {
+        if (streakP2 >= 2) {
+          streakBadgeP2.style.display = 'inline-block';
+          streakBadgeP2.textContent = streakP2 >= 5 ? `⚡ ${streakP2}x COMBO!` : `🔥 ${streakP2}x`;
+        } else {
+          streakBadgeP2.style.display = 'none';
+        }
+      }
+    }
+
+    function recordHistory(player, isCorrect) {
+      const arr = player === 1 ? p1HistoryArr : p2HistoryArr;
+      arr.push(isCorrect);
+      if (arr.length > 3) arr.shift();
+      renderHistoryDots(player);
+    }
+
+    function renderHistoryDots(player) {
+      const container = player === 1 ? historyP1 : historyP2;
+      const arr = player === 1 ? p1HistoryArr : p2HistoryArr;
+      container.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'hist-dot';
+        if (i < arr.length) {
+          dot.classList.add(arr[i] ? 'correct' : 'wrong');
+        }
+        container.appendChild(dot);
+      }
+    }
+
+    function updateScoreboard() {
+      scoreP1Val.textContent = scoreP1;
+      scoreP2Val.textContent = scoreP2;
+      const diff = Math.abs(scoreP1 - scoreP2);
+      scoreDiffVal.textContent = `Selisih: ${diff} / ${winDifference}`;
+
+      // Update tension needle
+      const netAdvantage = scoreP2 - scoreP1;
+      const percentage = 50 + (netAdvantage / winDifference) * 45;
+      const clampedPct = Math.max(5, Math.min(95, percentage));
+      tensionNeedle.style.left = `${clampedPct}%`;
+
+      // Match point danger indicator
+      if (diff >= winDifference - 1 && diff < winDifference) {
+        matchPointBanner.style.display = 'block';
+        gameArena.classList.add('danger-tension');
+        rope.classList.add('rope-danger');
+      } else {
+        matchPointBanner.style.display = 'none';
+        gameArena.classList.remove('danger-tension');
+        rope.classList.remove('rope-danger');
+      }
+    }
+
+    function updatePositions() {
+      const p1Offset = -150;
+      const p2Offset = 150;
+      rope.style.setProperty('--curr-offset', `${worldOffset}px`);
+      rope.style.transform = `translateX(calc(-50% + ${worldOffset}px))`;
+      characterP1.style.transform = `translateX(calc(-50% + ${p1Offset + worldOffset}px))`;
+      characterP2.style.transform = `translateX(calc(-50% + ${p2Offset + worldOffset}px)) scaleX(-1)`;
+    }
+
+    function checkWinner() {
+      const scoreDiff = Math.abs(scoreP1 - scoreP2);
+      updateScoreboard();
+
+      if (scoreDiff >= winDifference) {
+        gameOver = true;
+        stopTimers();
+        matchPointBanner.style.display = 'none';
+        statusMessage.textContent = '';
+        launchConfetti();
+        playWinSound();
+
+        const durationSeconds = Math.max(1, Math.round((Date.now() - matchStartTime) / 1000));
+        const mins = String(Math.floor(durationSeconds / 60)).padStart(2, '0');
+        const secs = String(durationSeconds % 60).padStart(2, '0');
+
+        setTimeout(() => {
+          const winnerName = scoreP1 > scoreP2 ? p1Name : p2Name;
+          const winnerColor = scoreP1 > scoreP2 ? '#0288d1' : '#d32f2f';
+
+          winTitle.textContent = `🎉 ${winnerName.toUpperCase()} MENANG! 🎉`;
+          winTitle.style.color = winnerColor;
+          winSubtitle.textContent = `Skor Akhir: ${Math.max(scoreP1, scoreP2)} - ${Math.min(scoreP1, scoreP2)} (Keunggulan ${scoreDiff} tarikan)`;
+
+          statDuration.textContent = `${mins}:${secs}`;
+          statTotalQ.textContent = `${totalQuestionsP1 + totalQuestionsP2}`;
+          statMaxStreak.textContent = `${Math.max(maxStreakP1, maxStreakP2)}x`;
+
+          winPopup.style.display = 'flex';
+        }, 350);
+      }
+    }
+
+    /* Helper: parse number with comma or period & negative sign */
+    function parseAnswer(str) {
+      if (!str || str === '-' || str === '-0' || str === '-0,') return NaN;
+      return parseFloat(str.replace(',', '.'));
+    }
+
+    function formatNumber(num) {
+      if (Number.isInteger(num)) return num.toString();
+      return num.toString().replace('.', ',');
+    }
+
+    function checkAnswer(player) {
+      if (gameOver) return;
+
+      if (player === 1) {
+        totalQuestionsP1++;
+        const val = parseAnswer(currentAnswerP1);
+        if (!isNaN(val) && Math.abs(val - currentProblemP1.answer) < 0.001) {
+          streakP1++;
+          if (streakP1 > maxStreakP1) maxStreakP1 = streakP1;
+          updateStreakBadge(1);
+          recordHistory(1, true);
+
+          if (streakP1 >= 3) playComboSound();
+          else playCorrectSound(streakP1);
+
+          scoreP1++;
+          const pullDist = streakP1 >= 3 ? moveDistance * 1.3 : moveDistance;
+          worldOffset -= pullDist;
+          characterP1.classList.add('tug-active-p1');
+          setTimeout(() => characterP1.classList.remove('tug-active-p1'), 280);
+          updatePositions();
+
+          wrongCountP1 = 0;
+          hintP1.style.display = 'none';
+
+          if (!gameOver) displayNewProblem(1);
+        } else {
+          playWrongSound();
+          streakP1 = 0;
+          updateStreakBadge(1);
+          recordHistory(1, false);
+          wrongCountP1++;
+
+          answerP1.classList.add('shake');
+          setTimeout(() => {
+            answerP1.classList.remove('shake');
+            currentAnswerP1 = '';
+            answerP1.textContent = '';
+          }, 350);
+
+          if (wrongCountP1 >= 2 && currentProblemP1.hint) {
+            hintP1.textContent = `💡 Petunjuk: ${currentProblemP1.hint}`;
+            hintP1.style.display = 'block';
+          }
+        }
+      } else {
+        totalQuestionsP2++;
+        const val = parseAnswer(currentAnswerP2);
+        if (!isNaN(val) && Math.abs(val - currentProblemP2.answer) < 0.001) {
+          streakP2++;
+          if (streakP2 > maxStreakP2) maxStreakP2 = streakP2;
+          updateStreakBadge(2);
+          recordHistory(2, true);
+
+          if (streakP2 >= 3) playComboSound();
+          else playCorrectSound(streakP2);
+
+          scoreP2++;
+          const pullDist = streakP2 >= 3 ? moveDistance * 1.3 : moveDistance;
+          worldOffset += pullDist;
+          characterP2.classList.add('tug-active-p2');
+          setTimeout(() => characterP2.classList.remove('tug-active-p2'), 280);
+          updatePositions();
+
+          wrongCountP2 = 0;
+          hintP2.style.display = 'none';
+
+          if (!gameOver) displayNewProblem(2);
+        } else {
+          playWrongSound();
+          streakP2 = 0;
+          updateStreakBadge(2);
+          recordHistory(2, false);
+          wrongCountP2++;
+
+          answerP2.classList.add('shake');
+          setTimeout(() => {
+            answerP2.classList.remove('shake');
+            currentAnswerP2 = '';
+            answerP2.textContent = '';
+          }, 350);
+
+          if (wrongCountP2 >= 2 && currentProblemP2.hint) {
+            hintP2.textContent = `💡 Petunjuk: ${currentProblemP2.hint}`;
+            hintP2.style.display = 'block';
+          }
+        }
+      }
+      checkWinner();
+    }
+
+    function gcd(a, b) {
+      while (b) {
+        [a, b] = [b, a % b];
+      }
+      return a;
+    }
+
+    /* ========================================================
+       PROBLEM GENERATOR (34 MODES + OPSI DESIMAL GLOBAL)
+       ======================================================== */
+    function generateProblem(player) {
+      let num1, num2, question, answer, hint = '';
+      let op = selectedOperation;
+
+      const allOperations = [
+        '+', '-', '*', '/', 'pangkat', 'akar',
+        'negatif', 'tambahkurang', 'kalibagi'
+      ];
+
+      if (op === 'campuran') {
+        op = operationCycle[currentCycleIndex];
+        currentCycleIndex = (currentCycleIndex + 1) % operationCycle.length;
+      } else if (op === 'semua') {
+        op = allOperations[Math.floor(Math.random() * allOperations.length)];
+      }
+
+      // --- KETIKA OPSI DESIMAL GLOBAL DIAKTIFKAN ---
+      if (globalDecimalMode) {
+        switch (op) {
+          case '+':
+          case '+2': {
+            const a = (Math.floor(Math.random() * 40) + 10) / 2;
+            const b = (Math.floor(Math.random() * 20) + 2) / 2;
+            answer = Math.round((a + b) * 10) / 10;
+            question = `${formatNumber(a)} + ${formatNumber(b)} = ?`;
+            hint = `Gunakan koma. Hasil di sekitar ${Math.floor(answer)}`;
+            return { question, answer, hint };
+          }
+          case '-':
+          case '-2': {
+            const ans = (Math.floor(Math.random() * 40) + 10) / 2;
+            const b = (Math.floor(Math.random() * 20) + 2) / 2;
+            const a = Math.round((ans + b) * 10) / 10;
+            answer = ans;
+            question = `${formatNumber(a)} - ${formatNumber(b)} = ?`;
+            hint = `Gunakan koma. Hasil di sekitar ${Math.floor(answer)}`;
+            return { question, answer, hint };
+          }
+          case '*': {
+            const base = (Math.floor(Math.random() * 8) + 1) * 2 + 1;
+            const mult = Math.floor(Math.random() * 4) + 2;
+            const a = base / 2;
+            answer = Math.round(a * mult * 10) / 10;
+            question = `${formatNumber(a)} × ${mult} = ?`;
+            hint = `Gunakan tombol koma (,)`;
+            return { question, answer, hint };
+          }
+          case '/': {
+            const oddDividend = (Math.floor(Math.random() * 35) + 5) * 2 + 1;
+            answer = Math.round((oddDividend / 2) * 10) / 10;
+            question = `${oddDividend} ÷ 2 = ?`;
+            hint = `Setengah dari ${oddDividend} berakhiran ,5`;
+            return { question, answer, hint };
+          }
+          case 'pangkat': {
+            const baseArr = [0.5, 1.5, 2.5, 3.5, 4.5];
+            const b = baseArr[Math.floor(Math.random() * baseArr.length)];
+            answer = Math.round(b * b * 100) / 100;
+            question = `${formatNumber(b)}² = ?`;
+            hint = `${formatNumber(b)} × ${formatNumber(b)}`;
+            return { question, answer, hint };
+          }
+          case 'pangkat3': {
+            const baseArr = [0.5, 1.5, 0.2];
+            const b = baseArr[Math.floor(Math.random() * baseArr.length)];
+            answer = Math.round(b * b * b * 1000) / 1000;
+            question = `${formatNumber(b)}³ = ?`;
+            hint = `${formatNumber(b)} × ${formatNumber(b)} × ${formatNumber(b)}`;
+            return { question, answer, hint };
+          }
+          case 'akar': {
+            const baseArr = [0.5, 1.5, 2.5, 3.5];
+            const b = baseArr[Math.floor(Math.random() * baseArr.length)];
+            const sq = Math.round(b * b * 100) / 100;
+            answer = b;
+            question = `√${formatNumber(sq)} = ?`;
+            hint = `Akar dari ${formatNumber(sq)} adalah ${formatNumber(b)}`;
+            return { question, answer, hint };
+          }
+          case 'tambahkurang': {
+            const a = (Math.floor(Math.random() * 20) + 10) / 2;
+            const b = (Math.floor(Math.random() * 10) + 2) / 2;
+            const c = Math.floor(Math.random() * 5) + 1;
+            answer = Math.round((a + b - c) * 10) / 10;
+            question = `${formatNumber(a)} + ${formatNumber(b)} - ${c} = ?`;
+            hint = `Hitung bertahap`;
+            return { question, answer, hint };
+          }
+          case 'kalibagi': {
+            const a = (Math.floor(Math.random() * 6) + 1) / 2;
+            const b = Math.floor(Math.random() * 4) + 2;
+            answer = Math.round((a * b / 2) * 10) / 10;
+            question = `${formatNumber(a)} × ${b} ÷ 2 = ?`;
+            hint = `Kerjakan perkalian dulu`;
+            return { question, answer, hint };
+          }
+          case 'persen': {
+            const pct = (Math.floor(Math.random() * 4) + 1) * 5;
+            const val = (Math.floor(Math.random() * 5) + 1) * 10 + 5;
+            answer = Math.round((pct / 100 * val) * 100) / 100;
+            question = `${pct}% dari ${val} = ?`;
+            hint = `Hasilnya adalah desimal: ${formatNumber(answer)}`;
+            return { question, answer, hint };
+          }
+          case 'waktu': {
+            const h = (Math.floor(Math.random() * 5) + 1) + 0.5;
+            question = `${formatNumber(h)} jam = ... menit`;
+            answer = h * 60;
+            hint = `${h} × 60`;
+            return { question, answer, hint };
+          }
+          case 'jarak': {
+            const k = (Math.floor(Math.random() * 6) + 1) + 0.5;
+            question = `${formatNumber(k)} km = ... m`;
+            answer = k * 1000;
+            hint = `${formatNumber(k)} × 1000`;
+            return { question, answer, hint };
+          }
+          case 'berat': {
+            const b = (Math.floor(Math.random() * 6) + 1) + 0.5;
+            question = `${formatNumber(b)} kg = ... gram`;
+            answer = b * 1000;
+            hint = `${formatNumber(b)} × 1000`;
+            return { question, answer, hint };
+          }
+          case 'volume': {
+            const v = (Math.floor(Math.random() * 6) + 1) + 0.5;
+            question = `${formatNumber(v)} liter = ... ml`;
+            answer = v * 1000;
+            hint = `${formatNumber(v)} × 1000`;
+            return { question, answer, hint };
+          }
+          case 'pola': {
+            const start = (Math.floor(Math.random() * 5) + 1) + 0.5;
+            question = `${formatNumber(start)}, ${formatNumber(start + 1.5)}, ${formatNumber(start + 3)}, ...`;
+            answer = Math.round((start + 4.5) * 10) / 10;
+            hint = `Pola bertambah 1,5`;
+            return { question, answer, hint };
+          }
+          case 'luas': {
+            const s = (Math.floor(Math.random() * 7) + 2) + 0.5;
+            question = `Persegi sisi ${formatNumber(s)}, Luas = ?`;
+            answer = Math.round(s * s * 100) / 100;
+            hint = `${formatNumber(s)} × ${formatNumber(s)}`;
+            return { question, answer, hint };
+          }
+          case 'keliling': {
+            const s = (Math.floor(Math.random() * 9) + 2) + 0.5;
+            question = `Keliling persegi sisi ${formatNumber(s)} = ?`;
+            answer = Math.round(4 * s * 10) / 10;
+            hint = `4 × ${formatNumber(s)}`;
+            return { question, answer, hint };
+          }
+          case 'segitiga': {
+            const a = Math.floor(Math.random() * 7) + 3;
+            const t = (Math.floor(Math.random() * 5) + 1) + 0.5;
+            question = `Segitiga alas ${a}, tinggi ${formatNumber(t)}, Luas = ?`;
+            answer = Math.round((a * t / 2) * 10) / 10;
+            hint = `(alas × tinggi) ÷ 2`;
+            return { question, answer, hint };
+          }
+          case 'kecepatan': {
+            const v = (Math.floor(Math.random() * 5) + 4) * 10;
+            question = `Kec ${v} km/jam × 1,5 jam = ... km`;
+            answer = v * 1.5;
+            hint = `${v} × 1,5`;
+            return { question, answer, hint };
+          }
+          case 'debit': {
+            const d = 2.5;
+            const t = Math.floor(Math.random() * 6) + 4;
+            question = `Debit 2,5 liter/detik × ${t} detik = ... liter`;
+            answer = Math.round(d * t * 10) / 10;
+            hint = `2,5 × ${t}`;
+            return { question, answer, hint };
+          }
+          case 'aljabar': {
+            const ans = (Math.floor(Math.random() * 30) + 10) / 2;
+            const b = (Math.floor(Math.random() * 10) + 2) / 2;
+            answer = ans;
+            question = `x + ${formatNumber(b)} = ${formatNumber(Math.round((ans + b) * 10) / 10)}, x = ?`;
+            hint = `Hasil x berkoma: ${formatNumber(ans)}`;
+            return { question, answer, hint };
+          }
+          case 'negatif': {
+            const a = -((Math.floor(Math.random() * 15) + 2) / 2);
+            const b = (Math.floor(Math.random() * 20) + 2) / 2;
+            answer = Math.round((a + b) * 10) / 10;
+            question = `${formatNumber(a)} + ${formatNumber(b)} = ?`;
+            hint = `Perhatikan minus dan tanda koma`;
+            return { question, answer, hint };
+          }
+          case 'uang': {
+            const p = (Math.floor(Math.random() * 8) + 2) / 2;
+            answer = Math.round((10 - p) * 10) / 10;
+            question = `Beli ${formatNumber(p)}rb, bayar 10rb, sisa = ...rb`;
+            hint = `10 - ${formatNumber(p)} = ${formatNumber(answer)}`;
+            return { question, answer, hint };
+          }
+          case 'sudut': {
+            question = "1/4 sudut siku-siku = ...°";
+            answer = 22.5;
+            hint = "90 ÷ 4 = 22,5°";
+            return { question, answer, hint };
+          }
+        }
+      }
+
+      // --- MODE STANDAR (BILANGAN BULAT) ---
+      switch (op) {
+        /* --- MODE BILANGAN BULAT NEGATIF --- */
+        case 'negatif': {
+          const nScen = Math.floor(Math.random() * 4);
+          if (nScen === 0) {
+            const a = Math.floor(Math.random() * 9) + 2;
+            const b = a + Math.floor(Math.random() * 8) + 2;
+            question = `${a} - ${b} = ?`;
+            answer = a - b;
+            hint = `Tekan tombol ± untuk membuat minus (-)`;
+          } else if (nScen === 1) {
+            const neg = -(Math.floor(Math.random() * 12) + 2);
+            const pos = Math.floor(Math.random() * 15) + 1;
+            question = `${neg} + ${pos} = ?`;
+            answer = neg + pos;
+            hint = `Perhatikan tanda minus. Hasil = ${answer}`;
+          } else if (nScen === 2) {
+            const a = -(Math.floor(Math.random() * 6) + 2);
+            const b = Math.floor(Math.random() * 6) + 2;
+            question = `${a} × ${b} = ?`;
+            answer = a * b;
+            hint = `Negatif kali positif hasilnya negatif`;
+          } else {
+            const ans = -(Math.floor(Math.random() * 6) + 2);
+            const b = Math.floor(Math.random() * 5) + 2;
+            const a = ans * b;
+            question = `${a} ÷ ${b} = ?`;
+            answer = ans;
+            hint = `Gunakan tombol ± jika jawabannya minus`;
+          }
+          break;
+        }
+
+        case '+':
+          num1 = Math.floor(Math.random() * 10) + 1;
+          num2 = Math.floor(Math.random() * 10) + 1;
+          question = `${num1} + ${num2} = ?`;
+          answer = num1 + num2;
+          hint = `Hasilnya antara ${answer - 2} dan ${answer + 2}`;
+          break;
+
+        case '+2':
+          num1 = Math.floor(Math.random() * 90) + 10;
+          num2 = Math.floor(Math.random() * 90) + 10;
+          question = `${num1} + ${num2} = ?`;
+          answer = num1 + num2;
+          hint = `Puluhannya mendekati ${Math.floor(answer / 10) * 10}`;
+          break;
+
+        case '-': {
+          let a = Math.floor(Math.random() * 10) + 1;
+          let b = Math.floor(Math.random() * 10) + 1;
+          if (a === b) {
+            if (a < 10) a += 1;
+            else b -= 1;
+          }
+          num1 = Math.max(a, b);
+          num2 = Math.min(a, b);
+          question = `${num1} - ${num2} = ?`;
+          answer = num1 - num2;
+          hint = `Hasilnya ${answer}`;
+          break;
+        }
+
+        case '-2': {
+          let aa = Math.floor(Math.random() * 90) + 10;
+          let bb = Math.floor(Math.random() * 90) + 10;
+          if (aa === bb) {
+            if (aa < 99) aa += 1;
+            else bb -= 1;
+          }
+          num1 = Math.max(aa, bb);
+          num2 = Math.min(aa, bb);
+          question = `${num1} - ${num2} = ?`;
+          answer = num1 - num2;
+          hint = `Hasilnya mendekati ${Math.floor(answer / 10) * 10}`;
+          break;
+        }
+
+        case '*':
+          num1 = Math.floor(Math.random() * 9) + 2;
+          num2 = Math.floor(Math.random() * 9) + 2;
+          question = `${num1} × ${num2} = ?`;
+          answer = num1 * num2;
+          hint = `Perkalian ${num1}. Hasilnya ${answer}`;
+          break;
+
+        case '/':
+          answer = Math.floor(Math.random() * 9) + 2;
+          num2 = Math.floor(Math.random() * 9) + 2;
+          num1 = answer * num2;
+          question = `${num1} ÷ ${num2} = ?`;
+          hint = `${num2} dikali berapa agar jadi ${num1}?`;
+          break;
+
+        case 'pangkat':
+          num1 = Math.floor(Math.random() * 9) + 2;
+          question = `${num1}² = ?`;
+          answer = num1 * num1;
+          hint = `${num1} × ${num1}`;
+          break;
+
+        case 'pangkat3':
+          num1 = Math.floor(Math.random() * 8) + 2;
+          question = `${num1}³ = ?`;
+          answer = num1 * num1 * num1;
+          hint = `${num1} × ${num1} × ${num1}`;
+          break;
+
+        case 'akar':
+          answer = Math.floor(Math.random() * 9) + 2;
+          num1 = answer * answer;
+          question = `√${num1} = ?`;
+          hint = `Berapa kuadrat yang hasilnya ${num1}?`;
+          break;
+
+        case 'akar3':
+          answer = Math.floor(Math.random() * 8) + 2;
+          num1 = answer * answer * answer;
+          question = `∛${num1} = ?`;
+          hint = `Berapa pangkat 3 yang hasilnya ${num1}?`;
+          break;
+
+        case 'persen':
+          num1 = (Math.floor(Math.random() * 5) + 1) * 10;
+          num2 = (Math.floor(Math.random() * 9) + 2) * 10;
+          question = `${num1}% dari ${num2} = ?`;
+          answer = (num1 / 100) * num2;
+          hint = `(${num1} × ${num2}) ÷ 100`;
+          break;
+
+        case 'tambahkurang': {
+          num1 = Math.floor(Math.random() * 10) + 1;
+          num2 = Math.floor(Math.random() * 10) + 1;
+          const sum = num1 + num2;
+          const num3 = Math.floor(Math.random() * (sum - 1)) + 1;
+          question = `${num1} + ${num2} - ${num3} = ?`;
+          answer = sum - num3;
+          hint = `Hitung dulu ${num1}+${num2}=${sum}, lalu kurangi ${num3}`;
+          break;
+        }
+
+        case 'kalibagi': {
+          num1 = Math.floor(Math.random() * 5) + 2;
+          const numB = Math.floor(Math.random() * 5) + 2;
+          answer = num1 * numB;
+          const numC = Math.floor(Math.random() * 5) + 2;
+          num2 = numB * numC;
+          question = `${num1} × ${num2} ÷ ${numC} = ?`;
+          hint = `Kerjakan perkalian dulu, lalu bagi`;
+          break;
+        }
+
+        case 'fpb':
+          num1 = Math.floor(Math.random() * 29) + 2;
+          num2 = Math.floor(Math.random() * 29) + 2;
+          if (num1 === num2) num2 += 1;
+          question = `FPB dari ${num1} & ${num2} = ?`;
+          answer = gcd(num1, num2);
+          hint = `Faktor persekutuan terbesar`;
+          break;
+
+        case 'kpk':
+          num1 = Math.floor(Math.random() * 19) + 2;
+          num2 = Math.floor(Math.random() * 19) + 2;
+          if (num1 === num2) num2 += 1;
+          question = `KPK dari ${num1} & ${num2} = ?`;
+          answer = (num1 * num2) / gcd(num1, num2);
+          hint = `Kelipatan persekutuan terkecil`;
+          break;
+
+        case 'waktu': {
+          const rand = Math.random();
+          if (rand < 0.25) {
+            question = "1/4 jam = ... menit";
+            answer = 15;
+            hint = "60 dibagi 4 = 15";
+          } else if (rand < 0.5) {
+            question = "1/2 jam = ... menit";
+            answer = 30;
+            hint = "Setengah dari 60";
+          } else if (rand < 0.75) {
+            question = "3/4 jam = ... menit";
+            answer = 45;
+            hint = "45 menit";
+          } else {
+            num1 = Math.floor(Math.random() * 5) + 1;
+            question = `${num1} jam = ... menit`;
+            answer = num1 * 60;
+            hint = `${num1} × 60`;
+          }
+          break;
+        }
+
+        case 'buah': {
+          const fruits = ['🍉', '🍎', '🍓', '🍇', '🍊', '🍍', '🥝', '🍌'];
+          const fruit = fruits[Math.floor(Math.random() * fruits.length)];
+          answer = Math.floor(Math.random() * 9) + 1;
+          question = fruit.repeat(answer);
+          hint = `Hitung jumlah buah di atas`;
+          break;
+        }
+
+        case 'jarak': {
+          const scen = Math.floor(Math.random() * 4);
+          if (scen === 0) {
+            num1 = (Math.floor(Math.random() * 9) + 1) * 100;
+            question = `${num1} cm = ... m`;
+            answer = num1 / 100;
+            hint = "1 meter = 100 cm";
+          } else if (scen === 1) {
+            num1 = Math.floor(Math.random() * 90) + 10;
+            question = `${num1} cm = ... mm`;
+            answer = num1 * 10;
+            hint = "1 cm = 10 mm";
+          } else if (scen === 2) {
+            const kmList = [
+              { q: "1/2 km = ... m", a: 500 },
+              { q: "1/4 km = ... m", a: 250 },
+              { q: "3/4 km = ... m", a: 750 }
+            ];
+            const pick = kmList[Math.floor(Math.random() * kmList.length)];
+            question = pick.q;
+            answer = pick.a;
+            hint = "1 km = 1000 meter";
+          } else {
+            num1 = Math.floor(Math.random() * 9) + 1;
+            question = `${num1} m = ... cm`;
+            answer = num1 * 100;
+            hint = "1 meter = 100 cm";
+          }
+          break;
+        }
+
+        case 'berat': {
+          const bScen = Math.floor(Math.random() * 6);
+          if (bScen === 0) {
+            num1 = Math.floor(Math.random() * 8) + 2;
+            question = `${num1} kg = ... gram`;
+            answer = num1 * 1000;
+            hint = "1 kg = 1000 gram";
+          } else if (bScen === 1) {
+            question = "1/2 kg = ... gram";
+            answer = 500;
+            hint = "500 gram";
+          } else if (bScen === 2) {
+            question = "1/4 kg = ... gram";
+            answer = 250;
+            hint = "250 gram";
+          } else if (bScen === 3) {
+            question = "3/4 kg = ... gram";
+            answer = 750;
+            hint = "750 gram";
+          } else if (bScen === 4) {
+            num1 = Math.floor(Math.random() * 5) + 1;
+            question = `${num1} ton = ... kg`;
+            answer = num1 * 1000;
+            hint = "1 ton = 1000 kg";
+          } else {
+            num1 = Math.floor(Math.random() * 8) + 2;
+            question = `${num1} ons = ... gram`;
+            answer = num1 * 100;
+            hint = "1 ons = 100 gram";
+          }
+          break;
+        }
+
+        case 'volume': {
+          const vScen = Math.floor(Math.random() * 5);
+          if (vScen === 0) {
+            num1 = Math.floor(Math.random() * 8) + 2;
+            question = `${num1} liter = ... ml`;
+            answer = num1 * 1000;
+            hint = "1 liter = 1000 ml";
+          } else if (vScen === 1) {
+            question = "1/2 liter = ... ml";
+            answer = 500;
+            hint = "500 ml";
+          } else if (vScen === 2) {
+            question = "1/4 liter = ... ml";
+            answer = 250;
+            hint = "250 ml";
+          } else if (vScen === 3) {
+            question = "3/4 liter = ... ml";
+            answer = 750;
+            hint = "750 ml";
+          } else {
+            const ltr = Math.floor(Math.random() * 7) + 2;
+            question = `${ltr * 1000} ml = ... liter`;
+            answer = ltr;
+            hint = "Bagi dengan 1000";
+          }
+          break;
+        }
+
+        case 'pola': {
+          const pScen = Math.floor(Math.random() * 4);
+          if (pScen === 0) {
+            const start = (Math.floor(Math.random() * 5) + 1) * 2;
+            question = `${start}, ${start + 2}, ${start + 4}, ...`;
+            answer = start + 6;
+            hint = "Pola lompat 2";
+          } else if (pScen === 1) {
+            const start = (Math.floor(Math.random() * 4) + 1) * 3;
+            question = `${start}, ${start + 3}, ${start + 6}, ...`;
+            answer = start + 9;
+            hint = "Pola lompat 3";
+          } else if (pScen === 2) {
+            const start = (Math.floor(Math.random() * 5) + 1) * 5;
+            question = `${start}, ${start + 5}, ${start + 10}, ...`;
+            answer = start + 15;
+            hint = "Pola lompat 5";
+          } else {
+            const start = (Math.floor(Math.random() * 5) + 1) * 10;
+            question = `${start}, ${start + 10}, ${start + 20}, ...`;
+            answer = start + 30;
+            hint = "Pola lompat 10";
+          }
+          break;
+        }
+
+        case 'luas': {
+          if (Math.random() < 0.5) {
+            const s = Math.floor(Math.random() * 9) + 2;
+            question = `Persegi sisi ${s}, Luas = ?`;
+            answer = s * s;
+            hint = `Luas = sisi × sisi = ${s} × ${s}`;
+          } else {
+            const p = Math.floor(Math.random() * 7) + 4;
+            const l = Math.floor(Math.random() * (p - 2)) + 2;
+            question = `P.Panjang p=${p}, l=${l}, Luas = ?`;
+            answer = p * l;
+            hint = `Luas = p × l = ${p} × ${l}`;
+          }
+          break;
+        }
+
+        case 'keliling': {
+          if (Math.random() < 0.5) {
+            const s = Math.floor(Math.random() * 12) + 3;
+            question = `Keliling persegi sisi ${s} = ?`;
+            answer = 4 * s;
+            hint = `Keliling = 4 × sisi`;
+          } else {
+            const p = Math.floor(Math.random() * 8) + 4;
+            const l = Math.floor(Math.random() * (p - 2)) + 2;
+            question = `Keliling p.panjang p=${p}, l=${l} = ?`;
+            answer = 2 * (p + l);
+            hint = `2 × (panjang + lebar)`;
+          }
+          break;
+        }
+
+        /* --- MODE SEGITIGA (BULAT) --- */
+        case 'segitiga': {
+          if (Math.random() < 0.6) {
+            const a = (Math.floor(Math.random() * 5) + 2) * 2; // genap
+            const t = Math.floor(Math.random() * 7) + 3;
+            question = `Segitiga alas ${a}, tinggi ${t}, Luas = ?`;
+            answer = (a * t) / 2;
+            hint = `Luas = (alas × tinggi) ÷ 2 = (${a} × ${t}) ÷ 2`;
+          } else {
+            const s = Math.floor(Math.random() * 8) + 3;
+            question = `Segitiga sama sisi s=${s}, Keliling = ?`;
+            answer = 3 * s;
+            hint = `Keliling = 3 × sisi = 3 × ${s}`;
+          }
+          break;
+        }
+
+        /* --- MODE KECEPATAN --- */
+        case 'kecepatan': {
+          const kScen = Math.floor(Math.random() * 3);
+          if (kScen === 0) {
+            const v = (Math.floor(Math.random() * 5) + 4) * 10;
+            const t = Math.floor(Math.random() * 3) + 2;
+            question = `Kec ${v} km/jam × ${t} jam = ... km`;
+            answer = v * t;
+            hint = `Jarak = Kecepatan × Waktu = ${v} × ${t}`;
+          } else if (kScen === 1) {
+            const t = Math.floor(Math.random() * 3) + 2;
+            const v = (Math.floor(Math.random() * 4) + 4) * 10;
+            const s = v * t;
+            question = `Jarak ${s} km, waktu ${t} jam, Kecepatan = ?`;
+            answer = v;
+            hint = `Kecepatan = Jarak ÷ Waktu = ${s} ÷ ${t}`;
+          } else {
+            const v = (Math.floor(Math.random() * 4) + 4) * 10;
+            const t = Math.floor(Math.random() * 3) + 2;
+            const s = v * t;
+            question = `Jarak ${s} km, kec ${v} km/jam, Waktu = ... jam`;
+            answer = t;
+            hint = `Waktu = Jarak ÷ Kecepatan = ${s} ÷ ${v}`;
+          }
+          break;
+        }
+
+        /* --- MODE DEBIT AIR --- */
+        case 'debit': {
+          if (Math.random() < 0.5) {
+            const d = Math.floor(Math.random() * 7) + 3;
+            const t = Math.floor(Math.random() * 6) + 4;
+            question = `Debit ${d} liter/detik × ${t} detik = ... liter`;
+            answer = d * t;
+            hint = `Volume = Debit × Waktu = ${d} × ${t}`;
+          } else {
+            const d = Math.floor(Math.random() * 6) + 3;
+            const t = Math.floor(Math.random() * 5) + 3;
+            const v = d * t;
+            question = `Volume ${v} liter, waktu ${t} detik, Debit = ?`;
+            answer = d;
+            hint = `Debit = Volume ÷ Waktu = ${v} ÷ ${t}`;
+          }
+          break;
+        }
+
+        case 'aljabar': {
+          const aScen = Math.floor(Math.random() * 4);
+          if (aScen === 0) {
+            const ans = Math.floor(Math.random() * 12) + 2;
+            const b = Math.floor(Math.random() * 12) + 2;
+            question = `x + ${b} = ${ans + b}, x = ?`;
+            answer = ans;
+            hint = `Kurangkan ${ans + b} dengan ${b}`;
+          } else if (aScen === 1) {
+            const ans = Math.floor(Math.random() * 12) + 2;
+            const b = Math.floor(Math.random() * 9) + 2;
+            question = `x - ${b} = ${ans}, x = ?`;
+            answer = ans + b;
+            hint = `Tambahkan ${ans} dengan ${b}`;
+          } else if (aScen === 2) {
+            const ans = Math.floor(Math.random() * 8) + 2;
+            const c = Math.floor(Math.random() * 4) + 2;
+            question = `${c}x = ${c * ans}, x = ?`;
+            answer = ans;
+            hint = `Bagi ${c * ans} dengan ${c}`;
+          } else {
+            const ans = Math.floor(Math.random() * 7) + 2;
+            const b = Math.floor(Math.random() * 7) + 1;
+            question = `2x + ${b} = ${2 * ans + b}, x = ?`;
+            answer = ans;
+            hint = `Kurangkan ${b} lalu bagi 2`;
+          }
+          break;
+        }
+
+        case 'romawi': {
+          const romanList = [
+            { r: 'IV', v: 4 }, { r: 'V', v: 5 }, { r: 'VI', v: 6 },
+            { r: 'IX', v: 9 }, { r: 'X', v: 10 }, { r: 'XI', v: 11 },
+            { r: 'XIV', v: 14 }, { r: 'XV', v: 15 }, { r: 'XVI', v: 16 },
+            { r: 'XIX', v: 19 }, { r: 'XX', v: 20 }, { r: 'XXIV', v: 24 },
+            { r: 'XXV', v: 25 }, { r: 'XXX', v: 30 }, { r: 'XL', v: 40 },
+            { r: 'L', v: 50 }, { r: 'LX', v: 60 }, { r: 'XC', v: 90 }, { r: 'C', v: 100 }
+          ];
+          const item = romanList[Math.floor(Math.random() * romanList.length)];
+          question = `Romawi ${item.r} = ?`;
+          answer = item.v;
+          hint = `X=10, V=5, I=1, L=50, C=100`;
+          break;
+        }
+
+        case 'sisa': {
+          const divisor = Math.floor(Math.random() * 6) + 3;
+          const remainder = Math.floor(Math.random() * (divisor - 1)) + 1;
+          const quotient = Math.floor(Math.random() * 6) + 2;
+          const dividend = divisor * quotient + remainder;
+          question = `Sisa dari ${dividend} ÷ ${divisor} = ?`;
+          answer = remainder;
+          hint = `Sisa pembagian adalah ${remainder}`;
+          break;
+        }
+
+        case 'uang': {
+          const uScen = Math.floor(Math.random() * 4);
+          if (uScen === 0) {
+            const price = Math.floor(Math.random() * 7) + 2;
+            question = `Beli ${price}rb, bayar 10rb, sisa = ...rb`;
+            answer = 10 - price;
+            hint = `10 - ${price} = ${answer}`;
+          } else if (uScen === 1) {
+            const price = (Math.floor(Math.random() * 8) + 11);
+            question = `Beli ${price}rb, bayar 20rb, sisa = ...rb`;
+            answer = 20 - price;
+            hint = `20 - ${price} = ${answer}`;
+          } else if (uScen === 2) {
+            const price = (Math.floor(Math.random() * 5) + 4) * 5;
+            question = `Beli ${price}rb, bayar 50rb, sisa = ...rb`;
+            answer = 50 - price;
+            hint = `50 - ${price} = ${answer}`;
+          } else {
+            const price = (Math.floor(Math.random() * 6) + 3) * 10;
+            question = `Beli ${price}rb, bayar 100rb, sisa = ...rb`;
+            answer = 100 - price;
+            hint = `100 - ${price} = ${answer}`;
+          }
+          break;
+        }
+
+        case 'sudut': {
+          const sScen = Math.floor(Math.random() * 5);
+          if (sScen === 0) {
+            question = "Sudut siku-siku = ...°";
+            answer = 90;
+            hint = "Besarnya 90°";
+          } else if (sScen === 1) {
+            question = "Sudut lurus = ...°";
+            answer = 180;
+            hint = "Besarnya 180°";
+          } else if (sScen === 2) {
+            question = "1 putaran penuh = ...°";
+            answer = 360;
+            hint = "Besarnya 360°";
+          } else if (sScen === 3) {
+            question = "Jumlah sudut segitiga = ...°";
+            answer = 180;
+            hint = "Total sudut segitiga selalu 180°";
+          } else {
+            question = "1/2 sudut siku-siku = ...°";
+            answer = 45;
+            hint = "90 dibagi 2 = 45°";
+          }
+          break;
+        }
+
+        default:
+          num1 = 1; num2 = 1; question = '1 + 1 = ?'; answer = 2; hint = '2';
+      }
+
+      return { question, answer, hint };
+    }
+
+    function displayNewProblem(player) {
+      if (player === 1) {
+        currentProblemP1 = generateProblem(1);
+        problemP1.textContent = `${currentProblemP1.question}`;
+        currentAnswerP1 = '';
+        answerP1.textContent = '';
+        hintP1.style.display = 'none';
+        startTimerForPlayer(1);
+      } else {
+        currentProblemP2 = generateProblem(2);
+        problemP2.textContent = `${currentProblemP2.question}`;
+        currentAnswerP2 = '';
+        answerP2.textContent = '';
+        hintP2.style.display = 'none';
+        startTimerForPlayer(2);
+      }
+    }
+
+    /* ========================================================
+       KEYPAD CREATION & EVENT LISTENERS
+       Layout: 3x5 Grid (Dengan Tombol Koma & Minus)
+       1  2  3
+       4  5  6
+       7  8  9
+       ±  0  ,
+       C  ⌫  GO (↵)
+       ======================================================== */
+    function createKeypad(keypadElement, player) {
+      const keysConfig = [
+        { label: '1', val: '1', cls: 'num-key' },
+        { label: '2', val: '2', cls: 'num-key' },
+        { label: '3', val: '3', cls: 'num-key' },
+
+        { label: '4', val: '4', cls: 'num-key' },
+        { label: '5', val: '5', cls: 'num-key' },
+        { label: '6', val: '6', cls: 'num-key' },
+
+        { label: '7', val: '7', cls: 'num-key' },
+        { label: '8', val: '8', cls: 'num-key' },
+        { label: '9', val: '9', cls: 'num-key' },
+
+        { label: '±', val: '±', cls: 'sign-btn' },
+        { label: '0', val: '0', cls: 'num-key' },
+        { label: ',', val: ',', cls: 'comma-btn' },
+
+        { label: 'C', val: 'C', cls: 'clear-btn' },
+        { label: '⌫', val: 'BS', cls: 'backspace-btn' },
+        { label: 'KIRIM ↵', val: 'Go', cls: 'action-btn' }
+      ];
+
+      keysConfig.forEach(item => {
+        const button = document.createElement('button');
+        button.textContent = item.label;
+        if (item.cls) button.classList.add(item.cls);
+
+        button.addEventListener('touchstart', (event) => {
+          event.preventDefault();
+          playClickSound();
+          handleKeyPress(player, item.val);
+        });
+
+        button.addEventListener('click', () => {
+          playClickSound();
+          handleKeyPress(player, item.val);
+        });
+
+        keypadElement.appendChild(button);
+      });
+    }
+
+    function handleKeyPress(player, key) {
+      if (gameOver) return;
+
+      if (player === 1) {
+        if (key === 'C') {
+          currentAnswerP1 = '';
+        } else if (key === 'BS') {
+          if (currentAnswerP1.length > 0) currentAnswerP1 = currentAnswerP1.slice(0, -1);
+          if (currentAnswerP1 === '-') currentAnswerP1 = '';
+        } else if (key === 'Go') {
+          checkAnswer(1);
+        } else if (key === '±') {
+          // Toggle negative sign
+          if (currentAnswerP1.startsWith('-')) {
+            currentAnswerP1 = currentAnswerP1.slice(1);
+          } else {
+            currentAnswerP1 = '-' + currentAnswerP1;
+          }
+        } else if (key === ',') {
+          if (currentAnswerP1.length === 0 || currentAnswerP1 === '-') {
+            currentAnswerP1 += '0,';
+          } else if (!currentAnswerP1.includes(',')) {
+            currentAnswerP1 += ',';
+          }
+        } else if (currentAnswerP1.length < 8) {
+          currentAnswerP1 += key;
+        }
+        answerP1.textContent = currentAnswerP1;
+      } else {
+        if (key === 'C') {
+          currentAnswerP2 = '';
+        } else if (key === 'BS') {
+          if (currentAnswerP2.length > 0) currentAnswerP2 = currentAnswerP2.slice(0, -1);
+          if (currentAnswerP2 === '-') currentAnswerP2 = '';
+        } else if (key === 'Go') {
+          checkAnswer(2);
+        } else if (key === '±') {
+          if (currentAnswerP2.startsWith('-')) {
+            currentAnswerP2 = currentAnswerP2.slice(1);
+          } else {
+            currentAnswerP2 = '-' + currentAnswerP2;
+          }
+        } else if (key === ',') {
+          if (currentAnswerP2.length === 0 || currentAnswerP2 === '-') {
+            currentAnswerP2 += '0,';
+          } else if (!currentAnswerP2.includes(',')) {
+            currentAnswerP2 += ',';
+          }
+        } else if (currentAnswerP2.length < 8) {
+          currentAnswerP2 += key;
+        }
+        answerP2.textContent = currentAnswerP2;
+      }
+    }
+
+    /* Keyboard controls support for desktop / laptop */
+    window.addEventListener('keydown', (e) => {
+      if (gameContent.style.display === 'none' || gameOver) return;
+
+      // Player 2 with Numpad
+      if (e.code.startsWith('Numpad')) {
+        const key = e.key;
+        if (/^[0-9]$/.test(key)) handleKeyPress(2, key);
+        else if (e.code === 'NumpadDecimal') handleKeyPress(2, ',');
+        else if (e.code === 'NumpadEnter') handleKeyPress(2, 'Go');
+        else if (e.code === 'NumpadSubtract') handleKeyPress(2, '±');
+        else if (key === 'Delete') handleKeyPress(2, 'BS');
+      }
+      // Top number row for Player 1
+      else if (/^[0-9]$/.test(e.key)) {
+        handleKeyPress(1, e.key);
+      } else if (e.key === ',' || e.key === '.') {
+        handleKeyPress(1, ',');
+      } else if (e.key === '-' || e.key === '_') {
+        handleKeyPress(1, '±');
+      } else if (e.key === 'Enter') {
+        handleKeyPress(1, 'Go');
+      } else if (e.key === 'Backspace') {
+        handleKeyPress(1, 'BS');
+      } else if (e.key.toLowerCase() === 'c') {
+        handleKeyPress(1, 'C');
+      }
+    });
+  </script>
+</body>
+</html>
