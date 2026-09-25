@@ -1092,6 +1092,24 @@
       box-shadow: 0 6px 14px rgba(46, 125, 50, 0.4);
     }
 
+    /* Bonus Question (Soal Bonus) Glow */
+    .problem-box.bonus-question {
+      background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%) !important;
+      border-color: #ffb300 !important;
+      color: #e65100 !important;
+      animation: bonusPulse 0.8s infinite alternate;
+    }
+    @keyframes bonusPulse {
+      0% { box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 0 0 0 rgba(255, 179, 0, 0.45); }
+      100% { box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 0 16px 4px rgba(255, 179, 0, 0.7); }
+    }
+
+    /* Difficulty Level Badge */
+    .level-badge {
+      background: #7c3aed !important;
+      color: #ffffff !important;
+    }
+
     /* Modal Windows */
     .modal {
       position: fixed;
@@ -3439,8 +3457,13 @@
     }
 
   </style>
+<base target="_blank">
 </head>
 <body oncontextmenu="return false">
+
+  <!-- Legacy hidden name inputs (synced with wizard inputs) -->
+  <input type="hidden" id="input-p1-name" value="Player 1">
+  <input type="hidden" id="input-p2-name" value="Player 2">
 
   <!-- DYNAMIC ANIMATED LIVING GAME BACKGROUND -->
   <div class="living-game-background" aria-hidden="true">
@@ -3764,6 +3787,7 @@
             <span class="player-name-tag" id="panel-name-p1">Player 1</span>
             <button id="p1-rotate-btn-header" class="p1-rot-btn" title="Putar Layar P1 180° (Duel Meja Berhadapan)">🔄 180°</button>
           </div>
+          <span class="streak-badge level-badge" id="level-badge-p1">Lv 1</span>
           <span class="streak-badge" id="streak-badge-p1" style="display:none;">🔥 0x</span>
         </div>
         <div class="problem-box" id="problem-p1">Soal Muncul Disini</div>
@@ -3990,6 +4014,8 @@
         <!-- 5. TEMA: PERANG MERIAM BENTENG (Cannon Siege) -->
         <div class="theme-layer" id="layer-cannon" style="display:none;">
           <div class="siege-arena-bg">
+            <div class="cannon-muzzle-flash flash-p1" id="muzzle-flash-p1"></div>
+            <div class="cannon-muzzle-flash flash-p2" id="muzzle-flash-p2"></div>
             <div class="castle-tower tower-p1" id="castle-p1">
               <div class="castle-hp-tag" id="hp-badge-p1">🛡️ Benteng: 5 / 5</div>
               <div class="cannon-mount cannon-p1" id="cannon-mount-p1"></div>
@@ -4021,6 +4047,7 @@
       <div class="player-panel" id="panel-p2">
         <div class="panel-header-bar">
           <span class="player-name-tag" id="panel-name-p2">Player 2</span>
+          <span class="streak-badge level-badge" id="level-badge-p2">Lv 1</span>
           <span class="streak-badge" id="streak-badge-p2" style="display:none;">🔥 0x</span>
         </div>
         <div class="problem-box" id="problem-p2">Soal Muncul Disini</div>
@@ -4535,6 +4562,8 @@
 
     const streakBadgeP1 = document.getElementById('streak-badge-p1');
     const streakBadgeP2 = document.getElementById('streak-badge-p2');
+    const levelBadgeP1 = document.getElementById('level-badge-p1');
+    const levelBadgeP2 = document.getElementById('level-badge-p2');
     const hintP1 = document.getElementById('hint-p1');
     const hintP2 = document.getElementById('hint-p2');
 
@@ -4644,6 +4673,12 @@
 
     let streakP1 = 0;
     let streakP2 = 0;
+    let diffLevelP1 = 1;
+    let diffLevelP2 = 1;
+    let bonusCounterP1 = 0;
+    let bonusCounterP2 = 0;
+    let isBonusP1 = false;
+    let isBonusP2 = false;
     let maxStreakP1 = 0;
     let maxStreakP2 = 0;
     let totalQuestionsP1 = 0;
@@ -4723,6 +4758,14 @@
       }
 
       decimalMenuButtons.forEach(btn => {
+        if ((btn.dataset.decimal === 'on' && globalDecimalMode) || (btn.dataset.decimal === 'off' && !globalDecimalMode)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      document.querySelectorAll('.step5-opt-btn[data-decimal]').forEach(btn => {
         if ((btn.dataset.decimal === 'on' && globalDecimalMode) || (btn.dataset.decimal === 'off' && !globalDecimalMode)) {
           btn.classList.add('active');
         } else {
@@ -5094,6 +5137,14 @@
 
       streakP1 = 0;
       streakP2 = 0;
+      diffLevelP1 = 1;
+      diffLevelP2 = 1;
+      bonusCounterP1 = 0;
+      bonusCounterP2 = 0;
+      isBonusP1 = false;
+      isBonusP2 = false;
+      problemP1.classList.remove('bonus-question');
+      problemP2.classList.remove('bonus-question');
       maxStreakP1 = 0;
       maxStreakP2 = 0;
       totalQuestionsP1 = 0;
@@ -5205,6 +5256,9 @@
         streakP1 = 0;
         updateStreakBadge(1);
         recordHistory(1, false);
+        isBonusP1 = false;
+        bonusCounterP1 = 0;
+        problemP1.classList.remove('bonus-question');
         answerP1.textContent = '⏳';
         answerP1.classList.add('shake');
         setTimeout(() => {
@@ -5215,6 +5269,9 @@
         streakP2 = 0;
         updateStreakBadge(2);
         recordHistory(2, false);
+        isBonusP2 = false;
+        bonusCounterP2 = 0;
+        problemP2.classList.remove('bonus-question');
         answerP2.textContent = '⏳';
         answerP2.classList.add('shake');
         setTimeout(() => {
@@ -5222,6 +5279,12 @@
           displayNewProblem(2);
         }, 400);
       }
+    }
+
+    function updateLevelBadge(player) {
+      const lvl = player === 1 ? diffLevelP1 : diffLevelP2;
+      const el = player === 1 ? levelBadgeP1 : levelBadgeP2;
+      if (el) el.textContent = `Lv ${lvl}`;
     }
 
     function updateStreakBadge(player) {
@@ -5440,10 +5503,19 @@
 
       if (player === 1) {
         totalQuestionsP1++;
+        const isBonusQ1 = isBonusP1;
+        isBonusP1 = false;
+        problemP1.classList.remove('bonus-question');
+        if (!isBonusQ1) bonusCounterP1++;
         const val = parseAnswer(currentAnswerP1);
         if (!isNaN(val) && Math.abs(val - currentProblemP1.answer) < 0.001) {
           streakP1++;
           if (streakP1 > maxStreakP1) maxStreakP1 = streakP1;
+          if (streakP1 % 4 === 0 && diffLevelP1 < 5) {
+            diffLevelP1++;
+            updateLevelBadge(1);
+            spawnCombatText(1, `📈 LEVEL ${diffLevelP1}!`, true);
+          }
           updateStreakBadge(1);
           recordHistory(1, true);
 
@@ -5469,9 +5541,18 @@
             spawnCombatText(1, hitTextP1, false);
           }
 
-          scoreP1++;
           const pullDist = streakP1 >= 3 ? moveDistance * 1.3 : moveDistance;
-          worldOffset -= pullDist;
+          if (isBonusQ1) {
+            scoreP1 += 2;
+            bonusCounterP1 = 0;
+            worldOffset -= Math.round(moveDistance * 1.6);
+            playComboSound();
+            spawnCombatText(1, '⭐ SOAL BONUS +2 POIN!', true);
+          } else {
+            scoreP1++;
+            worldOffset -= pullDist;
+            if (bonusCounterP1 >= 5) { isBonusP1 = true; bonusCounterP1 = 0; }
+          }
 
           if (currentTheme === 'tug') {
             characterP1.classList.add('tug-active-p1');
@@ -5507,6 +5588,14 @@
         } else {
           playWrongSound();
           streakP1 = 0;
+          if (diffLevelP1 > 1) { diffLevelP1--; updateLevelBadge(1); }
+          if (isBonusQ1) {
+            bonusCounterP1 = 0;
+            scoreP2++;
+            worldOffset += Math.round(moveDistance * 0.6);
+            spawnCombatText(1, '💀 BONUS GAGAL!', false, true);
+            spawnCombatText(2, '🎁 POIN GRATIS +1!', false);
+          }
           spawnCombatText(1, '❌ SALAH!', false, true);
           updateStreakBadge(1);
           recordHistory(1, false);
@@ -5526,10 +5615,19 @@
         }
       } else {
         totalQuestionsP2++;
+        const isBonusQ2 = isBonusP2;
+        isBonusP2 = false;
+        problemP2.classList.remove('bonus-question');
+        if (!isBonusQ2) bonusCounterP2++;
         const val = parseAnswer(currentAnswerP2);
         if (!isNaN(val) && Math.abs(val - currentProblemP2.answer) < 0.001) {
           streakP2++;
           if (streakP2 > maxStreakP2) maxStreakP2 = streakP2;
+          if (streakP2 % 4 === 0 && diffLevelP2 < 5) {
+            diffLevelP2++;
+            updateLevelBadge(2);
+            spawnCombatText(2, `📈 LEVEL ${diffLevelP2}!`, true);
+          }
           updateStreakBadge(2);
           recordHistory(2, true);
 
@@ -5555,9 +5653,18 @@
             spawnCombatText(2, hitTextP2, false);
           }
 
-          scoreP2++;
           const pullDist = streakP2 >= 3 ? moveDistance * 1.3 : moveDistance;
-          worldOffset += pullDist;
+          if (isBonusQ2) {
+            scoreP2 += 2;
+            bonusCounterP2 = 0;
+            worldOffset += Math.round(moveDistance * 1.6);
+            playComboSound();
+            spawnCombatText(2, '⭐ SOAL BONUS +2 POIN!', true);
+          } else {
+            scoreP2++;
+            worldOffset += pullDist;
+            if (bonusCounterP2 >= 5) { isBonusP2 = true; bonusCounterP2 = 0; }
+          }
 
           if (currentTheme === 'tug') {
             characterP2.classList.add('tug-active-p2');
@@ -5593,6 +5700,14 @@
         } else {
           playWrongSound();
           streakP2 = 0;
+          if (diffLevelP2 > 1) { diffLevelP2--; updateLevelBadge(2); }
+          if (isBonusQ2) {
+            bonusCounterP2 = 0;
+            scoreP1++;
+            worldOffset -= Math.round(moveDistance * 0.6);
+            spawnCombatText(2, '💀 BONUS GAGAL!', false, true);
+            spawnCombatText(1, '🎁 POIN GRATIS +1!', false);
+          }
           spawnCombatText(2, '❌ SALAH!', false, true);
           updateStreakBadge(2);
           recordHistory(2, false);
@@ -5627,6 +5742,7 @@
     function generateProblem(player) {
       let num1, num2, question, answer, hint = '';
       let op = selectedOperation;
+      const scale = (player === 1 ? diffLevelP1 : diffLevelP2) - 1; // 0..4, higher = harder
 
       const allOperations = [
         '+', '-', '*', '/', 'pangkat', 'akar',
@@ -5881,25 +5997,30 @@
           break;
         }
 
-        case '+':
-          num1 = Math.floor(Math.random() * 10) + 1;
-          num2 = Math.floor(Math.random() * 10) + 1;
+        case '+': {
+          const maxA = 9 + scale * 8;
+          num1 = Math.floor(Math.random() * maxA) + 1;
+          num2 = Math.floor(Math.random() * maxA) + 1;
           question = `${num1} + ${num2} = ?`;
           answer = num1 + num2;
           hint = `Hasilnya antara ${answer - 2} dan ${answer + 2}`;
           break;
+        }
 
-        case '+2':
-          num1 = Math.floor(Math.random() * 90) + 10;
-          num2 = Math.floor(Math.random() * 90) + 10;
+        case '+2': {
+          const maxB = 99 + scale * 60;
+          num1 = Math.floor(Math.random() * (maxB - 9)) + 10;
+          num2 = Math.floor(Math.random() * (maxB - 9)) + 10;
           question = `${num1} + ${num2} = ?`;
           answer = num1 + num2;
           hint = `Puluhannya mendekati ${Math.floor(answer / 10) * 10}`;
           break;
+        }
 
         case '-': {
-          let a = Math.floor(Math.random() * 10) + 1;
-          let b = Math.floor(Math.random() * 10) + 1;
+          const maxC = 9 + scale * 8;
+          let a = Math.floor(Math.random() * maxC) + 1;
+          let b = Math.floor(Math.random() * maxC) + 1;
           if (a === b) {
             if (a < 10) a += 1;
             else b -= 1;
@@ -5913,8 +6034,9 @@
         }
 
         case '-2': {
-          let aa = Math.floor(Math.random() * 90) + 10;
-          let bb = Math.floor(Math.random() * 90) + 10;
+          const maxD = 99 + scale * 60;
+          let aa = Math.floor(Math.random() * (maxD - 9)) + 10;
+          let bb = Math.floor(Math.random() * (maxD - 9)) + 10;
           if (aa === bb) {
             if (aa < 99) aa += 1;
             else bb -= 1;
@@ -5927,21 +6049,25 @@
           break;
         }
 
-        case '*':
-          num1 = Math.floor(Math.random() * 9) + 2;
-          num2 = Math.floor(Math.random() * 9) + 2;
+        case '*': {
+          const maxM = 9 + scale * 3;
+          num1 = Math.floor(Math.random() * (maxM - 1)) + 2;
+          num2 = Math.floor(Math.random() * (maxM - 1)) + 2;
           question = `${num1} × ${num2} = ?`;
           answer = num1 * num2;
           hint = `Perkalian ${num1}. Hasilnya ${answer}`;
           break;
+        }
 
-        case '/':
-          answer = Math.floor(Math.random() * 9) + 2;
-          num2 = Math.floor(Math.random() * 9) + 2;
+        case '/': {
+          const maxD2 = 9 + scale * 3;
+          answer = Math.floor(Math.random() * (maxD2 - 1)) + 2;
+          num2 = Math.floor(Math.random() * (maxD2 - 1)) + 2;
           num1 = answer * num2;
           question = `${num1} ÷ ${num2} = ?`;
           hint = `${num2} dikali berapa agar jadi ${num1}?`;
           break;
+        }
 
         case 'pangkat':
           num1 = Math.floor(Math.random() * 9) + 2;
@@ -6487,6 +6613,7 @@
       if (player === 1) {
         currentProblemP1 = generateProblem(1);
         problemP1.textContent = `${currentProblemP1.question}`;
+        if (isBonusP1) problemP1.classList.add('bonus-question');
         currentAnswerP1 = '';
         answerP1.textContent = '';
         hintP1.style.display = 'none';
@@ -6494,6 +6621,7 @@
       } else {
         currentProblemP2 = generateProblem(2);
         problemP2.textContent = `${currentProblemP2.question}`;
+        if (isBonusP2) problemP2.classList.add('bonus-question');
         currentAnswerP2 = '';
         answerP2.textContent = '';
         hintP2.style.display = 'none';
