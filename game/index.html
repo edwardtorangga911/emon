@@ -5165,23 +5165,56 @@
         button.textContent = item.label;
         if (item.cls) button.classList.add(item.cls);
 
-        button.addEventListener('touchstart', (event) => {
-          event.preventDefault();
-          playClickSound();
-          handleKeyPress(player, item.val);
-        });
+        let lastPressTime = 0;
+        let touchHandled = false;
 
-        button.addEventListener('click', () => {
+        function triggerPress(e) {
+          const now = Date.now();
+          if (now - lastPressTime < 140) {
+            if (e && e.cancelable) e.preventDefault();
+            return;
+          }
+          lastPressTime = now;
           playClickSound();
           handleKeyPress(player, item.val);
+        }
+
+        button.addEventListener('touchstart', (event) => {
+          if (event.cancelable) event.preventDefault();
+          touchHandled = true;
+          triggerPress(event);
+          setTimeout(() => { touchHandled = false; }, 350);
+        }, { passive: false });
+
+        button.addEventListener('click', (event) => {
+          if (touchHandled) {
+            event.preventDefault();
+            return;
+          }
+          triggerPress(event);
         });
 
         keypadElement.appendChild(button);
       });
     }
 
+    let lastKeyPressP1 = { key: '', time: 0 };
+    let lastKeyPressP2 = { key: '', time: 0 };
+
     function handleKeyPress(player, key) {
       if (gameOver) return;
+
+      const now = Date.now();
+      const last = player === 1 ? lastKeyPressP1 : lastKeyPressP2;
+      // Prevent synthetic ghost click double-fire of the exact same key within 120ms
+      if (last.key === key && (now - last.time) < 120) {
+        return;
+      }
+      if (player === 1) {
+        lastKeyPressP1 = { key, time: now };
+      } else {
+        lastKeyPressP2 = { key, time: now };
+      }
 
       if (player === 1) {
         if (key === 'C') {
