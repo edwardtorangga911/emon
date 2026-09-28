@@ -57,6 +57,14 @@ GameEngine = Class.extend({
             w: this.tileSize * this.tilesX,
             h: this.tileSize * this.tilesY
         };
+        this.players = [];
+        this.bots = [];
+        this.tiles = [];
+        this.bombs = [];
+        this.bonuses = [];
+        this.particles = [];
+        this.floatingTexts = [];
+        this.warps = [];
     },
 
     load: function() {
@@ -75,19 +83,52 @@ GameEngine = Class.extend({
         this.stage = new createjs.Stage("canvas");
         this.stage.enableMouseOver();
 
-        var queue = new createjs.LoadQueue(false);
+        this.menu = new Menu();
+
+        var useXHR = (window.location.protocol !== 'file:');
+        var queue = new createjs.LoadQueue(useXHR);
         var that = this;
-        queue.addEventListener("complete", function() {
-            that.playerBoyImg = queue.getResult("playerBoy");
-            that.playerImg = queue.getResult("player");
-            that.tilesImgs.grass = queue.getResult("tile_grass");
-            that.tilesImgs.wall = queue.getResult("tile_wall");
-            that.tilesImgs.wood = queue.getResult("tile_wood");
-            that.bombImg = queue.getResult("bomb");
-            that.fireImg = queue.getResult("fire");
-            that.bonusesImg = queue.getResult("bonuses");
-            that.setup();
+        var finished = false;
+
+        function onComplete() {
+            if (finished) return;
+            finished = true;
+            try {
+                that.playerBoyImg = queue.getResult("playerBoy") || that.playerBoyImg;
+                that.playerImg = queue.getResult("player") || that.playerImg;
+                that.tilesImgs.grass = queue.getResult("tile_grass") || that.tilesImgs.grass;
+                that.tilesImgs.wall = queue.getResult("tile_wall") || that.tilesImgs.wall;
+                that.tilesImgs.wood = queue.getResult("tile_wood") || that.tilesImgs.wood;
+                that.bombImg = queue.getResult("bomb") || that.bombImg;
+                that.fireImg = queue.getResult("fire") || that.fireImg;
+                that.bonusesImg = queue.getResult("bonuses") || that.bonusesImg;
+            } catch (e) {
+                console.warn("Preload getResult warning:", e);
+            }
+            try {
+                that.setup();
+            } catch (e) {
+                console.error("Setup error:", e);
+                if (that.menu) {
+                    that.menu.hideLoader();
+                    that.menu.show();
+                }
+            }
+        }
+
+        queue.addEventListener("complete", onComplete);
+        queue.addEventListener("error", function(err) {
+            console.warn("Preload error fallback:", err);
+            onComplete();
         });
+
+        setTimeout(function() {
+            if (!finished) {
+                console.warn("Preload safety timer triggered setup");
+                onComplete();
+            }
+        }, 1500);
+
         queue.loadManifest([
             {id: "playerBoy", src: "img/george.png"},
             {id: "player", src: "img/bomberman.png"},
@@ -106,8 +147,6 @@ GameEngine = Class.extend({
         createjs.Sound.alternateExtensions = ["mp3"];
         createjs.Sound.registerSound("sound/bomb.ogg", "bomb");
         createjs.Sound.registerSound("sound/game.ogg", "game");
-
-        this.menu = new Menu();
     },
 
     setup: function() {
@@ -130,8 +169,10 @@ GameEngine = Class.extend({
         this.drawTiles();
         this.drawBonuses();
 
-        this.spawnBots();
-        this.spawnPlayers();
+        if (this.playersCount >= 1) {
+            this.spawnBots();
+            this.spawnPlayers();
+        }
 
         gInputEngine.addListener('mute', this.toggleSound);
 
@@ -516,39 +557,34 @@ GameEngine = Class.extend({
     },
 
     updateHud: function() {
-        var p = (this.players && this.players.length) ? this.players[0] : null;
+        try {
+            var p = (this.players && this.players.length) ? this.players[0] : null;
 
-        var elLvl = document.getElementById('hud-level');
-        var elTheme = document.getElementById('hud-theme');
-        var elScore = document.getElementById('hud-score');
-        var elBomb = document.getElementById('hud-bombs');
-        var elFire = document.getElementById('hud-fire');
-        var elSpeed = document.getElementById('hud-speed');
-        var elShield = document.getElementById('hud-shield');
-        var elPierce = document.getElementById('badge-pierce');
-        var elRemote = document.getElementById('badge-remote');
-        var elKick = document.getElementById('badge-kick');
-        var elThrow = document.getElementById('badge-throw');
-        var elBombPass = document.getElementById('badge-bombpass');
-        var elWallPass = document.getElementById('badge-wallpass');
-        var elCurse = document.getElementById('hud-curse');
+            var elLvl = document.getElementById('hud-level');
+            var elTheme = document.getElementById('hud-theme');
+            var elScore = document.getElementById('hud-score');
+            var elBomb = document.getElementById('hud-bombs');
+            var elFire = document.getElementById('hud-fire');
+            var elSpeed = document.getElementById('hud-speed');
+            var elShield = document.getElementById('hud-shield');
+            var elPierce = document.getElementById('badge-pierce');
+            var elRemote = document.getElementById('badge-remote');
+            var elKick = document.getElementById('badge-kick');
+            var elThrow = document.getElementById('badge-throw');
+            var elBombPass = document.getElementById('badge-bombpass');
+            var elWallPass = document.getElementById('badge-wallpass');
+            var elCurse = document.getElementById('hud-curse');
 
-        var themeNames = {
-            'classic': 'Taman Hijau',
-            'ice': 'Gua Es Licin',
-            'factory': 'Pabrik Konveyor',
-            'warp': 'Kuil Portal Warp'
-        };
+            var themeNames = {
+                'classic': 'Taman Hijau',
+                'ice': 'Gua Es Licin',
+                'factory': 'Pabrik Konveyor',
+                'warp': 'Kuil Portal Warp'
+            };
 
-        if (elLvl) elLvl.textContent = this.currentLevel;
-        if (elTheme) elTheme.textContent = themeNames[this.currentTheme] || this.currentTheme;
-        if (elScore) elScore.textContent = this.score;
-
-        if (p) {
-            if (elBomb) elBomb.textContent = p.bombsMax;
-            if (elFire) elFire.textContent = p.bombStrength;
-            if (elSpeed) elSpeed.textContent = (p.velocity || 2).toFixed(1);
-            if (elShield) elShield.textContent = p.shield || 0;
+            if (elLvl) elLvl.textContent = this.currentLevel;
+            if (elTheme) elTheme.textContent = themeNames[this.currentTheme] || this.currentTheme;
+            if (elScore) elScore.textContent = this.score;
 
             function setBadge(el, active) {
                 if (!el) return;
@@ -556,34 +592,51 @@ GameEngine = Class.extend({
                 else el.classList.remove('active');
             }
 
-            setBadge(elPierce, p.hasPierceBomb);
-            setBadge(elRemote, p.hasDetonator);
-            setBadge(elKick, p.hasKick);
-            setBadge(elThrow, p.hasThrow);
-            setBadge(elBombPass, p.hasBombPass);
-            setBadge(elWallPass, p.hasWallPass);
+            if (p) {
+                if (elBomb) elBomb.textContent = p.bombsMax;
+                if (elFire) elFire.textContent = p.bombStrength;
+                if (elSpeed) elSpeed.textContent = (p.velocity || 2).toFixed(1);
+                if (elShield) elShield.textContent = p.shield || 0;
 
-            if (elCurse) {
-                if (p.curse) {
-                    var sec = Math.ceil(p.curseTimer / 50);
-                    var curseNames = {
-                        'diarrhea': 'Diare Bom',
-                        'snail': 'Siput',
-                        'reverse': 'Kontrol Terbalik',
-                        'amnesia': 'Amnesia'
-                    };
-                    var cName = curseNames[p.curse] || p.curse;
-                    elCurse.innerHTML = '<i class="fas fa-skull"></i> ' + cName + ' (' + sec + 's)';
-                    elCurse.style.display = 'inline-flex';
-                } else {
-                    elCurse.style.display = 'none';
+                setBadge(elPierce, p.hasPierceBomb);
+                setBadge(elRemote, p.hasDetonator);
+                setBadge(elKick, p.hasKick);
+                setBadge(elThrow, p.hasThrow);
+                setBadge(elBombPass, p.hasBombPass);
+                setBadge(elWallPass, p.hasWallPass);
+
+                if (elCurse) {
+                    if (p.curse) {
+                        var sec = Math.ceil(p.curseTimer / 50);
+                        var curseNames = {
+                            'diarrhea': 'Diare Bom',
+                            'snail': 'Siput',
+                            'reverse': 'Kontrol Terbalik',
+                            'amnesia': 'Amnesia'
+                        };
+                        var cName = curseNames[p.curse] || p.curse;
+                        elCurse.innerHTML = '<i class="fas fa-skull"></i> ' + cName + ' (' + sec + 's)';
+                        elCurse.style.display = 'inline-flex';
+                    } else {
+                        elCurse.style.display = 'none';
+                    }
                 }
+            } else {
+                if (elBomb) elBomb.textContent = 1;
+                if (elFire) elFire.textContent = 1;
+                if (elSpeed) elSpeed.textContent = "2.0";
+                if (elShield) elShield.textContent = 0;
+                [elPierce, elRemote, elKick, elThrow, elBombPass, elWallPass].forEach(function(el) {
+                    setBadge(el, false);
+                });
+                if (elCurse) elCurse.style.display = 'none';
             }
-        }
+        } catch (e) {}
     },
 
     spawnBots: function() {
         this.bots = [];
+        if (this.playersCount === 0) return;
 
         // Increase bot count on higher levels (up to 3 bots)
         var botTargetCount = Math.min(3, 1 + Math.floor(this.currentLevel / 2));
@@ -605,6 +658,7 @@ GameEngine = Class.extend({
 
     spawnPlayers: function() {
         this.players = [];
+        if (this.playersCount === 0) return;
 
         var player1 = new Player({ x: 1, y: 1 });
         this.players.push(player1);

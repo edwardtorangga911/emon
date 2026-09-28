@@ -58,7 +58,7 @@ Bot = Player.extend({
             this.wait = true;
         }
 
-        if (this.targetBitmapPosition.x == this.bmp.x && this.targetBitmapPosition.y == this.bmp.y) {
+        if (this.targetBitmapPosition && this.targetBitmapPosition.x == this.bmp.x && this.targetBitmapPosition.y == this.bmp.y) {
 
             // If we bumped into the wood, burn it!
             // If we are near player, kill it!
@@ -126,7 +126,7 @@ Bot = Player.extend({
             }
         }
         this.targetPosition = this.getRandomTarget(targets);
-        if (this.targetPosition && this.targetPosition.x) {
+        if (this.targetPosition && this.targetPosition.x !== undefined) {
             this.loadTargetPosition(this.targetPosition);
             this.targetBitmapPosition = Utils.convertToBitmapPosition(this.targetPosition);
         }

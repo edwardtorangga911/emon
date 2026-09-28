@@ -1,19 +1,24 @@
 Menu = Class.extend({
     visible: true,
     views: [],
+    loaderViews: [],
 
     init: function() {
+        this.views = [];
+        this.loaderViews = [];
         gGameEngine.botsCount = 4;
         gGameEngine.playersCount = 0;
         this.showLoader();
     },
 
     show: function(text, isLevelClear) {
+        this.hideLoader();
         this.visible = true;
         this.draw(text, isLevelClear);
     },
 
     hide: function() {
+        this.hideLoader();
         this.visible = false;
         for (var i = 0; i < this.views.length; i++) {
             gGameEngine.stage.removeChild(this.views[i]);
@@ -66,6 +71,12 @@ Menu = Class.extend({
     },
 
     draw: function(text, isLevelClear) {
+        this.hideLoader();
+        for (var i = 0; i < this.views.length; i++) {
+            gGameEngine.stage.removeChild(this.views[i]);
+        }
+        this.views = [];
+
         var that = this;
 
         // Semi-transparent backdrop
@@ -259,9 +270,12 @@ Menu = Class.extend({
         multiIconBoy.y = iconsY;
         gGameEngine.stage.addChild(multiIconBoy);
         this.views.push(multiIconBoy);
+
+        gGameEngine.stage.update();
     },
 
     showLoader: function() {
+        this.hideLoader();
         var bgGraphics = new createjs.Graphics().beginFill("#0f172a").drawRect(0, 0, gGameEngine.size.w, gGameEngine.size.h);
         var bg = new createjs.Shape(bgGraphics);
         gGameEngine.stage.addChild(bg);
@@ -271,5 +285,17 @@ Menu = Class.extend({
         loadingText.y = gGameEngine.size.h / 2 - loadingText.getMeasuredHeight() / 2;
         gGameEngine.stage.addChild(loadingText);
         gGameEngine.stage.update();
+
+        this.loaderViews = [bg, loadingText];
+    },
+
+    hideLoader: function() {
+        if (this.loaderViews && this.loaderViews.length) {
+            for (var i = 0; i < this.loaderViews.length; i++) {
+                gGameEngine.stage.removeChild(this.loaderViews[i]);
+            }
+            this.loaderViews = [];
+            gGameEngine.stage.update();
+        }
     }
 });
