@@ -1,3 +1,50 @@
+/**
+ * Modern Browser Compatibility Patches for CreateJS (EaselJS & SoundJS)
+ */
+(function() {
+    // 1. Suppress EaselJS 2D hit-test getImageData warning with willReadFrequently: true
+    if (typeof createjs !== 'undefined' && createjs.DisplayObject) {
+        try {
+            var hitCanvas = document.createElement('canvas');
+            hitCanvas.width = 1;
+            hitCanvas.height = 1;
+            createjs.DisplayObject._hitTestCanvas = hitCanvas;
+            createjs.DisplayObject._hitTestContext = hitCanvas.getContext('2d', { willReadFrequently: true });
+        } catch (e) {}
+    }
+
+    // 2. Suppress SoundJS autoplay AudioContext warning on page load
+    if (typeof createjs !== 'undefined' && createjs.WebAudioPlugin) {
+        createjs.WebAudioPlugin.playEmptySound = function() {
+            // No-op during page load to adhere to browser Autoplay Policy
+        };
+    }
+
+    // 3. One-time user interaction gesture unlocker for WebAudio
+    function unlockAudio() {
+        try {
+            if (typeof createjs !== 'undefined') {
+                if (createjs.WebAudioPlugin && createjs.WebAudioPlugin.context) {
+                    if (createjs.WebAudioPlugin.context.state === 'suspended') {
+                        createjs.WebAudioPlugin.context.resume();
+                    }
+                }
+                if (createjs.Sound && createjs.Sound.activePlugin && createjs.Sound.activePlugin.context) {
+                    if (createjs.Sound.activePlugin.context.state === 'suspended') {
+                        createjs.Sound.activePlugin.context.resume();
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        ['click', 'touchstart', 'keydown', 'pointerdown'].forEach(function(evt) {
+            document.addEventListener(evt, unlockAudio, { once: true, passive: true });
+        });
+    }
+})();
+
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.

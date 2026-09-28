@@ -60,6 +60,18 @@ GameEngine = Class.extend({
     },
 
     load: function() {
+        if (createjs.DisplayObject) {
+            try {
+                var hitCanvas = document.createElement("canvas");
+                hitCanvas.width = hitCanvas.height = 1;
+                createjs.DisplayObject._hitTestCanvas = hitCanvas;
+                createjs.DisplayObject._hitTestContext = hitCanvas.getContext("2d", { willReadFrequently: true });
+            } catch (e) {}
+        }
+        if (createjs.WebAudioPlugin) {
+            createjs.WebAudioPlugin.playEmptySound = function() {};
+        }
+
         this.stage = new createjs.Stage("canvas");
         this.stage.enableMouseOver();
 
