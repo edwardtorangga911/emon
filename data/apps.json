@@ -21,20 +21,19 @@
   },
   {
     "id": 2,
-    "name": "Tarik Tambang Multiplayer Game",
+    "name": "Boxed 2D Physics Game",
     "category": "Interactive Games",
-    "icon": "fas fa-trophy",
-    "description": "Game interaktif duel tarik tambang 2-player berbasis browser dengan animasi responsive, sound effects, dan kontrol keyboard kompetitif.",
+    "icon": "fas fa-cube",
+    "description": "Game aksi survival 2D dengan simulasi Box2D physics, dynamic procedural terrain generation, dan sistem musuh dinamis.",
     "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80",
-    "technologies": ["HTML5", "CSS3", "Vanilla JavaScript", "Audio API"],
+    "technologies": ["HTML5 Canvas", "Box2D Physics", "JavaScript", "Procedural World"],
     "features": [
-      "Mode 2 Pemain (Player 1 vs Player 2)",
-      "Animasi Real-time Physics Tarik Tambang",
-      "Efek Suara Dinamis & Soundtrack",
-      "Sistem Skor & Penentuan Pemenang Otomatis",
-      "Responsif di Desktop dan Tablet"
+      "Simulasi Rigidbody Box2D Real-time",
+      "Procedural Terrain & Dynamic Cave Generation",
+      "Dynamic Enemy & Bomb Spawner",
+      "High Score Persistent Tracking"
     ],
-    "url": "/tariktambang/index.html",
+    "url": "/game/boxed/index.html",
     "github": "https://github.com/edwardtorangga911/emon",
     "status": "completed",
     "year": "2026"
@@ -60,19 +59,19 @@
   },
   {
     "id": 4,
-    "name": "Retro Canvas Arcade Game",
+    "name": "Math Arcade Web Game",
     "category": "Interactive Games",
     "icon": "fas fa-gamepad",
-    "description": "Game arcade klasik yang di-render murni menggunakan HTML5 Canvas API dan JavaScript game loop, ringan dan seru dimainkan langsung di web.",
+    "description": "Game arcade edukatif matematika interaktif berbasis browser, ringan dan seru dimainkan langsung di web.",
     "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
-    "technologies": ["HTML5 Canvas", "JavaScript Game Engine", "Web Audio"],
+    "technologies": ["HTML5", "CSS3", "JavaScript Game Engine", "Audio API"],
     "features": [
-      "Rendering 60 FPS Canvas API",
-      "Collision Detection Cepat",
-      "High Score Storage (LocalStorage)",
-      "Ringan tanpa dependencies eksternal"
+      "Interactive Math Puzzles & Gameplay",
+      "Fast Responsive Controls",
+      "Score Tracking & Progress",
+      "Dukungan Cross-Device Desktop & Mobile"
     ],
-    "url": "/game/index.html",
+    "url": "/game/math/index.html",
     "github": "https://github.com/edwardtorangga911/emon",
     "status": "completed",
     "year": "2026"
