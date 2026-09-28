@@ -6,7 +6,7 @@ GameEngine = Class.extend({
     fps: 50,
     botsCount: 2, /* 0 - 3 */
     playersCount: 2, /* 1 - 2 */
-    bonusesPercent: 16,
+    bonusesPercent: 45,
 
     stage: null,
     menu: null,
@@ -179,6 +179,11 @@ GameEngine = Class.extend({
         // Menu
         gGameEngine.menu.update();
 
+        // Update HUD display
+        if (createjs.Ticker.getTicks() % 8 === 0 && gGameEngine.updateHud) {
+            gGameEngine.updateHud();
+        }
+
         // Stage
         gGameEngine.stage.update();
     },
@@ -242,8 +247,13 @@ GameEngine = Class.extend({
                     || (j == 2 && tile.position.x > this.tilesX / 2 && tile.position.y < this.tilesX / 2)
                     || (j == 3 && tile.position.x > this.tilesX / 2 && tile.position.y > this.tilesX / 2)) {
 
-                    var typePosition = placedCount % 3;
-                    var bonus = new Bonus(tile.position, typePosition);
+                    var bonusPool = [
+                        'bomb', 'bomb', 'fire', 'fire', 'speed', 'speed',
+                        'pierce', 'remote', 'kick', 'throw', 'bombpass',
+                        'shield', 'wallpass', 'skull'
+                    ];
+                    var chosenType = bonusPool[Math.floor(Math.random() * bonusPool.length)];
+                    var bonus = new Bonus(tile.position, chosenType);
                     this.bonuses.push(bonus);
 
                     // Move wood to front
@@ -251,6 +261,59 @@ GameEngine = Class.extend({
 
                     placedCount++;
                 }
+            }
+        }
+    },
+
+    updateHud: function() {
+        if (!this.players || !this.players.length) return;
+        var p = this.players[0];
+        if (!p) return;
+
+        var elBomb = document.getElementById('hud-bombs');
+        var elFire = document.getElementById('hud-fire');
+        var elSpeed = document.getElementById('hud-speed');
+        var elShield = document.getElementById('hud-shield');
+        var elPierce = document.getElementById('badge-pierce');
+        var elRemote = document.getElementById('badge-remote');
+        var elKick = document.getElementById('badge-kick');
+        var elThrow = document.getElementById('badge-throw');
+        var elBombPass = document.getElementById('badge-bombpass');
+        var elWallPass = document.getElementById('badge-wallpass');
+        var elCurse = document.getElementById('hud-curse');
+
+        if (elBomb) elBomb.textContent = p.bombsMax;
+        if (elFire) elFire.textContent = p.bombStrength;
+        if (elSpeed) elSpeed.textContent = (p.velocity || 2).toFixed(1);
+        if (elShield) elShield.textContent = p.shield || 0;
+
+        function setBadge(el, active) {
+            if (!el) return;
+            if (active) el.classList.add('active');
+            else el.classList.remove('active');
+        }
+
+        setBadge(elPierce, p.hasPierceBomb);
+        setBadge(elRemote, p.hasDetonator);
+        setBadge(elKick, p.hasKick);
+        setBadge(elThrow, p.hasThrow);
+        setBadge(elBombPass, p.hasBombPass);
+        setBadge(elWallPass, p.hasWallPass);
+
+        if (elCurse) {
+            if (p.curse) {
+                var sec = Math.ceil(p.curseTimer / 50);
+                var curseNames = {
+                    'diarrhea': 'Diare Bom',
+                    'snail': 'Siput',
+                    'reverse': 'Kontrol Terbalik',
+                    'amnesia': 'Amnesia'
+                };
+                var cName = curseNames[p.curse] || p.curse;
+                elCurse.innerHTML = '<i class="fas fa-skull"></i> ' + cName + ' (' + sec + 's)';
+                elCurse.style.display = 'inline-flex';
+            } else {
+                elCurse.style.display = 'none';
             }
         }
     },

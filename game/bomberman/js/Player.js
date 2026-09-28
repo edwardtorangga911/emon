@@ -5,6 +5,7 @@ Player = Entity.extend({
      * Moving speed
      */
     velocity: 2,
+    baseVelocity: 2,
 
     /**
      * Max number of bombs user can spawn
@@ -17,43 +18,55 @@ Player = Entity.extend({
     bombStrength: 1,
 
     /**
+     * Power-up ability flags
+     */
+    hasPierceBomb: false,
+    hasDetonator: false,
+    hasKick: false,
+    hasThrow: false,
+    hasBombPass: false,
+    hasWallPass: false,
+
+    /**
+     * Defensive shield count & invulnerability frame timer
+     */
+    shield: 0,
+    invulnerableTimer: 0,
+
+    /**
+     * Negative curse states: null, 'diarrhea', 'snail', 'reverse', 'amnesia'
+     */
+    curse: null,
+    curseTimer: 0,
+    lastStepTile: null,
+
+    /**
+     * Facing direction for throwing: 'up', 'down', 'left', 'right'
+     */
+    facingDirection: 'down',
+
+    /**
      * Entity position on map grid
      */
     position: {},
 
     /**
-     * Collision box dimensions.
-     * Deliberately independent from the sprite frame size below, so the
-     * artwork can be authored at a different resolution than the hitbox.
+     * Collision box dimensions
      */
     size: {
         w: 48,
         h: 48
     },
 
-    /**
-     * Sprite sheet layouts of the character artwork, laid out column-first
-     * (4 columns per row). `dead` is the last valid frame index of the
-     * sheet, used by the death animation.
-     *
-     * regX/regY place the character on its tile: the anchor is the middle of
-     * the tile horizontally and 2px above the tile bottom vertically, so the
-     * character's feet land on the floor regardless of the frame resolution.
-     */
     spriteSheets: {
-        // img/bomberman.png - 108x160, 4 x 4 cells of 27x40 (frames 0..15)
         player: { w: 27, h: 40, regX: -2, regY: 5, dead: 15 },
-        // img/george.png - 192x240, 4 x 5 cells of 48x48 (frames 0..19)
         bot: { w: 48, h: 48, regX: 10, regY: 12, dead: 16 }
     },
 
-    /**
-     * Bitmap animation
-     */
     bmp: null,
+    auraGfx: null,
 
     alive: true,
-
     bombs: [],
 
     controls: {
@@ -61,14 +74,12 @@ Player = Entity.extend({
         'left': 'left',
         'down': 'down',
         'right': 'right',
-        'bomb': 'bomb'
+        'bomb': 'bomb',
+        'detonate': 'detonate',
+        'throw': 'throw'
     },
 
-    /**
-     * Bomb that player can escape from even when there is a collision
-     */
     escapeBomb: null,
-
     deadTimer: 0,
 
     init: function(position, controls, id) {
@@ -106,82 +117,270 @@ Player = Entity.extend({
         this.bmp.x = pixels.x;
         this.bmp.y = pixels.y;
 
+        // Container for shield bubble and curse text
+        this.auraGfx = new createjs.Shape();
+        gGameEngine.stage.addChild(this.auraGfx);
+
         gGameEngine.stage.addChild(this.bmp);
 
         this.bombs = [];
+        this.baseVelocity = 2;
+        this.velocity = 2;
+        this.lastStepTile = { x: position.x, y: position.y };
+
         this.setBombsListener();
+        this.setSpecialControlsListener();
     },
 
     setBombsListener: function() {
-        // Subscribe to bombs spawning
         if (!(this instanceof Bot)) {
             var that = this;
             gInputEngine.addListener(this.controls.bomb, function() {
-                // Check whether there is already bomb on this position
-                for (var i = 0; i < gGameEngine.bombs.length; i++) {
-                    var bomb = gGameEngine.bombs[i];
-                    if (Utils.comparePositions(bomb.position, that.position)) {
-                        return;
-                    }
-                }
-
-                var unexplodedBombs = 0;
-                for (var i = 0; i < that.bombs.length; i++) {
-                    if (!that.bombs[i].exploded) {
-                        unexplodedBombs++;
-                    }
-                }
-
-                if (unexplodedBombs < that.bombsMax) {
-                    var bomb = new Bomb(that.position, that.bombStrength);
-                    gGameEngine.stage.addChild(bomb.bmp);
-                    that.bombs.push(bomb);
-                    gGameEngine.bombs.push(bomb);
-
-                    bomb.setExplodeListener(function() {
-                        Utils.removeFromArray(that.bombs, bomb);
-                    });
-                }
+                that.plantBomb();
             });
+        }
+    },
+
+    setSpecialControlsListener: function() {
+        if (!(this instanceof Bot)) {
+            var that = this;
+
+            // Detonator listener
+            if (this.controls.detonate) {
+                gInputEngine.addListener(this.controls.detonate, function() {
+                    that.detonateRemoteBombs();
+                });
+            }
+
+            // Throw bomb listener
+            if (this.controls.throw) {
+                gInputEngine.addListener(this.controls.throw, function() {
+                    that.throwBomb();
+                });
+            }
+        }
+    },
+
+    plantBomb: function() {
+        if (!this.alive || (gGameEngine.menu && gGameEngine.menu.visible)) return;
+
+        // Amnesia curse disables planting bombs
+        if (this.curse === 'amnesia') {
+            return;
+        }
+
+        // Check whether there is already bomb on this position
+        for (var i = 0; i < gGameEngine.bombs.length; i++) {
+            var bomb = gGameEngine.bombs[i];
+            if (Utils.comparePositions(bomb.position, this.position)) {
+                // If standing on bomb and has throw ability, pressing bomb again can throw it!
+                if (this.hasThrow) {
+                    this.throwBomb();
+                }
+                return;
+            }
+        }
+
+        var unexplodedBombs = 0;
+        for (var i = 0; i < this.bombs.length; i++) {
+            if (!this.bombs[i].exploded) {
+                unexplodedBombs++;
+            }
+        }
+
+        if (unexplodedBombs < this.bombsMax) {
+            var bomb = new Bomb(this.position, this.bombStrength, {
+                isPierce: this.hasPierceBomb,
+                isRemote: this.hasDetonator,
+                owner: this
+            });
+
+            gGameEngine.stage.addChild(bomb.bmp);
+            this.bombs.push(bomb);
+            gGameEngine.bombs.push(bomb);
+
+            if (window.AudioSynth) {
+                AudioSynth.play('plant');
+            }
+
+            var that = this;
+            bomb.setExplodeListener(function() {
+                Utils.removeFromArray(that.bombs, bomb);
+                if (gGameEngine.updateHud) gGameEngine.updateHud();
+            });
+
+            if (gGameEngine.updateHud) gGameEngine.updateHud();
+        } else if (this.hasDetonator) {
+            // If already at max bombs and has detonator, pressing bomb detonates!
+            this.detonateRemoteBombs();
+        }
+    },
+
+    detonateRemoteBombs: function() {
+        if (!this.hasDetonator || !this.alive) return;
+
+        var detonated = false;
+        for (var i = 0; i < this.bombs.length; i++) {
+            var bomb = this.bombs[i];
+            if (!bomb.exploded && bomb.isRemote) {
+                bomb.explode();
+                detonated = true;
+            }
+        }
+
+        if (detonated && window.AudioSynth) {
+            AudioSynth.play('detonate');
+        }
+    },
+
+    throwBomb: function() {
+        if (!this.hasThrow || !this.alive) return;
+
+        // Find bomb on current position or 1 tile in front
+        var targetBomb = null;
+        for (var i = 0; i < gGameEngine.bombs.length; i++) {
+            var b = gGameEngine.bombs[i];
+            if (!b.exploded) {
+                if (Utils.comparePositions(b.position, this.position)) {
+                    targetBomb = b;
+                    break;
+                }
+            }
+        }
+
+        if (!targetBomb) {
+            var frontPos = { x: this.position.x, y: this.position.y };
+            if (this.facingDirection === 'up') frontPos.y -= 1;
+            else if (this.facingDirection === 'down') frontPos.y += 1;
+            else if (this.facingDirection === 'left') frontPos.x -= 1;
+            else if (this.facingDirection === 'right') frontPos.x += 1;
+
+            for (var i = 0; i < gGameEngine.bombs.length; i++) {
+                var b = gGameEngine.bombs[i];
+                if (!b.exploded && Utils.comparePositions(b.position, frontPos)) {
+                    targetBomb = b;
+                    break;
+                }
+            }
+        }
+
+        if (targetBomb && !targetBomb.isThrowing) {
+            var throwDist = 3;
+            var targetGrid = { x: this.position.x, y: this.position.y };
+            if (this.facingDirection === 'up') targetGrid.y -= throwDist;
+            else if (this.facingDirection === 'down') targetGrid.y += throwDist;
+            else if (this.facingDirection === 'left') targetGrid.x -= throwDist;
+            else if (this.facingDirection === 'right') targetGrid.x += throwDist;
+
+            // Clamp inside border walls (1 to tilesX - 2, 1 to tilesY - 2)
+            targetGrid.x = Math.max(1, Math.min(gGameEngine.tilesX - 2, targetGrid.x));
+            targetGrid.y = Math.max(1, Math.min(gGameEngine.tilesY - 2, targetGrid.y));
+
+            targetBomb.throw(targetGrid);
         }
     },
 
     update: function() {
         if (!this.alive) {
-            //this.fade();
+            this.fade();
             return;
         }
         if (gGameEngine.menu.visible) {
             return;
         }
-        var position = { x: this.bmp.x, y: this.bmp.y };
 
+        // Update Invulnerability timer
+        if (this.invulnerableTimer > 0) {
+            this.invulnerableTimer--;
+            this.bmp.alpha = (Math.floor(this.invulnerableTimer / 4) % 2 === 0) ? 0.3 : 1;
+        } else if (this.hasWallPass) {
+            // Ghost effect when having Wall Pass
+            this.bmp.alpha = 0.65;
+        } else {
+            this.bmp.alpha = 1;
+        }
+
+        // Update Curse timer
+        if (this.curse) {
+            this.curseTimer--;
+
+            if (this.curse === 'snail') {
+                this.velocity = 0.9;
+            }
+
+            if (this.curse === 'diarrhea') {
+                if (!this.lastStepTile || this.position.x !== this.lastStepTile.x || this.position.y !== this.lastStepTile.y) {
+                    this.plantBomb();
+                    this.lastStepTile = { x: this.position.x, y: this.position.y };
+                }
+            }
+
+            if (this.curseTimer <= 0) {
+                this.curse = null;
+                this.velocity = this.baseVelocity || 2;
+                if (gGameEngine.updateHud) gGameEngine.updateHud();
+            }
+        }
+
+        var position = { x: this.bmp.x, y: this.bmp.y };
         var dirX = 0;
         var dirY = 0;
-        if (gInputEngine.actions[this.controls.up]) {
+
+        // Check directional inputs (handles reversed controls curse)
+        var actionUp = gInputEngine.actions[this.controls.up];
+        var actionDown = gInputEngine.actions[this.controls.down];
+        var actionLeft = gInputEngine.actions[this.controls.left];
+        var actionRight = gInputEngine.actions[this.controls.right];
+
+        if (this.curse === 'reverse') {
+            var tempUp = actionUp;
+            var tempDown = actionDown;
+            var tempLeft = actionLeft;
+            var tempRight = actionRight;
+            actionUp = tempDown;
+            actionDown = tempUp;
+            actionLeft = tempRight;
+            actionRight = tempLeft;
+        }
+
+        if (actionUp) {
             this.animate('up');
             position.y -= this.velocity;
             dirY = -1;
-        } else if (gInputEngine.actions[this.controls.down]) {
+            this.facingDirection = 'up';
+        } else if (actionDown) {
             this.animate('down');
             position.y += this.velocity;
             dirY = 1;
-        } else if (gInputEngine.actions[this.controls.left]) {
+            this.facingDirection = 'down';
+        } else if (actionLeft) {
             this.animate('left');
             position.x -= this.velocity;
             dirX = -1;
-        } else if (gInputEngine.actions[this.controls.right]) {
+            this.facingDirection = 'left';
+        } else if (actionRight) {
             this.animate('right');
             position.x += this.velocity;
             dirX = 1;
+            this.facingDirection = 'right';
         } else {
             this.animate('idle');
         }
 
         if (position.x != this.bmp.x || position.y != this.bmp.y) {
-            if (!this.detectBombCollision(position)) {
+            var bombCollision = this.detectBombCollision(position);
+
+            // Handle Bomb Kick when colliding with bomb
+            if (bombCollision && this.hasKick) {
+                var collidingBomb = this.getCollidingBomb(position);
+                if (collidingBomb && !collidingBomb.isMoving) {
+                    collidingBomb.kick(dirX, dirY);
+                }
+            }
+
+            // Bomb pass ignores bomb collisions entirely
+            if (!bombCollision || this.hasBombPass) {
                 if (this.detectWallCollision(position)) {
-                    // If we are on the corner, move to the aisle
                     var cornerFix = this.getCornerFix(dirX, dirY);
                     if (cornerFix) {
                         var fixX = 0;
@@ -203,102 +402,146 @@ Player = Entity.extend({
             }
         }
 
+        // Fire collision damage with Shield protection
         if (this.detectFireCollision()) {
-            this.die();
+            if (this.invulnerableTimer <= 0) {
+                if (this.shield > 0) {
+                    this.shield--;
+                    this.invulnerableTimer = 60; // ~1.2s invulnerability
+                    if (window.AudioSynth) AudioSynth.play('shield_break');
+                    if (gGameEngine.updateHud) gGameEngine.updateHud();
+                } else {
+                    this.die();
+                }
+            }
         }
+
+        // Update Aura / Shield / Curse visual graphics
+        this.updateAuraGfx();
 
         this.handleBonusCollision();
     },
 
-    /**
-     * Checks whether we are on corner to target position.
-     * Returns position where we should move before we can go to target.
-     */
+    updateAuraGfx: function() {
+        if (!this.auraGfx) return;
+        this.auraGfx.graphics.clear();
+
+        var px = this.bmp.x + 13;
+        var py = this.bmp.y + 18;
+
+        // Shield glowing bubble
+        if (this.shield > 0) {
+            this.auraGfx.graphics
+                .setStrokeStyle(2)
+                .beginStroke('#38bdf8')
+                .beginFill('rgba(56, 189, 248, 0.22)')
+                .drawCircle(px, py, 18);
+        }
+
+        // Active curse indicator halo
+        if (this.curse) {
+            var pulse = Math.sin(createjs.Ticker.getTicks() * 0.2) * 2;
+            this.auraGfx.graphics
+                .setStrokeStyle(1.5)
+                .beginStroke('#ef4444')
+                .drawCircle(px, py - 20, 5 + pulse);
+        }
+    },
+
+    getCollidingBomb: function(pixels) {
+        var position = Utils.convertToEntityPosition(pixels);
+        for (var i = 0; i < gGameEngine.bombs.length; i++) {
+            var bomb = gGameEngine.bombs[i];
+            if (bomb.position.x == position.x && bomb.position.y == position.y) {
+                return bomb;
+            }
+        }
+        return null;
+    },
+
     getCornerFix: function(dirX, dirY) {
         var edgeSize = 30;
-
-        // fix position to where we should go first
         var position = {};
 
-        // possible fix position we are going to choose from
         var pos1 = { x: this.position.x + dirY, y: this.position.y + dirX };
         var bmp1 = Utils.convertToBitmapPosition(pos1);
 
         var pos2 = { x: this.position.x - dirY, y: this.position.y - dirX };
         var bmp2 = Utils.convertToBitmapPosition(pos2);
 
-        // in front of current position
-        if (gGameEngine.getTileMaterial({ x: this.position.x + dirX, y: this.position.y + dirY }) == 'grass') {
+        var mat1 = gGameEngine.getTileMaterial(pos1);
+        var mat2 = gGameEngine.getTileMaterial(pos2);
+        var currentMat = gGameEngine.getTileMaterial({ x: this.position.x + dirX, y: this.position.y + dirY });
+
+        // WallPass allows treating wood tiles as passable
+        var isPassable = (mat) => (mat === 'grass' || (this.hasWallPass && mat === 'wood'));
+
+        if (isPassable(currentMat)) {
             position = this.position;
-        }
-        // right bottom
-        // left top
-        else if (gGameEngine.getTileMaterial(pos1) == 'grass'
+        } else if (isPassable(mat1)
             && Math.abs(this.bmp.y - bmp1.y) < edgeSize && Math.abs(this.bmp.x - bmp1.x) < edgeSize) {
-            if (gGameEngine.getTileMaterial({ x: pos1.x + dirX, y: pos1.y + dirY }) == 'grass') {
+            if (isPassable(gGameEngine.getTileMaterial({ x: pos1.x + dirX, y: pos1.y + dirY }))) {
                 position = pos1;
             }
-        }
-        // right top
-        // left bottom
-        else if (gGameEngine.getTileMaterial(pos2) == 'grass'
+        } else if (isPassable(mat2)
             && Math.abs(this.bmp.y - bmp2.y) < edgeSize && Math.abs(this.bmp.x - bmp2.x) < edgeSize) {
-            if (gGameEngine.getTileMaterial({ x: pos2.x + dirX, y: pos2.y + dirY }) == 'grass') {
+            if (isPassable(gGameEngine.getTileMaterial({ x: pos2.x + dirX, y: pos2.y + dirY }))) {
                 position = pos2;
             }
         }
 
-        if (position.x &&  gGameEngine.getTileMaterial(position) == 'grass') {
+        if (position.x && isPassable(gGameEngine.getTileMaterial(position))) {
             return Utils.convertToBitmapPosition(position);
         }
     },
 
-    /**
-     * Calculates and updates entity position according to its actual bitmap position
-     */
     updatePosition: function() {
         this.position = Utils.convertToEntityPosition(this.bmp);
     },
 
-    /**
-     * Returns true when collision is detected and we should not move to target position.
-     */
     detectWallCollision: function(position) {
-        var player = {};
-        player.left = position.x;
-        player.top = position.y;
-        player.right = player.left + this.size.w;
-        player.bottom = player.top + this.size.h;
+        var player = {
+            left: position.x,
+            top: position.y,
+            right: position.x + this.size.w,
+            bottom: position.y + this.size.h
+        };
 
-        // Check possible collision with all wall and wood tiles
         var tiles = gGameEngine.tiles;
         for (var i = 0; i < tiles.length; i++) {
-            var tilePosition = tiles[i].position;
+            var tile = tiles[i];
 
-            var tile = {};
-            tile.left = tilePosition.x * gGameEngine.tileSize + 25;
-            tile.top = tilePosition.y * gGameEngine.tileSize + 20;
-            tile.right = tile.left + gGameEngine.tileSize - 30;
-            tile.bottom = tile.top + gGameEngine.tileSize - 30;
+            // WallPass ability: ignore wood block collisions completely!
+            if (this.hasWallPass && tile.material === 'wood') {
+                continue;
+            }
 
-            if(gGameEngine.intersectRect(player, tile)) {
+            var tilePosition = tile.position;
+            var tileBox = {
+                left: tilePosition.x * gGameEngine.tileSize + 25,
+                top: tilePosition.y * gGameEngine.tileSize + 20,
+                right: tilePosition.x * gGameEngine.tileSize + 25 + gGameEngine.tileSize - 30,
+                bottom: tilePosition.y * gGameEngine.tileSize + 20 + gGameEngine.tileSize - 30
+            };
+
+            if (gGameEngine.intersectRect(player, tileBox)) {
                 return true;
             }
         }
         return false;
     },
 
-    /**
-     * Returns true when the bomb collision is detected and we should not move to target position.
-     */
     detectBombCollision: function(pixels) {
+        // BombPass ability ignores all bomb collisions
+        if (this.hasBombPass) {
+            return false;
+        }
+
         var position = Utils.convertToEntityPosition(pixels);
 
         for (var i = 0; i < gGameEngine.bombs.length; i++) {
             var bomb = gGameEngine.bombs[i];
-            // Compare bomb position
             if (bomb.position.x == position.x && bomb.position.y == position.y) {
-                // Allow to escape from bomb that appeared on my field
                 if (bomb == this.escapeBomb) {
                     return false;
                 } else {
@@ -307,7 +550,6 @@ Player = Entity.extend({
             }
         }
 
-        // I have escaped already
         if (this.escapeBomb) {
             this.escapeBomb = null;
         }
@@ -330,9 +572,6 @@ Player = Entity.extend({
         return false;
     },
 
-    /**
-     * Checks whether we have got bonus and applies it.
-     */
     handleBonusCollision: function() {
         for (var i = 0; i < gGameEngine.bonuses.length; i++) {
             var bonus = gGameEngine.bonuses[i];
@@ -343,22 +582,62 @@ Player = Entity.extend({
         }
     },
 
-    /**
-     * Applies bonus.
-     */
     applyBonus: function(bonus) {
+        if (window.AudioSynth) {
+            if (bonus.type === 'skull') {
+                AudioSynth.play('curse');
+            } else {
+                AudioSynth.play('pickup');
+            }
+        }
+
+        var meta = Bonus.METADATA[bonus.type] || { name: bonus.type };
+
         if (bonus.type == 'speed') {
-            this.velocity += 0.8;
+            this.baseVelocity = (this.baseVelocity || 2) + 0.6;
+            this.velocity = this.baseVelocity;
         } else if (bonus.type == 'bomb') {
             this.bombsMax++;
         } else if (bonus.type == 'fire') {
             this.bombStrength++;
+        } else if (bonus.type == 'pierce') {
+            this.hasPierceBomb = true;
+        } else if (bonus.type == 'remote') {
+            this.hasDetonator = true;
+        } else if (bonus.type == 'kick') {
+            this.hasKick = true;
+        } else if (bonus.type == 'throw') {
+            this.hasThrow = true;
+        } else if (bonus.type == 'bombpass') {
+            this.hasBombPass = true;
+        } else if (bonus.type == 'shield') {
+            this.shield = Math.min((this.shield || 0) + 1, 2);
+        } else if (bonus.type == 'wallpass') {
+            this.hasWallPass = true;
+        } else if (bonus.type == 'skull') {
+            this.triggerRandomCurse();
+        }
+
+        if (gGameEngine.updateHud) {
+            gGameEngine.updateHud();
         }
     },
 
-    /**
-     * Changes animation if requested animation is not already current.
-     */
+    triggerRandomCurse: function() {
+        var curses = ['diarrhea', 'snail', 'reverse', 'amnesia'];
+        var picked = curses[Math.floor(Math.random() * curses.length)];
+        this.curse = picked;
+        this.curseTimer = 12 * 50; // 12 seconds @ 50fps
+
+        if (picked === 'snail') {
+            this.velocity = 0.9;
+        }
+
+        if (gGameEngine.updateHud) {
+            gGameEngine.updateHud();
+        }
+    },
+
     animate: function(animation) {
         if (!this.bmp.currentAnimation || this.bmp.currentAnimation.indexOf(animation) === -1) {
             this.bmp.gotoAndPlay(animation);
@@ -367,6 +646,11 @@ Player = Entity.extend({
 
     die: function() {
         this.alive = false;
+
+        if (this.auraGfx) {
+            gGameEngine.stage.removeChild(this.auraGfx);
+            this.auraGfx = null;
+        }
 
         if (gGameEngine.countPlayersAlive() == 1 && gGameEngine.playersCount == 2) {
             gGameEngine.gameOver('win');
@@ -383,14 +667,12 @@ Player = Entity.extend({
         var bmp = this.bmp;
         var fade = setInterval(function() {
             timer++;
-
             if (timer > 30) {
                 bmp.alpha -= 0.05;
             }
             if (bmp.alpha <= 0) {
                 clearInterval(fade);
             }
-
         }, 30);
     }
 });

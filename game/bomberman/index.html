@@ -1,16 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HTML5 Bombergirl</title>
-    <meta name="description" content="HTML5 game written in JavaScript with help of EaselJS library">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Bomberman: Power-Up Edition - Edward Torangga</title>
+    <meta name="description" content="HTML5 Bomberman dengan 11 variasi power-up seru: Bom Tembus, Remote Detonator, Tendang Bom, Lempar Bom, Perisai, Tembus Tembok, dan Kutukan Tengkorak.">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    <meta property="og:image" content="http://matousskala.cz/files/bomberman_screen.png" />
 
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <!-- Libraries -->
     <script type="text/javascript" src="lib/easeljs-0.8.1.min.js"></script>
     <script type="text/javascript" src="lib/preloadjs-0.6.1.min.js"></script>
     <script type="text/javascript" src="lib/soundjs-0.6.1.min.js"></script>
+
+    <!-- Game Scripts -->
+    <script type="text/javascript" src="js/AudioSynth.js"></script>
     <script type="text/javascript" src="js/core.js"></script>
     <script type="text/javascript" src="js/Utils.js"></script>
     <script type="text/javascript" src="js/Entity.js"></script>
@@ -23,69 +32,371 @@
     <script type="text/javascript" src="js/Menu.js"></script>
     <script type="text/javascript" src="js/InputEngine.js"></script>
     <script type="text/javascript" src="js/GameEngine.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 <body onload="gGameEngine.load()">
     <div class="page">
 
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <a href="/" class="back-btn" title="Kembali ke emon.my.id">
+                <i class="fas fa-arrow-left"></i>
+                <span>Portfolio</span>
+            </a>
+
+            <div class="nav-actions">
+                <button type="button" class="nav-btn" id="btn-sound" title="Suara (M)">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button type="button" class="nav-btn" id="btn-fullscreen" title="Layar Penuh">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Header -->
         <header class="page-header">
-            <i class="html5"><span>HTML5</span></i>
-            <h1>Bomber<strong>girl</strong></h1>
+            <div class="header-title-wrap">
+                <i class="html5"><span>HTML5</span></i>
+                <div>
+                    <h1>Bomber<strong>man</strong> <span class="edition-badge">Power-Up Edition</span></h1>
+                </div>
+            </div>
         </header>
 
+        <!-- Game Canvas Stage -->
         <div id="game">
             <canvas id="canvas" width="545" height="416"></canvas>
         </div>
 
+        <!-- Live Power-Up HUD Status Strip -->
+        <div class="hud-strip">
+            <div class="hud-main-stats">
+                <span class="stat-item" title="Kuota Bom Maksimum">
+                    <i class="fas fa-bomb" style="color: #38bdf8;"></i>
+                    <span>Bom: <strong id="hud-bombs">1</strong></span>
+                </span>
+                <span class="stat-item" title="Daya Jangkauan Api">
+                    <i class="fas fa-fire" style="color: #f97316;"></i>
+                    <span>Api: <strong id="hud-fire">1</strong></span>
+                </span>
+                <span class="stat-item" title="Kecepatan Bergerak">
+                    <i class="fas fa-bolt" style="color: #10b981;"></i>
+                    <span>Speed: <strong id="hud-speed">2.0</strong></span>
+                </span>
+                <span class="stat-item" title="Perisai Hati (Kebal 1x serangan)">
+                    <i class="fas fa-shield-halved" style="color: #f59e0b;"></i>
+                    <span>Perisai: <strong id="hud-shield">0</strong></span>
+                </span>
+                <span id="hud-curse" class="badge-curse"></span>
+            </div>
+
+            <!-- Active Ability Badges -->
+            <div class="hud-abilities">
+                <span id="badge-pierce" class="badge-item" title="Bom Tembus: Api menembus beberapa balok rapuh">
+                    <i class="fas fa-bullseye"></i> Bom Tembus
+                </span>
+                <span id="badge-remote" class="badge-item" title="Remote Detonator: Ledakkan bom kapan saja dengan tekan E / B / X">
+                    <i class="fas fa-satellite-dish"></i> Remote (E)
+                </span>
+                <span id="badge-kick" class="badge-item" title="Tendang Bom: Tabrak bom untuk meluncurkannya">
+                    <i class="fas fa-shoe-prints"></i> Tendang
+                </span>
+                <span id="badge-throw" class="badge-item" title="Lempar Bom: Lempar bom 3 petak melewati dinding (F / C)">
+                    <i class="fas fa-hand-rock"></i> Lempar (F)
+                </span>
+                <span id="badge-bombpass" class="badge-item" title="Tembus Bom: Berjalan bebas menembus bom sendiri / lawan">
+                    <i class="fas fa-ghost"></i> Tembus Bom
+                </span>
+                <span id="badge-wallpass" class="badge-item" title="Tembus Tembok: Berjalan menembus balok kayu rapuh">
+                    <i class="fas fa-dungeon"></i> Tembus Balok
+                </span>
+            </div>
+        </div>
+
+        <!-- Mobile Virtual Gamepad -->
+        <div class="virtual-gamepad" aria-label="Kontrol Virtual Layar Sentuh">
+            <!-- D-Pad -->
+            <div class="dpad">
+                <button type="button" class="dpad-btn btn-dpad-up" id="vbtn-up" aria-label="Atas">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+                <button type="button" class="dpad-btn btn-dpad-left" id="vbtn-left" aria-label="Kiri">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button type="button" class="dpad-btn btn-dpad-down" id="vbtn-down" aria-label="Bawah">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <button type="button" class="dpad-btn btn-dpad-right" id="vbtn-right" aria-label="Kanan">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-cluster">
+                <div class="action-row">
+                    <button type="button" class="act-btn btn-act-detonate" id="vbtn-detonate" aria-label="Detonator Remote">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>PICU</span>
+                    </button>
+                    <button type="button" class="act-btn btn-act-throw" id="vbtn-throw" aria-label="Lempar Bom">
+                        <i class="fas fa-hand-rock"></i>
+                        <span>LEMPAR</span>
+                    </button>
+                </div>
+                <button type="button" class="act-btn btn-act-bomb" id="vbtn-bomb" aria-label="Pasang Bom">
+                    <i class="fas fa-bomb"></i>
+                    <span>BOM</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls Guide Panel -->
         <section class="panel">
-            <h2>How to play</h2>
+            <h2><i class="fas fa-gamepad"></i> Kontrol Permainan</h2>
 
             <div class="controls">
                 <div class="control-group">
-                    <h3>Player 1</h3>
+                    <h3>Pemain 1 (Utama)</h3>
                     <ul>
-                        <li><span class="keys"><kbd>&larr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd></span> move</li>
-                        <li><span class="keys"><kbd>space</kbd><kbd>alt</kbd></span> plant the bomb</li>
+                        <li><span class="keys"><kbd>&larr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd><kbd>&rarr;</kbd></span> Jalan</li>
+                        <li><span class="keys"><kbd>Spasi</kbd><kbd>Alt</kbd></span> Pasang Bom</li>
+                        <li><span class="keys"><kbd>E</kbd><kbd>B</kbd><kbd>X</kbd></span> Ledakkan Remote Bom</li>
+                        <li><span class="keys"><kbd>F</kbd><kbd>C</kbd></span> Lempar Bom (3 petak)</li>
                     </ul>
                 </div>
                 <div class="control-group">
-                    <h3>Player 2</h3>
+                    <h3>Pemain 2 (Lokal)</h3>
                     <ul>
-                        <li><span class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span> move</li>
-                        <li><span class="keys"><kbd>shift</kbd></span> plant the bomb</li>
+                        <li><span class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span> Jalan</li>
+                        <li><span class="keys"><kbd>Shift</kbd></span> Pasang Bom</li>
+                        <li><span class="keys"><kbd>Q</kbd></span> Ledakkan Remote Bom</li>
+                        <li><span class="keys"><kbd>R</kbd></span> Lempar Bom</li>
                     </ul>
                 </div>
             </div>
 
             <ul class="shortcuts">
-                <li><kbd>M</kbd> mute / unmute sound</li>
-                <li><kbd>enter</kbd> restart</li>
-                <li><kbd>esc</kbd> menu</li>
+                <li><kbd>M</kbd> Mute / Unmute Suara</li>
+                <li><kbd>Enter</kbd> Mulai Ulang (Restart)</li>
+                <li><kbd>Esc</kbd> Menu Utama</li>
             </ul>
         </section>
 
+        <!-- Power-Ups & Bonuses Legend Panel -->
+        <section class="panel">
+            <h2><i class="fas fa-sparkles"></i> Variasi Power-Up &amp; Bonus</h2>
+
+            <div class="powerups-guide">
+                <!-- 1. Offensive -->
+                <div class="guide-category cat-offensive">
+                    <h4><i class="fas fa-swords"></i> 1. Serangan (Offensive)</h4>
+                    <ul class="guide-list">
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #38bdf8;"><i class="fas fa-bomb"></i></span>
+                            <div>
+                                <strong>Bomb Up</strong>
+                                Menambah kuota bom aktif sekaligus (+1).
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #ef4444;"><i class="fas fa-bullseye"></i></span>
+                            <div>
+                                <strong>Bom Tembus (Spike Bomb)</strong>
+                                Api ledakan menembus beberapa balok rapuh sekaligus dalam satu garis.
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #8b5cf6;"><i class="fas fa-satellite-dish"></i></span>
+                            <div>
+                                <strong>Remote Bom (Detonator)</strong>
+                                Bom tidak meledak dengan timer, melainkan via tombol pemicu (E/B).
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 2. Utility -->
+                <div class="guide-category cat-utility">
+                    <h4><i class="fas fa-tools"></i> 2. Interaksi Bom (Utility)</h4>
+                    <ul class="guide-list">
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #06b6d4;"><i class="fas fa-shoe-prints"></i></span>
+                            <div>
+                                <strong>Tendang Bom (Bomb Kick)</strong>
+                                Tabrak bom untuk meluncurkannya menjauh hingga menabrak dinding/musuh.
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #ec4899;"><i class="fas fa-hand-rock"></i></span>
+                            <div>
+                                <strong>Lempar Bom (Bomb Throw)</strong>
+                                Ambil dan lemparkan bom 3 petak melewati dinding/balok kayu (F/C).
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #14b8a6;"><i class="fas fa-ghost"></i></span>
+                            <div>
+                                <strong>Tembus Bom (Bomb Pass)</strong>
+                                Bebas berjalan melewati bom tanpa terhalang sudut buntu.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 3. Defensive -->
+                <div class="guide-category cat-defensive">
+                    <h4><i class="fas fa-shield"></i> 3. Pertahanan &amp; Mobilitas</h4>
+                    <ul class="guide-list">
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #eab308;"><i class="fas fa-shield-halved"></i></span>
+                            <div>
+                                <strong>Perisai (Shield / Heart)</strong>
+                                Melindungi pemain dari 1x serangan musuh atau ledakan fatal.
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #a855f7;"><i class="fas fa-dungeon"></i></span>
+                            <div>
+                                <strong>Tembus Tembok (Wall Pass)</strong>
+                                Menembus balok kayu rapuh seolah menjadi hantu transparan.
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #10b981;"><i class="fas fa-bolt"></i></span>
+                            <div>
+                                <strong>Speed Up</strong>
+                                Menambah kelincahan kecepatan jalan pemain.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 4. Chaos / Curses -->
+                <div class="guide-category cat-chaos">
+                    <h4><i class="fas fa-skull"></i> 4. Kutukan Tengkorak (Item Negatif)</h4>
+                    <ul class="guide-list">
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #ef4444;"><i class="fas fa-poop"></i></span>
+                            <div>
+                                <strong>Diare Bom</strong>
+                                Otomatis menjatuhkan bom di setiap langkah tanpa bisa dicegah!
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #64748b;"><i class="fas fa-hourglass-end"></i></span>
+                            <div>
+                                <strong>Siput (Slow)</strong>
+                                Kecepatan lari menjadi sangat lambat selama 12 detik.
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #f59e0b;"><i class="fas fa-arrows-rotate"></i></span>
+                            <div>
+                                <strong>Kontrol Terbalik</strong>
+                                Arah kemudi terbalik: atas jadi bawah, kiri jadi kanan!
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #ec4899;"><i class="fas fa-ban"></i></span>
+                            <div>
+                                <strong>Amnesia</strong>
+                                Lupa cara menaruh bom sama sekali selama kutukan aktif.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
         <footer class="footer">
-            <p class="source">
-                <img src="img/github.png" width="25" alt="GitHub">
-                This game has nothing to hide.
-                <a href="http://github.com/MattSkala/html5-bombergirl">Download the source code on GitHub.</a>
-            </p>
-
-            <p class="meta">
-                <span class="copyright">&copy; 2013 Created by <a href="http://matousskala.cz">Matt Skala</a></span>
-                <a class="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a>
-            </p>
-
-            <p class="credits">
-                Credits:
-                <a href="http://www.newgrounds.com/art/view/hyptosis/tile-art-batch-1">Hyptosis</a>,
-                <a href="http://opengameart.org/content/alternate-lpc-character-sprites-george">George</a>,
-                <a href="http://opengameart.org/content/one-more-lpc-alternate-character">Radomir Dopieralski</a>,
-                <a href="http://www.flashkit.com/soundfx/Cartoon/Explosions/Explosio-Adrian_G-7936">Adrian Gallant</a>
-            </p>
+            <p>Bomberman Power-Up Edition &bull; Portfolio <a href="/">emon.my.id</a></p>
         </footer>
 
     </div>
+
+    <!-- UI Controllers & Touch Script -->
+    <script>
+        // Fullscreen Toggle
+        const fsBtn = document.getElementById("btn-fullscreen");
+        if (fsBtn) {
+            fsBtn.addEventListener("click", () => {
+                if (!document.fullscreenElement) {
+                    const target = document.documentElement;
+                    if (target.requestFullscreen) target.requestFullscreen();
+                    else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+                    fsBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                    fsBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            });
+            document.addEventListener("fullscreenchange", () => {
+                fsBtn.innerHTML = document.fullscreenElement ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
+            });
+        }
+
+        // Sound Toggle
+        const soundBtn = document.getElementById("btn-sound");
+        if (soundBtn) {
+            soundBtn.addEventListener("click", () => {
+                if (window.gGameEngine) {
+                    gGameEngine.toggleSound();
+                    soundBtn.innerHTML = gGameEngine.mute ? '<i class="fas fa-volume-xmark"></i>' : '<i class="fas fa-volume-up"></i>';
+                }
+            });
+        }
+
+        // Virtual Touch Gamepad Binds
+        function bindVirtualPad(btnId, actionName) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+
+            const press = (e) => {
+                e.preventDefault();
+                btn.classList.add("pressed");
+                if (window.gInputEngine) {
+                    gInputEngine.actions[actionName] = true;
+                }
+            };
+
+            const release = (e) => {
+                e.preventDefault();
+                btn.classList.remove("pressed");
+                if (window.gInputEngine) {
+                    gInputEngine.actions[actionName] = false;
+                    const listeners = gInputEngine.listeners[actionName];
+                    if (listeners) {
+                        for (let i = 0; i < listeners.length; i++) {
+                            listeners[i]();
+                        }
+                    }
+                }
+            };
+
+            btn.addEventListener("touchstart", press, { passive: false });
+            btn.addEventListener("touchend", release, { passive: false });
+            btn.addEventListener("touchcancel", release);
+            btn.addEventListener("mousedown", press);
+            btn.addEventListener("mouseup", release);
+            btn.addEventListener("mouseleave", () => {
+                if (btn.classList.contains("pressed")) {
+                    btn.classList.remove("pressed");
+                    if (window.gInputEngine) gInputEngine.actions[actionName] = false;
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            bindVirtualPad("vbtn-up", "up");
+            bindVirtualPad("vbtn-down", "down");
+            bindVirtualPad("vbtn-left", "left");
+            bindVirtualPad("vbtn-right", "right");
+            bindVirtualPad("vbtn-bomb", "bomb");
+            bindVirtualPad("vbtn-detonate", "detonate");
+            bindVirtualPad("vbtn-throw", "throw");
+        });
+    </script>
 </body>
 </html>

@@ -81,13 +81,29 @@ Bot = Player.extend({
         if (!this.wait) {
             this.moveToTargetPosition();
         }
+        if (this.invulnerableTimer > 0) {
+            this.invulnerableTimer--;
+            this.bmp.alpha = (Math.floor(this.invulnerableTimer / 4) % 2 === 0) ? 0.3 : 1;
+        } else if (this.hasWallPass) {
+            this.bmp.alpha = 0.65;
+        } else {
+            this.bmp.alpha = 1;
+        }
+
+        this.updateAuraGfx();
         this.handleBonusCollision();
 
         if (this.detectFireCollision()) {
-            // Bot has to die
-            this.die();
+            if (this.invulnerableTimer <= 0) {
+                if (this.shield > 0) {
+                    this.shield--;
+                    this.invulnerableTimer = 60;
+                    if (window.AudioSynth) AudioSynth.play('shield_break');
+                } else {
+                    this.die();
+                }
+            }
         }
-
     },
 
     /**

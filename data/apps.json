@@ -151,5 +151,26 @@
     "github": "https://github.com/edwardtorangga911",
     "status": "in-progress",
     "year": "2025"
+  },
+  {
+    "id": 9,
+    "name": "Bomberman: Power-Up Edition",
+    "category": "Interactive Games",
+    "icon": "fas fa-bomb",
+    "description": "Game aksi klasik Bomberman dengan 11 variasi power-up seru: Bom Tembus, Remote Detonator, Tendang Bom, Lempar Bom, Perisai Hati, Tembus Tembok, dan Kutukan Tengkorak.",
+    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
+    "technologies": ["HTML5 Canvas", "EaselJS", "Web Audio API", "Game Engine"],
+    "features": [
+      "11 Variasi Power-Up & Bonus Lengkap",
+      "Serangan: Bom Tembus & Remote Detonator",
+      "Interaksi: Tendang & Lempar Bom",
+      "Pertahanan: Perisai Hati & Tembus Tembok",
+      "Kutukan Tengkorak (Diare, Siput, Kontrol Terbalik, Amnesia)",
+      "Dukungan Keyboard & Virtual Gamepad Layar Sentuh"
+    ],
+    "url": "/game/bomberman/index.html",
+    "github": "https://github.com/edwardtorangga911/emon",
+    "status": "completed",
+    "year": "2026"
   }
 ]

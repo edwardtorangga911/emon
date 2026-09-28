@@ -23,12 +23,19 @@ InputEngine = Class.extend({
         this.bind(39, 'right');
         this.bind(32, 'bomb');
         this.bind(18, 'bomb');
+        this.bind(69, 'detonate'); // E
+        this.bind(66, 'detonate'); // B
+        this.bind(88, 'detonate'); // X
+        this.bind(70, 'throw');    // F
+        this.bind(67, 'throw');    // C
 
         this.bind(87, 'up2');
         this.bind(65, 'left2');
         this.bind(83, 'down2');
         this.bind(68, 'right2');
         this.bind(16, 'bomb2');
+        this.bind(81, 'detonate2'); // Q
+        this.bind(82, 'throw2');    // R
 
         this.bind(13, 'restart');
         this.bind(27, 'escape');

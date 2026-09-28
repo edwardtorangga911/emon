@@ -1,4 +1,4 @@
-const CACHE_NAME = "edward-torangga-v3";
+const CACHE_NAME = "edward-torangga-v4";
 const urlsToCache = [
   "/",
   "/index.html",
