@@ -1,55 +1,65 @@
-/* Dark Mode Styles */
+/* ==========================================================================
+   DARK MODE SYSTEM - EDWARD TORANGGA PORTFOLIO
+   ========================================================================== */
+
 body.dark-mode {
-    --text-primary: #ffffff;
-    --text-secondary: #e0e0e0;
-    --text-muted: #b0b0b0;
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #0d0d0d;
-    --bg-card: #2a2a2a;
-    --border-color: #3a3a3a;
-    --border-color-dark: #4a4a4a;
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.5);
+  --bg-body: #0b0f19;
+  --bg-card: rgba(17, 24, 39, 0.92);
+  --bg-card-subtle: #1e293b;
+  --bg-pill: #334155;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  
+  --text-main: #f8fafc;
+  --text-sub: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-glow: rgba(59, 130, 246, 0.35);
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #34d399;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
 }
 
-body.dark-mode .hero-section {
-    background-image: linear-gradient(340deg, #1a0066 0%, #006666 100%);
+body.dark-mode .ambient-glow {
+  background: 
+    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.22) 0%, transparent 50%),
+    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.16) 0%, transparent 50%);
 }
 
 body.dark-mode .profile-image {
-    box-shadow: 0 0 20px rgba(9, 112, 231, 0.3);
+  border-color: #1e293b;
+  box-shadow: 0 0 28px rgba(59, 130, 246, 0.3);
+}
+
+body.dark-mode .highlight-box {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(56, 189, 248, 0.12) 100%);
+  border-left-color: var(--primary);
+}
+
+body.dark-mode .quick-launch-banner {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+body.dark-mode .launch-item-card {
+  background: #1e293b;
+}
+
+body.dark-mode .toast {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 body.dark-mode .dark-mode-toggle {
-    background-color: var(--bg-card);
-    border-color: var(--border-color);
+  color: #facc15;
 }
 
-body.dark-mode .tab-link.active {
-    background-color: rgba(9, 112, 231, 0.1);
-}
-
-body.dark-mode .skill-bar {
-    background-color: var(--border-color-dark);
-}
-
-body.dark-mode .contact-form label {
-    color: var(--text-secondary);
-}
-
-body.dark-mode .contact-form input,
-body.dark-mode .contact-form textarea {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-}
-
-body.dark-mode .search-box input {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-}
-
-body.dark-mode .right-column {
-    opacity: 0.8;
+body.dark-mode .tech-tag {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
 }
