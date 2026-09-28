@@ -10,10 +10,10 @@
     <link rel="apple-touch-icon" href="/assets/favicon.png" />
 
     <!-- SEO Meta Tags -->
-    <title>Edward Torangga - Web Developer & Network Specialist</title>
+    <title>Edward Torangga - Web Developer &amp; Network Specialist</title>
     <meta
       name="description"
-      content="Portfolio resmi Edward Torangga - Web Developer & Network Specialist di SMA Katolik Santo Albertus Malang. Spesialis Full-stack Web, Mikrotik RouterOS, dan infrastruktur sistem."
+      content="Portfolio resmi Edward Torangga - Web Developer &amp; Network Specialist di SMA Katolik Santo Albertus Malang. Spesialis Full-stack Web, Mikrotik RouterOS, dan infrastruktur sistem."
     />
     <meta
       name="keywords"
@@ -24,7 +24,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://emon.my.id/" />
-    <meta property="og:title" content="Edward Torangga - Web Developer & Network Specialist" />
+    <meta property="og:title" content="Edward Torangga - Web Developer &amp; Network Specialist" />
     <meta
       property="og:description"
       content="Portfolio resmi Edward Torangga - Menampilkan proyek web, aplikasi interaktif, dan keahlian infrastruktur jaringan."
@@ -34,10 +34,10 @@
     <!-- Twitter Card -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://emon.my.id/" />
-    <meta property="twitter:title" content="Edward Torangga - Web Developer & Network Specialist" />
+    <meta property="twitter:title" content="Edward Torangga - Web Developer &amp; Network Specialist" />
     <meta
       property="twitter:description"
-      content="Portfolio resmi Edward Torangga - Web Developer & Network Specialist di SMA Katolik Santo Albertus Malang."
+      content="Portfolio resmi Edward Torangga - Web Developer &amp; Network Specialist di SMA Katolik Santo Albertus Malang."
     />
     <meta property="twitter:image" content="https://emon.my.id/assets/profile.jpeg" />
 
@@ -62,16 +62,10 @@
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/dark-mode.css" />
     <link rel="stylesheet" href="/css/apps.css" />
-
-    <!-- Particles.js Engine -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   </head>
   <body>
-    <!-- Ambient Background Glows -->
-    <div class="ambient-glow"></div>
-
-    <!-- Particle Background Canvas -->
-    <div id="particles-js"></div>
+    <!-- Interactive Background Canvas (Aurora & Neural Starfield) -->
+    <canvas id="bg-canvas"></canvas>
 
     <!-- Top Floating Header Bar -->
     <header class="top-header-bar">
@@ -542,7 +536,7 @@
 
     <!-- Footer Bar -->
     <footer class="footer-credit">
-      <div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div>
           &copy; <span id="year">2026</span> <strong>Edward Torangga</strong>. Hak Cipta Dilindungi.
         </div>
@@ -559,7 +553,7 @@
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
     <!-- Scripts -->
-    <script src="/js/particles-config.js"></script>
+    <script src="/js/background-canvas.js"></script>
     <script src="/js/apps.js"></script>
     <script src="/js/main.js"></script>
   </body>
