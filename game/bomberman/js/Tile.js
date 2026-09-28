@@ -26,13 +26,17 @@ Tile = Entity.extend({
         var imgOrCanvas = null;
 
         if (material == 'grass') {
-            imgOrCanvas = gGameEngine.tilesImgs.grass;
+            imgOrCanvas = (gGameEngine.tilesImgs && gGameEngine.tilesImgs.grass) ? gGameEngine.tilesImgs.grass : null;
         } else if (material == 'wall') {
-            imgOrCanvas = gGameEngine.tilesImgs.wall;
+            imgOrCanvas = (gGameEngine.tilesImgs && gGameEngine.tilesImgs.wall) ? gGameEngine.tilesImgs.wall : null;
         } else if (material == 'wood') {
-            imgOrCanvas = gGameEngine.tilesImgs.wood;
+            imgOrCanvas = (gGameEngine.tilesImgs && gGameEngine.tilesImgs.wood) ? gGameEngine.tilesImgs.wood : null;
         } else {
             // Hazard materials (ice, conveyor, warp) generated via Canvas 2D
+            imgOrCanvas = Tile.getTileCanvas(material);
+        }
+
+        if (!imgOrCanvas) {
             imgOrCanvas = Tile.getTileCanvas(material);
         }
 
@@ -77,7 +81,23 @@ Tile.getTileCanvas = function(material) {
     c.height = 32;
     var ctx = c.getContext('2d');
 
-    if (material === 'ice') {
+    if (material === 'grass') {
+        ctx.fillStyle = '#15803d';
+        ctx.fillRect(0, 0, 32, 32);
+        ctx.fillStyle = '#16a34a';
+        ctx.fillRect(4, 4, 10, 10);
+        ctx.fillRect(18, 16, 8, 8);
+    } else if (material === 'wall') {
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(0, 0, 32, 32);
+        ctx.strokeStyle = '#0f172a';
+        ctx.strokeRect(1, 1, 30, 30);
+    } else if (material === 'wood') {
+        ctx.fillStyle = '#854d0e';
+        ctx.fillRect(0, 0, 32, 32);
+        ctx.strokeStyle = '#713f12';
+        ctx.strokeRect(2, 2, 28, 28);
+    } else if (material === 'ice') {
         // Frosted ice tile with glistening cracks
         ctx.fillStyle = '#38bdf8';
         ctx.fillRect(0, 0, 32, 32);

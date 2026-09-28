@@ -13,10 +13,14 @@ InputEngine = Class.extend({
 
     listeners: [],
 
+    isSetup: false,
+
     init: function() {
     },
 
     setup: function() {
+        if (this.isSetup) return;
+        this.isSetup = true;
         this.bind(38, 'up');
         this.bind(37, 'left');
         this.bind(40, 'down');

@@ -72,9 +72,15 @@ Bomb = Entity.extend({
         this.isPierce = options.isPierce || false;
         this.isRemote = options.isRemote || false;
         this.owner = options.owner || null;
+        var bombImg = gGameEngine.bombImg;
+        if (!bombImg) {
+            bombImg = document.createElement('canvas');
+            bombImg.width = this.size.w * 5;
+            bombImg.height = this.size.h;
+        }
 
         var spriteSheet = new createjs.SpriteSheet({
-            images: [gGameEngine.bombImg],
+            images: [bombImg],
             frames: {
                 width: this.size.w,
                 height: this.size.h,

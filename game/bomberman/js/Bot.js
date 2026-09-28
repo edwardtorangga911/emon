@@ -58,7 +58,7 @@ Bot = Player.extend({
             this.wait = true;
         }
 
-        if (this.targetBitmapPosition && this.targetBitmapPosition.x == this.bmp.x && this.targetBitmapPosition.y == this.bmp.y) {
+        if (this.targetBitmapPosition && this.targetBitmapPosition.x !== undefined && this.targetBitmapPosition.x == this.bmp.x && this.targetBitmapPosition.y == this.bmp.y) {
 
             // If we bumped into the wood, burn it!
             // If we are near player, kill it!
@@ -136,6 +136,9 @@ Bot = Player.extend({
      * Moves a step forward to target position.
      */
     moveToTargetPosition: function() {
+        if (!this.targetBitmapPosition || this.targetBitmapPosition.x === undefined) {
+            return;
+        }
         this.animate(this.direction);
 
         var velocity = this.velocity;

@@ -8,7 +8,6 @@ Menu = Class.extend({
         this.loaderViews = [];
         gGameEngine.botsCount = 4;
         gGameEngine.playersCount = 0;
-        this.showLoader();
     },
 
     show: function(text, isLevelClear) {
@@ -225,7 +224,7 @@ Menu = Class.extend({
 
         var iconW = 27, iconH = 40, iconGap = 8;
         var iconsY = modesY + 14;
-        var singleIcon = new createjs.Bitmap("img/bomberman.png");
+        var singleIcon = new createjs.Bitmap(gGameEngine.playerImg);
         singleIcon.sourceRect = new createjs.Rectangle(0, 0, iconW, iconH);
         singleIcon.x = singleX + (modeSize - iconW) / 2;
         singleIcon.y = iconsY;
@@ -257,14 +256,14 @@ Menu = Class.extend({
         gGameEngine.stage.addChild(multiTitle2);
         this.views.push(multiTitle2);
 
-        var multiIconGirl = new createjs.Bitmap("img/bomberman.png");
+        var multiIconGirl = new createjs.Bitmap(gGameEngine.playerImg);
         multiIconGirl.sourceRect = new createjs.Rectangle(0, 0, iconW, iconH);
         multiIconGirl.x = multiX + (modeSize - (iconW * 2 + iconGap)) / 2;
         multiIconGirl.y = iconsY;
         gGameEngine.stage.addChild(multiIconGirl);
         this.views.push(multiIconGirl);
 
-        var multiIconBoy = new createjs.Bitmap("img/bomberman.png");
+        var multiIconBoy = new createjs.Bitmap(gGameEngine.playerImg);
         multiIconBoy.sourceRect = new createjs.Rectangle(0, 2 * iconH, iconW, iconH);
         multiIconBoy.x = multiIconGirl.x + iconW + iconGap;
         multiIconBoy.y = iconsY;

@@ -98,6 +98,12 @@ Player = Entity.extend({
             img = gGameEngine.playerImg;
         }
 
+        if (!img) {
+            img = document.createElement('canvas');
+            img.width = layout.w * 4;
+            img.height = layout.h * 4;
+        }
+
         var spriteSheet = new createjs.SpriteSheet({
             images: [img],
             frames: { width: layout.w, height: layout.h, regX: layout.regX, regY: layout.regY },

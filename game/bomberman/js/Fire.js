@@ -25,8 +25,15 @@ Fire = Entity.extend({
     init: function(position, bomb) {
         this.bomb = bomb;
 
+        var fireImg = gGameEngine.fireImg;
+        if (!fireImg) {
+            fireImg = document.createElement('canvas');
+            fireImg.width = this.size.w * 6;
+            fireImg.height = this.size.h;
+        }
+
         var spriteSheet = new createjs.SpriteSheet({
-            images: [gGameEngine.fireImg],
+            images: [fireImg],
             frames: { width: this.size.w, height: this.size.h, regX: 0, regY: 0 },
             animations: {
                 idle: [0, 5, null, 0.4],

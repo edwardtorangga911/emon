@@ -83,74 +83,117 @@ GameEngine = Class.extend({
         this.stage = new createjs.Stage("canvas");
         this.stage.enableMouseOver();
 
+        // 1. Immediately create fallback canvases so NO image is ever null/undefined
+        function makeCanvas(w, h, color) {
+            var c = document.createElement('canvas');
+            c.width = w || 32;
+            c.height = h || 32;
+            var ctx = c.getContext('2d');
+            if (ctx) {
+                ctx.fillStyle = color || '#334155';
+                ctx.fillRect(0, 0, c.width, c.height);
+            }
+            return c;
+        }
+
+        this.playerBoyImg = makeCanvas(192, 192, '#3b82f6');
+        this.playerImg = makeCanvas(108, 160, '#ef4444');
+        this.tilesImgs = {
+            grass: makeCanvas(32, 32, '#15803d'),
+            wall: makeCanvas(32, 32, '#334155'),
+            wood: makeCanvas(32, 32, '#854d0e')
+        };
+        this.bombImg = makeCanvas(140, 28, '#0f172a');
+        this.fireImg = makeCanvas(228, 38, '#ea580c');
+        this.bonusesImg = makeCanvas(112, 16, '#eab308');
+
         this.menu = new Menu();
 
-        var useXHR = (window.location.protocol !== 'file:');
-        var queue = new createjs.LoadQueue(useXHR);
+        // 2. Direct HTML Image preloader with robust completion & error handling
+        var manifest = [
+            { id: "playerBoy", src: "img/george.png" },
+            { id: "player", src: "img/bomberman.png" },
+            { id: "tile_grass", src: "img/tile_grass.png" },
+            { id: "tile_wall", src: "img/tile_wall.png" },
+            { id: "tile_wood", src: "img/tile_wood.png" },
+            { id: "bomb", src: "img/bomb.png" },
+            { id: "fire", src: "img/fire.png" },
+            { id: "bonuses", src: "img/bonuses.png" }
+        ];
+
         var that = this;
+        var loadedCount = 0;
+        var totalAssets = manifest.length;
         var finished = false;
+
+        function assignAsset(id, img) {
+            if (id === 'playerBoy') that.playerBoyImg = img;
+            else if (id === 'player') that.playerImg = img;
+            else if (id === 'tile_grass') that.tilesImgs.grass = img;
+            else if (id === 'tile_wall') that.tilesImgs.wall = img;
+            else if (id === 'tile_wood') that.tilesImgs.wood = img;
+            else if (id === 'bomb') that.bombImg = img;
+            else if (id === 'fire') that.fireImg = img;
+            else if (id === 'bonuses') that.bonusesImg = img;
+        }
 
         function onComplete() {
             if (finished) return;
             finished = true;
-            try {
-                that.playerBoyImg = queue.getResult("playerBoy") || that.playerBoyImg;
-                that.playerImg = queue.getResult("player") || that.playerImg;
-                that.tilesImgs.grass = queue.getResult("tile_grass") || that.tilesImgs.grass;
-                that.tilesImgs.wall = queue.getResult("tile_wall") || that.tilesImgs.wall;
-                that.tilesImgs.wood = queue.getResult("tile_wood") || that.tilesImgs.wood;
-                that.bombImg = queue.getResult("bomb") || that.bombImg;
-                that.fireImg = queue.getResult("fire") || that.fireImg;
-                that.bonusesImg = queue.getResult("bonuses") || that.bonusesImg;
-            } catch (e) {
-                console.warn("Preload getResult warning:", e);
+            // When all textures are loaded, refresh menu screen if player hasn't started yet
+            if (that.menu && that.menu.visible && !that.playing) {
+                try {
+                    that.restart();
+                } catch (e) {}
             }
-            try {
-                that.setup();
-            } catch (e) {
-                console.error("Setup error:", e);
-                if (that.menu) {
-                    that.menu.hideLoader();
-                    that.menu.show();
+        }
+
+        // Launch instant setup with guaranteed fallback canvases immediately
+        try {
+            this.setup();
+        } catch (setupErr) {
+            console.error("Initial setup error:", setupErr);
+        }
+
+        for (var a = 0; a < totalAssets; a++) {
+            (function(asset) {
+                var img = new Image();
+                img.onload = function() {
+                    assignAsset(asset.id, img);
+                    loadedCount++;
+                    if (loadedCount >= totalAssets) {
+                        onComplete();
+                    }
+                };
+                img.onerror = function() {
+                    console.warn("Asset failed to load: " + asset.src + ", fallback active");
+                    loadedCount++;
+                    if (loadedCount >= totalAssets) {
+                        onComplete();
+                    }
+                };
+                img.src = asset.src;
+                if (img.complete && img.naturalWidth > 0) {
+                    img.onload();
                 }
-            }
+            })(manifest[a]);
         }
 
-        queue.addEventListener("complete", onComplete);
-        queue.addEventListener("error", function(err) {
-            console.warn("Preload error fallback:", err);
-            onComplete();
-        });
-
-        setTimeout(function() {
-            if (!finished) {
-                console.warn("Preload safety timer triggered setup");
-                onComplete();
+        try {
+            if (window.location.protocol === 'file:') {
+                createjs.Sound.registerPlugins([createjs.HTMLAudioPlugin]);
             }
-        }, 1500);
-
-        queue.loadManifest([
-            {id: "playerBoy", src: "img/george.png"},
-            {id: "player", src: "img/bomberman.png"},
-            {id: "tile_grass", src: "img/tile_grass.png"},
-            {id: "tile_wall", src: "img/tile_wall.png"},
-            {id: "tile_wood", src: "img/tile_wood.png"},
-            {id: "bomb", src: "img/bomb.png"},
-            {id: "fire", src: "img/fire.png"},
-            {id: "bonuses", src: "img/bonuses.png"}
-        ]);
-
-        if (window.location.protocol === 'file:') {
-            createjs.Sound.registerPlugins([createjs.HTMLAudioPlugin]);
+            createjs.Sound.addEventListener("fileload", this.onSoundLoaded);
+            createjs.Sound.alternateExtensions = ["mp3"];
+            createjs.Sound.registerSound("sound/bomb.ogg", "bomb");
+            createjs.Sound.registerSound("sound/game.ogg", "game");
+        } catch (soundErr) {
+            console.warn("SoundJS registration warning:", soundErr);
         }
-        createjs.Sound.addEventListener("fileload", this.onSoundLoaded);
-        createjs.Sound.alternateExtensions = ["mp3"];
-        createjs.Sound.registerSound("sound/bomb.ogg", "bomb");
-        createjs.Sound.registerSound("sound/game.ogg", "game");
     },
 
     setup: function() {
-        if (!gInputEngine.bindings.length) {
+        if (!gInputEngine.isSetup) {
             gInputEngine.setup();
         }
 
@@ -254,7 +297,7 @@ GameEngine = Class.extend({
             var dx = (Math.random() * 2 - 1) * this.shakeIntensity * decay;
             var dy = (Math.random() * 2 - 1) * this.shakeIntensity * decay;
             canvas.style.transform = 'translate(' + dx.toFixed(1) + 'px, ' + dy.toFixed(1) + 'px)';
-        } else if (canvas.style.transform) {
+        } else if (canvas.style.transform && canvas.style.transform !== 'none') {
             canvas.style.transform = 'none';
         }
     },
@@ -396,38 +439,42 @@ GameEngine = Class.extend({
     },
 
     update: function() {
-        // Players
-        for (var i = 0; i < gGameEngine.players.length; i++) {
-            gGameEngine.players[i].update();
+        try {
+            // Players
+            for (var i = 0; i < gGameEngine.players.length; i++) {
+                if (gGameEngine.players[i]) gGameEngine.players[i].update();
+            }
+
+            // Bots
+            for (var i = 0; i < gGameEngine.bots.length; i++) {
+                if (gGameEngine.bots[i]) gGameEngine.bots[i].update();
+            }
+
+            // Bombs
+            for (var i = 0; i < gGameEngine.bombs.length; i++) {
+                if (gGameEngine.bombs[i]) gGameEngine.bombs[i].update();
+            }
+
+            // Screen Shake decay
+            gGameEngine.updateScreenShake();
+
+            // Particles & Floating Text updates
+            gGameEngine.updateParticles();
+            gGameEngine.updateFloatingTexts();
+
+            // Periodic HUD update
+            if (createjs.Ticker.getTicks() % 8 === 0 && gGameEngine.updateHud) {
+                gGameEngine.updateHud();
+            }
+
+            // Menu
+            if (gGameEngine.menu) gGameEngine.menu.update();
+
+            // Stage
+            if (gGameEngine.stage) gGameEngine.stage.update();
+        } catch (loopErr) {
+            console.error("GameEngine update loop error:", loopErr);
         }
-
-        // Bots
-        for (var i = 0; i < gGameEngine.bots.length; i++) {
-            gGameEngine.bots[i].update();
-        }
-
-        // Bombs
-        for (var i = 0; i < gGameEngine.bombs.length; i++) {
-            gGameEngine.bombs[i].update();
-        }
-
-        // Screen Shake decay
-        gGameEngine.updateScreenShake();
-
-        // Particles & Floating Text updates
-        gGameEngine.updateParticles();
-        gGameEngine.updateFloatingTexts();
-
-        // Periodic HUD update
-        if (createjs.Ticker.getTicks() % 8 === 0 && gGameEngine.updateHud) {
-            gGameEngine.updateHud();
-        }
-
-        // Menu
-        gGameEngine.menu.update();
-
-        // Stage
-        gGameEngine.stage.update();
     },
 
     drawTiles: function() {
