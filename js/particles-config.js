@@ -1,91 +1,76 @@
-// Particles.js Configuration
+// Particles.js Configuration adaptive for both light & dark themes
 function initParticles() {
-    particlesJS('particles-js', {
-        particles: {
-            number: {
-                value: 80,
-                density: {
-                    enable: true,
-                    value_area: 800
-                }
-            },
-            color: {
-                value: '#ffffff'
-            },
-            shape: {
-                type: 'circle',
-                stroke: {
-                    width: 0,
-                    color: '#000000'
-                }
-            },
-            opacity: {
-                value: 0.5,
-                random: false,
-                anim: {
-                    enable: false,
-                    speed: 1,
-                    opacity_min: 0.1,
-                    sync: false
-                }
-            },
-            size: {
-                value: 3,
-                random: true,
-                anim: {
-                    enable: false,
-                    speed: 40,
-                    size_min: 0.1,
-                    sync: false
-                }
-            },
-            line_linked: {
-                enable: true,
-                distance: 150,
-                color: '#ffffff',
-                opacity: 0.4,
-                width: 1
-            },
-            move: {
-                enable: true,
-                speed: 2,
-                direction: 'none',
-                random: false,
-                straight: false,
-                out_mode: 'out',
-                bounce: false,
-                attract: {
-                    enable: false,
-                    rotateX: 600,
-                    rotateY: 1200
-                }
-            }
+  if (typeof particlesJS === "undefined") return;
+
+  const isDark = document.body.classList.contains("dark-mode");
+  const particleColor = isDark ? "#38bdf8" : "#2563eb";
+  const lineColor = isDark ? "#3b82f6" : "#60a5fa";
+
+  particlesJS("particles-js", {
+    particles: {
+      number: {
+        value: 50,
+        density: {
+          enable: true,
+          value_area: 900
+        }
+      },
+      color: {
+        value: particleColor
+      },
+      shape: {
+        type: "circle"
+      },
+      opacity: {
+        value: isDark ? 0.35 : 0.22,
+        random: true
+      },
+      size: {
+        value: 3,
+        random: true
+      },
+      line_linked: {
+        enable: true,
+        distance: 140,
+        color: lineColor,
+        opacity: isDark ? 0.25 : 0.15,
+        width: 1
+      },
+      move: {
+        enable: true,
+        speed: 1.5,
+        direction: "none",
+        random: false,
+        straight: false,
+        out_mode: "out",
+        bounce: false
+      }
+    },
+    interactivity: {
+      detect_on: "window",
+      events: {
+        onhover: {
+          enable: true,
+          mode: "grab"
         },
-        interactivity: {
-            detect_on: 'canvas',
-            events: {
-                onhover: {
-                    enable: true,
-                    mode: 'grab'
-                },
-                onclick: {
-                    enable: true,
-                    mode: 'push'
-                },
-                resize: true
-            },
-            modes: {
-                grab: {
-                    distance: 140,
-                    line_linked: {
-                        opacity: 1
-                    }
-                },
-                push: {
-                    particles_nb: 4
-                }
-            }
+        onclick: {
+          enable: true,
+          mode: "push"
         },
-        retina_detect: true
-    });
+        resize: true
+      },
+      modes: {
+        grab: {
+          distance: 130,
+          line_linked: {
+            opacity: 0.5
+          }
+        },
+        push: {
+          particles_nb: 3
+        }
+      }
+    },
+    retina_detect: true
+  });
 }

@@ -2,191 +2,559 @@
 <html lang="id">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"
-    />
-    <meta name="theme-color" content="#0970e7" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="theme-color" content="#2563eb" />
 
-    <!-- Favicon -->
+    <!-- Favicon & PWA Icons -->
     <link rel="icon" type="image/png" href="/assets/favicon.png" />
     <link rel="apple-touch-icon" href="/assets/favicon.png" />
 
     <!-- SEO Meta Tags -->
-    <title>Edward Torangga - Web Developer & Network Specialist</title>
+    <title>Edward Torangga - Web Developer &amp; Network Specialist</title>
     <meta
       name="description"
-      content="Portfolio website Edward Torangga - Web Developer, Network Specialist, dan IT Professional. Menampilkan projects, skills, dan tools yang digunakan."
+      content="Portfolio resmi Edward Torangga - Web Developer &amp; Network Specialist di SMA Katolik Santo Albertus Malang. Spesialis Full-stack Web, Mikrotik RouterOS, dan infrastruktur sistem."
     />
     <meta
       name="keywords"
-      content="Edward Torangga, Web Developer, Network Specialist, IT Professional, Portfolio"
+      content="Edward Torangga, Web Developer Malang, Network Specialist, Mikrotik, SMA Santo Albertus Dempo, Portfolio IT, PWA"
     />
     <meta name="author" content="Edward Torangga" />
 
-    <!-- Open Graph Meta Tags -->
-    <meta
-      property="og:title"
-      content="Edward Torangga - Web Developer & Network Specialist"
-    />
-    <meta
-      property="og:description"
-      content="Portfolio website Edward Torangga - Web Developer, Network Specialist, dan IT Professional."
-    />
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://emon.my.id/" />
+    <meta property="og:title" content="Edward Torangga - Web Developer &amp; Network Specialist" />
     <meta
-      property="og:image"
-      content="https://emon.my.id/assets/profile.jpeg"
+      property="og:description"
+      content="Portfolio resmi Edward Torangga - Menampilkan proyek web, aplikasi interaktif, dan keahlian infrastruktur jaringan."
     />
+    <meta property="og:image" content="https://emon.my.id/assets/profile.jpeg" />
 
-    <!-- Twitter Card Meta Tags -->
+    <!-- Twitter Card -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta
-      property="twitter:title"
-      content="Edward Torangga - Web Developer & Network Specialist"
-    />
+    <meta property="twitter:url" content="https://emon.my.id/" />
+    <meta property="twitter:title" content="Edward Torangga - Web Developer &amp; Network Specialist" />
     <meta
       property="twitter:description"
-      content="Portfolio website Edward Torangga - Web Developer, Network Specialist, dan IT Professional."
+      content="Portfolio resmi Edward Torangga - Web Developer &amp; Network Specialist di SMA Katolik Santo Albertus Malang."
     />
-    <meta
-      property="twitter:image"
-      content="https://emon.my.id/assets/profile.jpeg"
-    />
+    <meta property="twitter:image" content="https://emon.my.id/assets/profile.jpeg" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Fonts -->
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap"
     />
 
-    <!-- Font Awesome -->
-    <link
-      rel="preload"
-      href="https://use.fontawesome.com/releases/v6.7.2/css/all.css"
-      as="style"
-    />
+    <!-- Font Awesome Icons -->
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v6.7.2/css/all.css"
     />
-
-    <!-- Particles.js -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/dark-mode.css" />
     <link rel="stylesheet" href="/css/apps.css" />
-
-
   </head>
   <body>
+    <!-- Interactive Background Canvas (Aurora & Neural Starfield) -->
+    <canvas id="bg-canvas"></canvas>
 
-    <!-- Dark Mode Toggle -->
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle Dark Mode">
-        <i class="fas fa-moon"></i>
-    </button>
+    <!-- Top Floating Header Bar -->
+    <header class="top-header-bar">
+      <a href="/" class="brand-badge" aria-label="Beranda Edward Torangga">
+        <span class="brand-logo-icon">ET</span>
+        <span>emon.my.id</span>
+      </a>
 
+      <div class="top-actions">
+        <span class="status-pill">
+          <span class="pulse-dot"></span>
+          <span>Tersedia untuk Proyek</span>
+        </span>
+
+        <button 
+          class="dark-mode-toggle" 
+          onclick="toggleDarkMode()" 
+          aria-label="Ganti Mode Gelap/Terang"
+          title="Ganti Mode Tampilan"
+        >
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Section -->
     <section class="hero-section">
-        <!-- Particle Background -->
-        <div id="particles-js"></div>
+      <main class="portfolio-card">
         
-        <main class="portfolio-card">
+        <!-- SIDEBAR: Profil Singkat & Aksi Cepat -->
+        <aside class="profile-sidebar">
+          <div class="profile-avatar-wrap">
+            <div class="profile-image" role="img" aria-label="Foto Profil Edward Torangga"></div>
+            <div class="profile-badge-online" title="Online / Aktif"></div>
+          </div>
 
-            <div class="card-column left-column">
-                
-                <button class="mobile-menu-button" onclick="toggleMenu()">☰ Menu</button>
-                
-                <nav class="tabs-navigation">
-                    <button class="tab-link active" onclick="openTab(event, 'Profil')" id="defaultOpen">Profil</button>
-                    <button class="tab-link" onclick="openTab(event, 'Portfolio')">Portfolio</button>
-                    <button class="tab-link" onclick="openTab(event, 'Skills')">Skills</button>
-                    <button class="tab-link" onclick="openTab(event, 'Apps')">Apps</button>
-                    <button class="tab-link" onclick="openTab(event, 'Kontak')">Kontak</button>
-                </nav>
+          <h1 class="profile-name">
+            Edward Torangga
+            <i class="fas fa-circle-check verified-badge" title="Terverifikasi Profesional"></i>
+          </h1>
 
-                <div id="Profil" class="tab-content-panel">
-                    <div class="profile-content">
-                        <div class="profile-image"></div>
-                        <h1 class="profile-name">Edward Torangga</h1>
-                        <p class="profile-bio">Web Developer & Network Specialist</p>
-                        <p class="profile-bio">Passionate about creating modern web applications and managing network infrastructure. Currently working at SMA DEMPO in Malang.</p>
-                        
-                        <a href="#" class="download-cv-btn">
-                            <i class="fas fa-download"></i>
-                            Download CV
-                        </a>
-                        
-                        <div class="social-links">
-                            <a href="https://wa.me/6289516236789" class="social-icon" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-whatsapp" aria-hidden="true"></i>
-                            </a>
-                            <a href="https://github.com/edwardtorangga911" class="social-icon" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-github" aria-hidden="true"></i>
-                            </a>
-                            <a href="https://www.linkedin.com/in/edward-torangga" class="social-icon" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-linkedin" aria-hidden="true"></i>
-                            </a>
-                            <a href="https://www.instagram.com/edwardtorangga" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-instagram" aria-hidden="true"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+          <div class="profile-title">Web Developer &amp; Network Specialist</div>
 
-                <div id="Portfolio" class="tab-content-panel">
-                    <!-- Content will be loaded dynamically from projects.json -->
-                </div>
+          <div class="profile-workplace">
+            <i class="fas fa-building-columns"></i>
+            <span>SMA Katolik Santo Albertus Malang</span>
+          </div>
 
-                <div id="Skills" class="tab-content-panel">
-                    <!-- Content will be loaded dynamically from skills.json -->
-                </div>
+          <div class="profile-location">
+            <i class="fas fa-location-dot"></i>
+            <span>Malang, Jawa Timur, Indonesia</span>
+          </div>
 
-                <div id="Apps" class="tab-content-panel">
-                    <!-- Content will be loaded dynamically from apps.json -->
-                </div>
+          <!-- Quick Stats Strip -->
+          <div class="stats-strip">
+            <div class="stat-item">
+              <span class="stat-num">5+</span>
+              <span class="stat-label">Tahun Exp</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">15+</span>
+              <span class="stat-label">Aplikasi</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">99.9%</span>
+              <span class="stat-label">Reliable</span>
+            </div>
+          </div>
 
-                <div id="Kontak" class="tab-content-panel">
-                    <form class="contact-form" onsubmit="handleContactForm(event)">
-                        <label for="name">Nama</label>
-                        <input type="text" id="name" name="name" required>
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                        <label for="message">Pesan</label>
-                        <textarea id="message" name="message" rows="4" required></textarea>
-                        <button type="submit">
-                            <i class="fab fa-whatsapp"></i> Kirim via WhatsApp
-                        </button>
-                    </form>
-                </div>
-                
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <a 
+              href="https://wa.me/6289516236789" 
+              class="btn btn-primary" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              <i class="fab fa-whatsapp"></i> Chat WhatsApp
+            </a>
+
+            <button 
+              type="button" 
+              class="btn btn-outline" 
+              onclick="copyToClipboard('edwardtorangga911@gmail.com', 'Email edwardtorangga911@gmail.com berhasil disalin!')"
+            >
+              <i class="fas fa-copy"></i> Salin Email
+            </button>
+
+            <button 
+              type="button" 
+              class="btn btn-ghost" 
+              onclick="handleCvDownload(event)"
+            >
+              <i class="fas fa-file-arrow-down"></i> Minta Resume / CV
+            </button>
+          </div>
+
+          <!-- Social Links -->
+          <nav class="social-links" aria-label="Tautan Media Sosial">
+            <a 
+              href="https://wa.me/6289516236789" 
+              class="social-icon wa" 
+              aria-label="WhatsApp" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              title="Hubungi via WhatsApp"
+            >
+              <i class="fab fa-whatsapp"></i>
+            </a>
+            <a 
+              href="https://github.com/edwardtorangga911" 
+              class="social-icon gh" 
+              aria-label="GitHub" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              title="Kunjungi GitHub"
+            >
+              <i class="fab fa-github"></i>
+            </a>
+            <a 
+              href="https://www.linkedin.com/in/edward-torangga" 
+              class="social-icon li" 
+              aria-label="LinkedIn" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              title="Profil LinkedIn"
+            >
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a 
+              href="https://www.instagram.com/edwardtorangga" 
+              class="social-icon ig" 
+              aria-label="Instagram" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              title="Instagram"
+            >
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a 
+              href="mailto:edwardtorangga911@gmail.com" 
+              class="social-icon em" 
+              aria-label="Kirim Email"
+              title="Kirim Email Langsung"
+            >
+              <i class="fas fa-envelope"></i>
+            </a>
+          </nav>
+        </aside>
+
+        <!-- MAIN CONTENT: Navigasi Tab & Dashboard Interaktif -->
+        <section class="main-content">
+          
+          <!-- Tab Navigation Bar -->
+          <nav class="tabs-navigation" aria-label="Navigasi Menu Portfolio">
+            <button 
+              class="tab-link active" 
+              onclick="openTab(event, 'Profil')" 
+              id="defaultOpen"
+            >
+              <i class="fas fa-user-tie"></i>
+              <span>Profil</span>
+            </button>
+            <button 
+              class="tab-link" 
+              onclick="openTab(event, 'Apps')"
+            >
+              <i class="fas fa-cubes"></i>
+              <span>Aplikasi &amp; Tools</span>
+            </button>
+            <button 
+              class="tab-link" 
+              onclick="openTab(event, 'Portfolio')"
+            >
+              <i class="fas fa-briefcase"></i>
+              <span>Portfolio</span>
+            </button>
+            <button 
+              class="tab-link" 
+              onclick="openTab(event, 'Skills')"
+            >
+              <i class="fas fa-layer-group"></i>
+              <span>Keahlian</span>
+            </button>
+            <button 
+              class="tab-link" 
+              onclick="openTab(event, 'Kontak')"
+            >
+              <i class="fas fa-paper-plane"></i>
+              <span>Kontak</span>
+            </button>
+          </nav>
+
+          <!-- TAB 1: PROFIL & IKHTISAR -->
+          <div id="Profil" class="tab-content-panel active">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="fas fa-id-card"></i> Tentang Saya &amp; Spesialisasi
+              </h2>
+              <p class="section-desc">
+                Ringkasan pengalaman profesional, pilar keahlian teknologi, dan karya digital pilihan.
+              </p>
             </div>
 
-            <div class="card-column right-column"></div>
+            <!-- About Text Box -->
+            <div class="about-card">
+              <p class="about-text">
+                Halo! Saya <strong>Edward Torangga</strong>, praktisi teknologi yang berfokus pada 
+                <strong>Web Development</strong> dan <strong>Infrastruktur Jaringan Komputer</strong>. 
+                Saat ini aktif mengelola arsitektur IT dan sistem jaringan di 
+                <strong>SMA Katolik Santo Albertus Malang (DEMPO)</strong>.
+              </p>
+              
+              <div class="highlight-box">
+                <i class="fas fa-quote-left" style="margin-right: 8px; color: var(--primary);"></i>
+                Menggabungkan keandalan infrastruktur jaringan enterprise dengan aplikasi web modern yang cepat, aman, dan intuitif.
+              </div>
 
-        </main>
+              <p class="about-text">
+                Saya terbiasa menangani implementasi jaringan skala kampus (Mikrotik RouterOS, VLAN, DHCP Server, manajemen bandwidth), 
+                serta merancang sistem berbasis web responsif, aplikasi kasir (POS), progressive web apps (PWA), hingga integrasi bot otomatis.
+              </p>
+            </div>
+
+            <!-- 4 Pillars Grid -->
+            <div class="pillars-grid">
+              <div class="pillar-card">
+                <div class="pillar-icon-box">
+                  <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3 class="pillar-title">Full-Stack Web &amp; PWA</h3>
+                <p class="pillar-desc">
+                  Membangun aplikasi web responsif berkinerja tinggi menggunakan HTML5/CSS3, JavaScript modern, PHP, REST API, dan PWA offline ready.
+                </p>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon-box">
+                  <i class="fas fa-network-wired"></i>
+                </div>
+                <h3 class="pillar-title">Mikrotik &amp; Network Engine</h3>
+                <p class="pillar-desc">
+                  Konfigurasi RouterOS, manajemen bandwidth QoS (Queue Tree/PCQ), VLAN segregation, DHCP Server pool, dan optimasi WiFi enterprise.
+                </p>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon-box">
+                  <i class="fas fa-shield-halved"></i>
+                </div>
+                <h3 class="pillar-title">Server &amp; Cloud Security</h3>
+                <p class="pillar-desc">
+                  Administrasi Linux/Windows server, Cloudflare Zero Trust &amp; Tunneling, firewall rules, bot filtering, dan perlindungan keamanan web.
+                </p>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon-box">
+                  <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="pillar-title">Digital Signage &amp; Tools</h3>
+                <p class="pillar-desc">
+                  Sistem videotron playlist real-time, skrip automasi sistem, web game interaktif, dan utilitas administrasi jaringan mandiri.
+                </p>
+              </div>
+            </div>
+
+            <!-- Quick Launch Showcase Banner -->
+            <div class="quick-launch-banner">
+              <div class="quick-launch-header">
+                <h3 class="quick-launch-title">
+                  <i class="fas fa-rocket" style="color: var(--primary);"></i>
+                  Coba Langsung Aplikasi (Live Demo)
+                </h3>
+                <button 
+                  type="button" 
+                  class="btn-ghost" 
+                  style="width: auto; padding: 6px 12px; font-size: 12px;"
+                  onclick="openTab(event, 'Apps')"
+                >
+                  Lihat Semua <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+
+              <div class="quick-launch-grid">
+                <a href="/sayurbox/index.html" class="launch-item-card">
+                  <i class="fas fa-carrot"></i>
+                  <span class="launch-item-name">Sayurbox POS</span>
+                  <span class="launch-item-badge">E-Commerce</span>
+                </a>
+
+                <a href="/tariktambang/index.html" class="launch-item-card">
+                  <i class="fas fa-trophy"></i>
+                  <span class="launch-item-name">Tarik Tambang</span>
+                  <span class="launch-item-badge">2-Player Game</span>
+                </a>
+
+                <a href="/sparepart/index.html" class="launch-item-card">
+                  <i class="fas fa-cogs"></i>
+                  <span class="launch-item-name">Sparepart Part</span>
+                  <span class="launch-item-badge">Web Catalog</span>
+                </a>
+
+                <a href="/game/index.html" class="launch-item-card">
+                  <i class="fas fa-gamepad"></i>
+                  <span class="launch-item-name">Retro Arcade</span>
+                  <span class="launch-item-badge">Canvas Game</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: APLIKASI & TOOLS (LOADED DYNAMICALLY) -->
+          <div id="Apps" class="tab-content-panel">
+            <!-- Content will be loaded dynamically by apps.js -->
+          </div>
+
+          <!-- TAB 3: PORTFOLIO (LOADED DYNAMICALLY) -->
+          <div id="Portfolio" class="tab-content-panel">
+            <!-- Content will be loaded dynamically by main.js -->
+          </div>
+
+          <!-- TAB 4: SKILLS (LOADED DYNAMICALLY) -->
+          <div id="Skills" class="tab-content-panel">
+            <!-- Content will be loaded dynamically by main.js -->
+          </div>
+
+          <!-- TAB 5: KONTAK -->
+          <div id="Kontak" class="tab-content-panel">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="fas fa-envelope-open-text"></i> Hubungi Saya
+              </h2>
+              <p class="section-desc">
+                Tertarik berkolaborasi untuk pembuatan website, konsultasi jaringan Mikrotik, atau integrasi sistem? Silakan hubungi langsung!
+              </p>
+            </div>
+
+            <div class="contact-layout">
+              <!-- Contact Info Left Column -->
+              <div class="contact-info-panel">
+                <div class="contact-card-item">
+                  <div class="contact-card-icon">
+                    <i class="fab fa-whatsapp"></i>
+                  </div>
+                  <div class="contact-card-content">
+                    <div class="contact-card-title">WhatsApp Resmi</div>
+                    <div class="contact-card-val">+62 895-1623-6789</div>
+                  </div>
+                  <a 
+                    href="https://wa.me/6289516236789" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="contact-card-action"
+                    title="Buka Chat WhatsApp"
+                  >
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                  </a>
+                </div>
+
+                <div class="contact-card-item">
+                  <div class="contact-card-icon">
+                    <i class="fas fa-envelope"></i>
+                  </div>
+                  <div class="contact-card-content">
+                    <div class="contact-card-title">Email Bisnis</div>
+                    <div class="contact-card-val">edwardtorangga911@gmail.com</div>
+                  </div>
+                  <button 
+                    type="button" 
+                    class="contact-card-action" 
+                    onclick="copyToClipboard('edwardtorangga911@gmail.com', 'Email berhasil disalin!')"
+                    title="Salin Alamat Email"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+
+                <div class="contact-card-item">
+                  <div class="contact-card-icon">
+                    <i class="fas fa-map-location-dot"></i>
+                  </div>
+                  <div class="contact-card-content">
+                    <div class="contact-card-title">Lokasi &amp; Domisili</div>
+                    <div class="contact-card-val">Malang, Jawa Timur, Indonesia</div>
+                  </div>
+                  <div class="contact-card-action" style="cursor: default;">
+                    <i class="fas fa-location-arrow"></i>
+                  </div>
+                </div>
+
+                <div class="contact-card-item">
+                  <div class="contact-card-icon">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <div class="contact-card-content">
+                    <div class="contact-card-title">Waktu Respon</div>
+                    <div class="contact-card-val">Senin - Sabtu (08:00 - 20:00 WIB)</div>
+                  </div>
+                  <div class="contact-card-action" style="cursor: default;">
+                    <i class="fas fa-business-time"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Interactive Contact Form -->
+              <div class="contact-form-panel">
+                <form class="contact-form" onsubmit="handleContactForm(event)">
+                  <div class="form-group">
+                    <label for="contactName"><i class="fas fa-user"></i> Nama Lengkap</label>
+                    <input 
+                      type="text" 
+                      id="contactName" 
+                      name="name" 
+                      class="form-input" 
+                      placeholder="Masukkan nama Anda" 
+                      required 
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="contactEmail"><i class="fas fa-envelope"></i> Alamat Email</label>
+                    <input 
+                      type="email" 
+                      id="contactEmail" 
+                      name="email" 
+                      class="form-input" 
+                      placeholder="nama@email.com" 
+                      required 
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="contactTopic"><i class="fas fa-tag"></i> Topik Kebutuhan</label>
+                    <select id="contactTopic" name="topic" class="form-select">
+                      <option value="Pembuatan Website &amp; Web App">Pembuatan Website &amp; Web App</option>
+                      <option value="Konsultasi Jaringan Mikrotik &amp; WiFi">Konsultasi Jaringan Mikrotik &amp; WiFi</option>
+                      <option value="Setup Server, Linux, atau Cloudflare">Setup Server, Linux, atau Cloudflare</option>
+                      <option value="Integrasi Sistem &amp; Custom Tool">Integrasi Sistem &amp; Custom Tool</option>
+                      <option value="Tanya-tanya / Diskusi Lainnya">Tanya-tanya / Diskusi Lainnya</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="contactMessage"><i class="fas fa-message"></i> Pesan / Detail Kebutuhan</label>
+                    <textarea 
+                      id="contactMessage" 
+                      name="message" 
+                      rows="4" 
+                      class="form-textarea" 
+                      placeholder="Ceritakan gambaran proyek atau pertanyaan Anda..." 
+                      required
+                    ></textarea>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" style="margin-top: 6px;">
+                    <i class="fab fa-whatsapp"></i> Kirim Pesan via WhatsApp
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
     </section>
 
-
+    <!-- Footer Bar -->
     <footer class="footer-credit">
-      &copy; <span id="year"></span> Edward Torangga. Dibuat dengan ❤️ oleh
-      <a href="https://emon.my.id/" target="_blank" rel="noopener noreferrer"
-        >Edward Torangga</a
-      >.
+      <div style="max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          &copy; <span id="year">2026</span> <strong>Edward Torangga</strong>. Hak Cipta Dilindungi.
+        </div>
+        <div>
+          Portfolio hosted at 
+          <a href="https://emon.my.id" target="_blank" rel="noopener noreferrer">emon.my.id</a>
+          &bull; 
+          <a href="https://github.com/edwardtorangga911/emon" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
+        </div>
+      </div>
     </footer>
 
-    
-    <!-- External JavaScript -->
-    <script src="/js/particles-config.js"></script>
-    <script src="/js/main.js"></script>
-    <script src="/js/apps.js"></script>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-</body>
+    <!-- Scripts -->
+    <script src="/js/background-canvas.js"></script>
+    <script src="/js/apps.js"></script>
+    <script src="/js/main.js"></script>
+  </body>
 </html>
