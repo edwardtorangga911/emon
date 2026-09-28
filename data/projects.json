@@ -10,11 +10,11 @@
   },
   {
     "id": 2,
-    "title": "Tarik Tambang 2-Player Web Game",
-    "description": "Game duel tarik tambang interaktif 2 pemain dengan sistem physics dinamis, efek audio, dan kontrol kompetitif.",
+    "title": "Boxed 2D Physics Action Game",
+    "description": "Game aksi bertahan hidup 2D dengan simulasi fisika Box2D real-time, procedural continuous terrain, dan dynamic spawner.",
     "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80",
-    "technologies": ["HTML5", "JavaScript", "Web Audio API", "CSS Animations"],
-    "url": "/tariktambang/index.html",
+    "technologies": ["HTML5 Canvas", "Box2D Physics", "JavaScript", "Procedural World"],
+    "url": "/game/boxed/index.html",
     "github": "https://github.com/edwardtorangga911/emon"
   },
   {
@@ -28,11 +28,11 @@
   },
   {
     "id": 4,
-    "title": "Retro Arcade Web Game",
-    "description": "Game retro arcade klasik dengan rendering grafis 60 FPS HTML5 Canvas murni dan high score persistent.",
+    "title": "Math Arcade Web Game",
+    "description": "Game edukatif arcade matematika interaktif berbasis browser dengan animasi responsive dan kontrol responsif.",
     "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
-    "technologies": ["HTML5 Canvas", "Game Loop", "Vanilla JS"],
-    "url": "/game/index.html",
+    "technologies": ["HTML5", "CSS3", "JavaScript Game Engine", "Audio API"],
+    "url": "/game/math/index.html",
     "github": "https://github.com/edwardtorangga911/emon"
   },
   {
