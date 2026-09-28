@@ -71,6 +71,22 @@
 
         <!-- Live Power-Up HUD Status Strip -->
         <div class="hud-strip">
+            <!-- Campaign Level & Score Header -->
+            <div class="hud-campaign-bar">
+                <span class="stat-item stat-level" title="Level Berlanjut">
+                    <i class="fas fa-trophy" style="color: #fbbf24;"></i>
+                    <span>Level: <strong id="hud-level">1</strong></span>
+                </span>
+                <span class="stat-item stat-theme" title="Tema Arena & Rintangan Aktif">
+                    <i class="fas fa-map" style="color: #38bdf8;"></i>
+                    <span>Tema: <strong id="hud-theme">Taman Hijau</strong></span>
+                </span>
+                <span class="stat-item stat-score" title="Total Skor Permainan">
+                    <i class="fas fa-star" style="color: #facc15;"></i>
+                    <span>Skor: <strong id="hud-score">0</strong></span>
+                </span>
+            </div>
+
             <div class="hud-main-stats">
                 <span class="stat-item" title="Kuota Bom Maksimum">
                     <i class="fas fa-bomb" style="color: #38bdf8;"></i>
@@ -302,6 +318,41 @@
                             <div>
                                 <strong>Amnesia</strong>
                                 Lupa cara menaruh bom sama sekali selama kutukan aktif.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 5. Map Hazards & Level Progression -->
+                <div class="guide-category cat-hazards">
+                    <h4><i class="fas fa-meteor"></i> 5. Rintangan Peta &amp; Mode Level Berlanjut</h4>
+                    <ul class="guide-list">
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #38bdf8;"><i class="fas fa-snowflake"></i></span>
+                            <div>
+                                <strong>Lantai Es Licin (Ice Hazard)</strong>
+                                Permukaan membeku! Pemain dan bom yang ditendang akan tergelincir meluncur ke depan.
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #f59e0b;"><i class="fas fa-arrows-left-right"></i></span>
+                            <div>
+                                <strong>Sabuk Konveyor Pabrik (Conveyor Belts)</strong>
+                                Lantai pabrik bergerak yang terus mendorong pemain serta bom aktif searah panah kuning.
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #c084fc;"><i class="fas fa-circle-notch"></i></span>
+                            <div>
+                                <strong>Portal Warp Gaib (Vortex Teleport)</strong>
+                                Teleportasi instan dua arah. Masuk ke satu portal akan memindahkan pemain/bom ke portal pasangannya!
+                            </div>
+                        </li>
+                        <li class="guide-item">
+                            <span class="guide-icon" style="color: #10b981;"><i class="fas fa-arrow-trend-up"></i></span>
+                            <div>
+                                <strong>Kampanye Level Berlanjut</strong>
+                                Setiap memenangkan babak, lanjutkan ke level berikutnya. Tema peta berotasi dinamis, dan seluruh power-up yang dikumpulkan tetap tersimpan!
                             </div>
                         </li>
                     </ul>

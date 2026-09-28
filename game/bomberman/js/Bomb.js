@@ -165,7 +165,7 @@ Bomb = Entity.extend({
         // Check if next tile in direction is free
         var nextPos = { x: this.position.x + dirX, y: this.position.y + dirY };
         var material = gGameEngine.getTileMaterial(nextPos);
-        if (material !== 'grass') return;
+        if (material === 'wall' || material === 'wood') return;
 
         // Check if another bomb is in the way
         for (var i = 0; i < gGameEngine.bombs.length; i++) {
@@ -219,7 +219,7 @@ Bomb = Entity.extend({
 
                 // If landed on wall or wood or another bomb, bounce or explode
                 var mat = gGameEngine.getTileMaterial(this.position);
-                if (mat !== 'grass') {
+                if (mat === 'wall' || mat === 'wood') {
                     this.explode();
                     return;
                 }
@@ -246,7 +246,7 @@ Bomb = Entity.extend({
                 y: currentGrid.y + this.moveDir.y
             };
             var aheadMat = gGameEngine.getTileMaterial(aheadGrid);
-            var obstacleAhead = (aheadMat !== 'grass');
+            var obstacleAhead = (aheadMat === 'wall' || aheadMat === 'wood');
 
             if (!obstacleAhead) {
                 for (var i = 0; i < gGameEngine.bombs.length; i++) {
@@ -277,6 +277,22 @@ Bomb = Entity.extend({
             }
         }
 
+        // Conveyor belt pushes idle bomb
+        if (!this.isMoving && !this.isThrowing) {
+            var tileMat = gGameEngine.getTileMaterial(this.position);
+            if (tileMat && tileMat.indexOf('conveyor_') === 0) {
+                var cDir = tileMat.split('_')[1];
+                var dirVec = { x: 0, y: 0 };
+                if (cDir === 'left') dirVec.x = -1;
+                else if (cDir === 'right') dirVec.x = 1;
+                else if (cDir === 'up') dirVec.y = -1;
+                else if (cDir === 'down') dirVec.y = 1;
+                this.kick(dirVec.x, dirVec.y);
+            } else if (tileMat === 'warp' && gGameEngine.teleportEntity) {
+                gGameEngine.teleportEntity(this);
+            }
+        }
+
         // Normal timer explosion for non-remote bombs
         if (!this.isRemote) {
             var fps = (createjs.Ticker && createjs.Ticker.getMeasuredFPS()) || 50;
@@ -289,6 +305,11 @@ Bomb = Entity.extend({
     explode: function() {
         if (this.exploded) return;
         this.exploded = true;
+
+        // Trigger Screen Shake
+        if (gGameEngine.triggerScreenShake) {
+            gGameEngine.triggerScreenShake(7, 12);
+        }
 
         if (this.auraGfx) {
             gGameEngine.stage.removeChild(this.auraGfx);
@@ -318,8 +339,8 @@ Bomb = Entity.extend({
                 if (tile) {
                     tile.remove();
                 }
-            } else if (material == 'grass') {
-                // Explode chain bombs in fire
+            } else if (material !== 'wall') {
+                // Explode chain bombs in fire on any floor tile
                 for (var j = 0; j < gGameEngine.bombs.length; j++) {
                     var bomb = gGameEngine.bombs[j];
                     if (!bomb.exploded && Utils.comparePositions(bomb.position, position)) {

@@ -170,7 +170,8 @@ Bot = Player.extend({
             else if (i == 3) { dirX = 0; dirY = -1; }
 
             var position = { x: this.position.x + dirX, y: this.position.y + dirY };
-            if (gGameEngine.getTileMaterial(position) == 'grass' && !this.hasBomb(position)) {
+            var mat = gGameEngine.getTileMaterial(position);
+            if (mat !== 'wall' && mat !== 'wood' && !this.hasBomb(position)) {
                 targets.push(position);
             }
         }

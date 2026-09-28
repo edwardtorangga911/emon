@@ -343,28 +343,64 @@ Player = Entity.extend({
             actionRight = tempLeft;
         }
 
+        if (this.warpCooldown > 0) this.warpCooldown--;
+
+        var currentMat = gGameEngine.getTileMaterial(this.position);
+
+        // Warp Portal Teleportation
+        if (currentMat === 'warp' && this.warpCooldown <= 0) {
+            if (gGameEngine.teleportEntity) {
+                gGameEngine.teleportEntity(this);
+                this.warpCooldown = 75; // ~1.5s cooldown
+            }
+        }
+
+        // Conveyor belt drift
+        if (currentMat && currentMat.indexOf('conveyor_') === 0) {
+            var cDir = currentMat.split('_')[1];
+            var cSpeed = 1;
+            if (cDir === 'left') position.x -= cSpeed;
+            else if (cDir === 'right') position.x += cSpeed;
+            else if (cDir === 'up') position.y -= cSpeed;
+            else if (cDir === 'down') position.y += cSpeed;
+        }
+
+        var isMovingInput = actionUp || actionDown || actionLeft || actionRight;
+
         if (actionUp) {
             this.animate('up');
             position.y -= this.velocity;
             dirY = -1;
             this.facingDirection = 'up';
+            this.slideDir = { x: 0, y: -1 };
         } else if (actionDown) {
             this.animate('down');
             position.y += this.velocity;
             dirY = 1;
             this.facingDirection = 'down';
+            this.slideDir = { x: 0, y: 1 };
         } else if (actionLeft) {
             this.animate('left');
             position.x -= this.velocity;
             dirX = -1;
             this.facingDirection = 'left';
+            this.slideDir = { x: -1, y: 0 };
         } else if (actionRight) {
             this.animate('right');
             position.x += this.velocity;
             dirX = 1;
             this.facingDirection = 'right';
+            this.slideDir = { x: 1, y: 0 };
+        } else if (currentMat === 'ice' && this.slideDir) {
+            // Ice sliding inertia
+            position.x += this.slideDir.x * (this.velocity * 0.85);
+            position.y += this.slideDir.y * (this.velocity * 0.85);
+            dirX = this.slideDir.x;
+            dirY = this.slideDir.y;
+            if (Math.random() < 0.05 && window.AudioSynth) AudioSynth.play('slide');
         } else {
             this.animate('idle');
+            this.slideDir = null;
         }
 
         if (position.x != this.bmp.x || position.y != this.bmp.y) {
@@ -393,12 +429,16 @@ Player = Entity.extend({
                         this.bmp.x += fixX * this.velocity;
                         this.bmp.y += fixY * this.velocity;
                         this.updatePosition();
+                    } else {
+                        this.slideDir = null;
                     }
                 } else {
                     this.bmp.x = position.x;
                     this.bmp.y = position.y;
                     this.updatePosition();
                 }
+            } else {
+                this.slideDir = null;
             }
         }
 
@@ -473,8 +513,8 @@ Player = Entity.extend({
         var mat2 = gGameEngine.getTileMaterial(pos2);
         var currentMat = gGameEngine.getTileMaterial({ x: this.position.x + dirX, y: this.position.y + dirY });
 
-        // WallPass allows treating wood tiles as passable
-        var isPassable = (mat) => (mat === 'grass' || (this.hasWallPass && mat === 'wood'));
+        // Non-wall tiles (grass, ice, conveyor, warp) are passable; wood is passable only with WallPass
+        var isPassable = (mat) => (mat !== 'wall' && (mat !== 'wood' || this.hasWallPass));
 
         if (isPassable(currentMat)) {
             position = this.position;
@@ -618,6 +658,19 @@ Player = Entity.extend({
             this.triggerRandomCurse();
         }
 
+        if (bonus.type !== 'skull') {
+            if (gGameEngine.spawnFloatingText) {
+                gGameEngine.spawnFloatingText(this.bmp.x, this.bmp.y, '+' + meta.name.toUpperCase(), meta.color);
+            }
+            if (gGameEngine.addScore) {
+                gGameEngine.addScore(150);
+            }
+        } else {
+            if (gGameEngine.spawnFloatingText) {
+                gGameEngine.spawnFloatingText(this.bmp.x, this.bmp.y, 'KUTUKAN!', '#ef4444');
+            }
+        }
+
         if (gGameEngine.updateHud) {
             gGameEngine.updateHud();
         }
@@ -650,6 +703,12 @@ Player = Entity.extend({
         if (this.auraGfx) {
             gGameEngine.stage.removeChild(this.auraGfx);
             this.auraGfx = null;
+        }
+        if (this instanceof Bot && gGameEngine.addScore) {
+            gGameEngine.addScore(300);
+            if (gGameEngine.spawnFloatingText) {
+                gGameEngine.spawnFloatingText(this.bmp.x, this.bmp.y, '+300 PTS', '#10b981');
+            }
         }
 
         if (gGameEngine.countPlayersAlive() == 1 && gGameEngine.playersCount == 2) {

@@ -8,6 +8,29 @@ GameEngine = Class.extend({
     playersCount: 2, /* 1 - 2 */
     bonusesPercent: 45,
 
+    /**
+     * Level Progression & Themes
+     */
+    currentLevel: 1,
+    score: 0,
+    themes: ['classic', 'ice', 'factory', 'warp'],
+    currentTheme: 'classic',
+    savedPlayerUpgrades: null,
+
+    /**
+     * Visual Juice: Screen shake, particles, floating text
+     */
+    shakeIntensity: 0,
+    shakeTimer: 0,
+    particles: [],
+    floatingTexts: [],
+
+    /**
+     * Hazard data: Portal pairs
+     */
+    warps: [],
+    floorGrid: {},
+
     stage: null,
     menu: null,
     players: [],
@@ -37,11 +60,9 @@ GameEngine = Class.extend({
     },
 
     load: function() {
-        // Init canvas
         this.stage = new createjs.Stage("canvas");
         this.stage.enableMouseOver();
 
-        // Load assets (preferXHR = false allows loading images via HTML tag mode, supporting file:// without CORS issues)
         var queue = new createjs.LoadQueue(false);
         var that = this;
         queue.addEventListener("complete", function() {
@@ -74,7 +95,6 @@ GameEngine = Class.extend({
         createjs.Sound.registerSound("sound/bomb.ogg", "bomb");
         createjs.Sound.registerSound("sound/game.ogg", "game");
 
-        // Create menu
         this.menu = new Menu();
     },
 
@@ -85,20 +105,24 @@ GameEngine = Class.extend({
 
         this.bombs = [];
         this.tiles = [];
+        this.floorGrid = {};
         this.bonuses = [];
+        this.particles = [];
+        this.floatingTexts = [];
+        this.warps = [];
 
-        // Draw tiles
+        // Set current theme from level
+        this.currentTheme = this.themes[(this.currentLevel - 1) % this.themes.length];
+
+        // Draw tiles according to theme hazards
         this.drawTiles();
         this.drawBonuses();
 
         this.spawnBots();
         this.spawnPlayers();
 
-        // Toggle sound
         gInputEngine.addListener('mute', this.toggleSound);
 
-        // Restart listener
-        // Timeout because when you press enter in address bar too long, it would not show menu
         setTimeout(function() {
             gInputEngine.addListener('restart', function() {
                 if (gGameEngine.playersCount == 0) {
@@ -110,14 +134,12 @@ GameEngine = Class.extend({
             });
         }, 200);
 
-        // Escape listener
         gInputEngine.addListener('escape', function() {
             if (!gGameEngine.menu.visible) {
                 gGameEngine.menu.show();
             }
         });
 
-        // Start loop
         if (!createjs.Ticker.hasEventListener('tick')) {
             createjs.Ticker.addEventListener('tick', gGameEngine.update);
             createjs.Ticker.setFPS(this.fps);
@@ -132,6 +154,8 @@ GameEngine = Class.extend({
         if (!this.playing) {
             this.menu.show();
         }
+
+        this.updateHud();
     },
 
     onSoundLoaded: function(sound) {
@@ -148,7 +172,7 @@ GameEngine = Class.extend({
             try {
                 gGameEngine.soundtrack = createjs.Sound.play("game", "none", 0, 0, -1);
                 if (gGameEngine.soundtrack && gGameEngine.soundtrack.setVolume) {
-                    gGameEngine.soundtrack.setVolume(1);
+                    gGameEngine.soundtrack.setVolume(0.3);
                 }
                 gGameEngine.soundtrackPlaying = true;
             } catch (e) {
@@ -157,60 +181,278 @@ GameEngine = Class.extend({
         }
     },
 
+    addScore: function(pts) {
+        this.score = (this.score || 0) + pts;
+        this.updateHud();
+    },
+
+    triggerScreenShake: function(intensity, duration) {
+        this.shakeIntensity = intensity || 6;
+        this.shakeTimer = duration || 10;
+    },
+
+    updateScreenShake: function() {
+        var canvas = document.getElementById('canvas');
+        if (!canvas) return;
+
+        if (this.shakeTimer > 0) {
+            this.shakeTimer--;
+            var decay = this.shakeTimer / 10;
+            var dx = (Math.random() * 2 - 1) * this.shakeIntensity * decay;
+            var dy = (Math.random() * 2 - 1) * this.shakeIntensity * decay;
+            canvas.style.transform = 'translate(' + dx.toFixed(1) + 'px, ' + dy.toFixed(1) + 'px)';
+        } else if (canvas.style.transform) {
+            canvas.style.transform = 'none';
+        }
+    },
+
+    spawnDebris: function(position, type) {
+        var pixels = Utils.convertToBitmapPosition(position);
+        var cx = pixels.x + 16;
+        var cy = pixels.y + 16;
+        var count = 8;
+        var colors = (type === 'ice') ? ['#bae6fd', '#38bdf8', '#ffffff'] : ['#b45309', '#d97706', '#f59e0b', '#78350f'];
+
+        for (var i = 0; i < count; i++) {
+            var shape = new createjs.Shape();
+            var col = colors[Math.floor(Math.random() * colors.length)];
+            var sz = Math.random() * 5 + 3;
+            shape.graphics.beginFill(col).drawRect(-sz / 2, -sz / 2, sz, sz);
+            shape.x = cx;
+            shape.y = cy;
+            this.stage.addChild(shape);
+
+            var angle = Math.random() * Math.PI * 2;
+            var speed = Math.random() * 4 + 2;
+            this.particles.push({
+                shape: shape,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 2,
+                gravity: 0.25,
+                rot: (Math.random() - 0.5) * 20,
+                life: 25
+            });
+        }
+    },
+
+    updateParticles: function() {
+        for (var i = this.particles.length - 1; i >= 0; i--) {
+            var p = this.particles[i];
+            p.shape.x += p.vx;
+            p.shape.y += p.vy;
+            p.vy += p.gravity;
+            p.shape.rotation += p.rot;
+            p.life--;
+            p.shape.alpha = p.life / 25;
+
+            if (p.life <= 0) {
+                this.stage.removeChild(p.shape);
+                this.particles.splice(i, 1);
+            }
+        }
+    },
+
+    spawnFloatingText: function(x, y, text, color) {
+        var t = new createjs.Text(text, "bold 13px 'Plus Jakarta Sans', Arial, sans-serif", color || "#fbbf24");
+        t.x = x - (t.getMeasuredWidth() / 2) + 16;
+        t.y = y - 10;
+        t.shadow = new createjs.Shadow("#000000", 2, 2, 4);
+        this.stage.addChild(t);
+
+        this.floatingTexts.push({
+            text: t,
+            life: 35,
+            vy: -1.2
+        });
+    },
+
+    updateFloatingTexts: function() {
+        for (var i = this.floatingTexts.length - 1; i >= 0; i--) {
+            var ft = this.floatingTexts[i];
+            ft.text.y += ft.vy;
+            ft.life--;
+            ft.text.alpha = Math.min(1, ft.life / 15);
+
+            if (ft.life <= 0) {
+                this.stage.removeChild(ft.text);
+                this.floatingTexts.splice(i, 1);
+            }
+        }
+    },
+
+    teleportEntity: function(entity) {
+        if (!this.warps || this.warps.length < 2) return;
+
+        // Find which portal entity is currently on
+        var currentPortal = null;
+        var partnerPortal = null;
+
+        for (var i = 0; i < this.warps.length; i++) {
+            var w = this.warps[i];
+            if (Utils.comparePositions(w.pos, entity.position)) {
+                currentPortal = w;
+                partnerPortal = w.partner;
+                break;
+            }
+        }
+
+        if (partnerPortal) {
+            entity.position = { x: partnerPortal.pos.x, y: partnerPortal.pos.y };
+            var pixels = Utils.convertToBitmapPosition(entity.position);
+            entity.bmp.x = pixels.x;
+            entity.bmp.y = pixels.y;
+
+            if (window.AudioSynth) {
+                AudioSynth.play('warp');
+            }
+
+            this.spawnDebris(currentPortal.pos, 'ice');
+            this.spawnDebris(partnerPortal.pos, 'ice');
+            this.spawnFloatingText(entity.bmp.x, entity.bmp.y, 'WARP!', '#c084fc');
+        }
+    },
+
+    nextLevel: function() {
+        // Save player powerup inventory
+        if (this.players && this.players[0]) {
+            var p = this.players[0];
+            this.savedPlayerUpgrades = {
+                bombsMax: p.bombsMax,
+                bombStrength: p.bombStrength,
+                baseVelocity: p.baseVelocity,
+                hasPierceBomb: p.hasPierceBomb,
+                hasDetonator: p.hasDetonator,
+                hasKick: p.hasKick,
+                hasThrow: p.hasThrow,
+                hasBombPass: p.hasBombPass,
+                hasWallPass: p.hasWallPass,
+                shield: Math.max(1, p.shield || 0) // reward at least 1 shield on level clear!
+            };
+        }
+
+        this.currentLevel++;
+        this.currentTheme = this.themes[(this.currentLevel - 1) % this.themes.length];
+
+        this.menu.hide();
+        this.restart();
+
+        if (this.spawnFloatingText && this.players[0]) {
+            var p0 = this.players[0];
+            this.spawnFloatingText(p0.bmp.x, p0.bmp.y, 'LEVEL ' + this.currentLevel + ' MULAI!', '#10b981');
+        }
+    },
+
     update: function() {
-        // Player
+        // Players
         for (var i = 0; i < gGameEngine.players.length; i++) {
-            var player = gGameEngine.players[i];
-            player.update();
+            gGameEngine.players[i].update();
         }
 
         // Bots
         for (var i = 0; i < gGameEngine.bots.length; i++) {
-            var bot = gGameEngine.bots[i];
-            bot.update();
+            gGameEngine.bots[i].update();
         }
 
         // Bombs
         for (var i = 0; i < gGameEngine.bombs.length; i++) {
-            var bomb = gGameEngine.bombs[i];
-            bomb.update();
+            gGameEngine.bombs[i].update();
+        }
+
+        // Screen Shake decay
+        gGameEngine.updateScreenShake();
+
+        // Particles & Floating Text updates
+        gGameEngine.updateParticles();
+        gGameEngine.updateFloatingTexts();
+
+        // Periodic HUD update
+        if (createjs.Ticker.getTicks() % 8 === 0 && gGameEngine.updateHud) {
+            gGameEngine.updateHud();
         }
 
         // Menu
         gGameEngine.menu.update();
-
-        // Update HUD display
-        if (createjs.Ticker.getTicks() % 8 === 0 && gGameEngine.updateHud) {
-            gGameEngine.updateHud();
-        }
 
         // Stage
         gGameEngine.stage.update();
     },
 
     drawTiles: function() {
+        var theme = this.currentTheme;
+
+        // Setup warp portals for 'warp' theme
+        if (theme === 'warp') {
+            var p1 = { x: 2, y: 2 };
+            var p2 = { x: this.tilesX - 3, y: this.tilesY - 3 };
+            var p3 = { x: 2, y: this.tilesY - 3 };
+            var p4 = { x: this.tilesX - 3, y: 2 };
+
+            var w1 = { pos: p1, partner: null };
+            var w2 = { pos: p2, partner: null };
+            var w3 = { pos: p3, partner: null };
+            var w4 = { pos: p4, partner: null };
+            w1.partner = w2; w2.partner = w1;
+            w3.partner = w4; w4.partner = w3;
+            this.warps = [w1, w2, w3, w4];
+        }
+
         for (var i = 0; i < this.tilesY; i++) {
             for (var j = 0; j < this.tilesX; j++) {
-                if ((i == 0 || j == 0 || i == this.tilesY - 1 || j == this.tilesX - 1)
-                    || (j % 2 == 0 && i % 2 == 0)) {
-                    // Wall tiles
+                var isBorderOrPillar = (i == 0 || j == 0 || i == this.tilesY - 1 || j == this.tilesX - 1)
+                    || (j % 2 == 0 && i % 2 == 0);
+
+                if (isBorderOrPillar) {
                     var tile = new Tile('wall', { x: j, y: i });
                     this.stage.addChild(tile.bmp);
                     this.tiles.push(tile);
                 } else {
-                    // Grass tiles
-                    var tile = new Tile('grass', { x: j, y: i });
-                    this.stage.addChild(tile.bmp);
+                    // Check special hazard tiles based on theme
+                    var floorMat = 'grass';
 
-                    // Wood tiles
-                    if (!(i <= 2 && j <= 2)
-                        && !(i >= this.tilesY - 3 && j >= this.tilesX - 3)
-                        && !(i <= 2 && j >= this.tilesX - 3)
-                        && !(i >= this.tilesY - 3 && j <= 2)) {
+                    if (theme === 'ice') {
+                        // Ice paths on alternating corridors
+                        if ((i === 4 || i === 8 || j === 4 || j === 8 || j === 12)) {
+                            floorMat = 'ice';
+                        }
+                    } else if (theme === 'factory') {
+                        // Industrial conveyor belts
+                        if (i === 3 && j >= 3 && j <= 13) {
+                            floorMat = 'conveyor_right';
+                        } else if (i === 9 && j >= 3 && j <= 13) {
+                            floorMat = 'conveyor_left';
+                        } else if (j === 8 && i >= 4 && i <= 8) {
+                            floorMat = 'conveyor_down';
+                        }
+                    } else if (theme === 'warp') {
+                        // Portal tiles
+                        for (var wIdx = 0; wIdx < this.warps.length; wIdx++) {
+                            if (this.warps[wIdx].pos.x === j && this.warps[wIdx].pos.y === i) {
+                                floorMat = 'warp';
+                                break;
+                            }
+                        }
+                    }
 
-                        var wood = new Tile('wood', { x: j, y: i });
-                        this.stage.addChild(wood.bmp);
-                        this.tiles.push(wood);
+                    var floorTile = new Tile(floorMat, { x: j, y: i });
+                    this.stage.addChild(floorTile.bmp);
+                    this.floorGrid[j + '_' + i] = floorMat;
+
+                    // Wood destructible tiles (skip corners for player/bot spawn points and portals)
+                    var isCornerSpawn = (i <= 2 && j <= 2)
+                        || (i >= this.tilesY - 3 && j >= this.tilesX - 3)
+                        || (i <= 2 && j >= this.tilesX - 3)
+                        || (i >= this.tilesY - 3 && j <= 2);
+
+                    var isWarpTile = (floorMat === 'warp');
+
+                    if (!isCornerSpawn && !isWarpTile) {
+                        // Slightly less wood on factory conveyors to keep belts moving
+                        var woodChance = (floorMat.indexOf('conveyor_') === 0) ? 0.4 : 1.0;
+                        if (Math.random() <= woodChance) {
+                            var wood = new Tile('wood', { x: j, y: i });
+                            this.stage.addChild(wood.bmp);
+                            this.tiles.push(wood);
+                        }
                     }
                 }
             }
@@ -218,7 +460,6 @@ GameEngine = Class.extend({
     },
 
     drawBonuses: function() {
-        // Cache woods tiles
         var woods = [];
         for (var i = 0; i < this.tiles.length; i++) {
             var tile = this.tiles[i];
@@ -227,12 +468,16 @@ GameEngine = Class.extend({
             }
         }
 
-        // Sort tiles randomly
         woods.sort(function() {
             return 0.5 - Math.random();
         });
 
-        // Distribute bonuses to quarters of map precisely fairly
+        var bonusPool = [
+            'bomb', 'bomb', 'fire', 'fire', 'speed', 'speed',
+            'pierce', 'remote', 'kick', 'throw', 'bombpass',
+            'shield', 'wallpass', 'skull'
+        ];
+
         for (var j = 0; j < 4; j++) {
             var bonusesCount = Math.round(woods.length * this.bonusesPercent * 0.01 / 4);
             var placedCount = 0;
@@ -247,18 +492,11 @@ GameEngine = Class.extend({
                     || (j == 2 && tile.position.x > this.tilesX / 2 && tile.position.y < this.tilesX / 2)
                     || (j == 3 && tile.position.x > this.tilesX / 2 && tile.position.y > this.tilesX / 2)) {
 
-                    var bonusPool = [
-                        'bomb', 'bomb', 'fire', 'fire', 'speed', 'speed',
-                        'pierce', 'remote', 'kick', 'throw', 'bombpass',
-                        'shield', 'wallpass', 'skull'
-                    ];
                     var chosenType = bonusPool[Math.floor(Math.random() * bonusPool.length)];
                     var bonus = new Bonus(tile.position, chosenType);
                     this.bonuses.push(bonus);
 
-                    // Move wood to front
                     this.moveToFront(tile.bmp);
-
                     placedCount++;
                 }
             }
@@ -266,10 +504,11 @@ GameEngine = Class.extend({
     },
 
     updateHud: function() {
-        if (!this.players || !this.players.length) return;
-        var p = this.players[0];
-        if (!p) return;
+        var p = (this.players && this.players.length) ? this.players[0] : null;
 
+        var elLvl = document.getElementById('hud-level');
+        var elTheme = document.getElementById('hud-theme');
+        var elScore = document.getElementById('hud-score');
         var elBomb = document.getElementById('hud-bombs');
         var elFire = document.getElementById('hud-fire');
         var elSpeed = document.getElementById('hud-speed');
@@ -282,38 +521,51 @@ GameEngine = Class.extend({
         var elWallPass = document.getElementById('badge-wallpass');
         var elCurse = document.getElementById('hud-curse');
 
-        if (elBomb) elBomb.textContent = p.bombsMax;
-        if (elFire) elFire.textContent = p.bombStrength;
-        if (elSpeed) elSpeed.textContent = (p.velocity || 2).toFixed(1);
-        if (elShield) elShield.textContent = p.shield || 0;
+        var themeNames = {
+            'classic': 'Taman Hijau',
+            'ice': 'Gua Es Licin',
+            'factory': 'Pabrik Konveyor',
+            'warp': 'Kuil Portal Warp'
+        };
 
-        function setBadge(el, active) {
-            if (!el) return;
-            if (active) el.classList.add('active');
-            else el.classList.remove('active');
-        }
+        if (elLvl) elLvl.textContent = this.currentLevel;
+        if (elTheme) elTheme.textContent = themeNames[this.currentTheme] || this.currentTheme;
+        if (elScore) elScore.textContent = this.score;
 
-        setBadge(elPierce, p.hasPierceBomb);
-        setBadge(elRemote, p.hasDetonator);
-        setBadge(elKick, p.hasKick);
-        setBadge(elThrow, p.hasThrow);
-        setBadge(elBombPass, p.hasBombPass);
-        setBadge(elWallPass, p.hasWallPass);
+        if (p) {
+            if (elBomb) elBomb.textContent = p.bombsMax;
+            if (elFire) elFire.textContent = p.bombStrength;
+            if (elSpeed) elSpeed.textContent = (p.velocity || 2).toFixed(1);
+            if (elShield) elShield.textContent = p.shield || 0;
 
-        if (elCurse) {
-            if (p.curse) {
-                var sec = Math.ceil(p.curseTimer / 50);
-                var curseNames = {
-                    'diarrhea': 'Diare Bom',
-                    'snail': 'Siput',
-                    'reverse': 'Kontrol Terbalik',
-                    'amnesia': 'Amnesia'
-                };
-                var cName = curseNames[p.curse] || p.curse;
-                elCurse.innerHTML = '<i class="fas fa-skull"></i> ' + cName + ' (' + sec + 's)';
-                elCurse.style.display = 'inline-flex';
-            } else {
-                elCurse.style.display = 'none';
+            function setBadge(el, active) {
+                if (!el) return;
+                if (active) el.classList.add('active');
+                else el.classList.remove('active');
+            }
+
+            setBadge(elPierce, p.hasPierceBomb);
+            setBadge(elRemote, p.hasDetonator);
+            setBadge(elKick, p.hasKick);
+            setBadge(elThrow, p.hasThrow);
+            setBadge(elBombPass, p.hasBombPass);
+            setBadge(elWallPass, p.hasWallPass);
+
+            if (elCurse) {
+                if (p.curse) {
+                    var sec = Math.ceil(p.curseTimer / 50);
+                    var curseNames = {
+                        'diarrhea': 'Diare Bom',
+                        'snail': 'Siput',
+                        'reverse': 'Kontrol Terbalik',
+                        'amnesia': 'Amnesia'
+                    };
+                    var cName = curseNames[p.curse] || p.curse;
+                    elCurse.innerHTML = '<i class="fas fa-skull"></i> ' + cName + ' (' + sec + 's)';
+                    elCurse.style.display = 'inline-flex';
+                } else {
+                    elCurse.style.display = 'none';
+                }
             }
         }
     },
@@ -321,33 +573,44 @@ GameEngine = Class.extend({
     spawnBots: function() {
         this.bots = [];
 
-        if (this.botsCount >= 1) {
-            var bot2 = new Bot({ x: 1, y: this.tilesY - 2 });
-            this.bots.push(bot2);
-        }
+        // Increase bot count on higher levels (up to 3 bots)
+        var botTargetCount = Math.min(3, 1 + Math.floor(this.currentLevel / 2));
+        if (this.playersCount === 2) botTargetCount = 2;
 
-        if (this.botsCount >= 2) {
-            var bot3 = new Bot({ x: this.tilesX - 2, y: 1 });
-            this.bots.push(bot3);
-        }
+        var botPositions = [
+            { x: 1, y: this.tilesY - 2 },
+            { x: this.tilesX - 2, y: 1 },
+            { x: this.tilesX - 2, y: this.tilesY - 2 }
+        ];
 
-        if (this.botsCount >= 3) {
-            var bot = new Bot({ x: this.tilesX - 2, y: this.tilesY - 2 });
-            this.bots.push(bot);
-        }
-
-        if (this.botsCount >= 4) {
-            var bot = new Bot({ x: 1, y: 1 });
-            this.bots.push(bot);
+        for (var i = 0; i < botTargetCount; i++) {
+            var b = new Bot(botPositions[i]);
+            // Speed scales slightly with level
+            b.velocity = Math.min(2.4, 1.6 + (this.currentLevel * 0.12));
+            this.bots.push(b);
         }
     },
 
     spawnPlayers: function() {
         this.players = [];
 
-        if (this.playersCount >= 1) {
-            var player = new Player({ x: 1, y: 1 });
-            this.players.push(player);
+        var player1 = new Player({ x: 1, y: 1 });
+        this.players.push(player1);
+
+        // Restore saved powerups from previous level clear!
+        if (this.savedPlayerUpgrades) {
+            var u = this.savedPlayerUpgrades;
+            player1.bombsMax = u.bombsMax;
+            player1.bombStrength = u.bombStrength;
+            player1.baseVelocity = u.baseVelocity;
+            player1.velocity = u.baseVelocity;
+            player1.hasPierceBomb = u.hasPierceBomb;
+            player1.hasDetonator = u.hasDetonator;
+            player1.hasKick = u.hasKick;
+            player1.hasThrow = u.hasThrow;
+            player1.hasBombPass = u.hasBombPass;
+            player1.hasWallPass = u.hasWallPass;
+            player1.shield = u.shield;
         }
 
         if (this.playersCount >= 2) {
@@ -356,23 +619,15 @@ GameEngine = Class.extend({
                 'left': 'left2',
                 'down': 'down2',
                 'right': 'right2',
-                'bomb': 'bomb2'
+                'bomb': 'bomb2',
+                'detonate': 'detonate2',
+                'throw': 'throw2'
             };
             var player2 = new Player({ x: this.tilesX - 2, y: this.tilesY - 2 }, controls, 1);
             this.players.push(player2);
         }
     },
 
-    /**
-     * Checks whether two rectangles intersect.
-     */
-    intersectRect: function(a, b) {
-        return (a.left <= b.right && b.left <= a.right && a.top <= b.bottom && b.top <= a.bottom);
-    },
-
-    /**
-     * Returns tile at given position.
-     */
     getTile: function(position) {
         for (var i = 0; i < this.tiles.length; i++) {
             var tile = this.tiles[i];
@@ -380,28 +635,38 @@ GameEngine = Class.extend({
                 return tile;
             }
         }
+        return null;
     },
 
-    /**
-     * Returns tile material at given position.
-     */
+    getFloorMaterial: function(position) {
+        if (!position) return 'grass';
+        return this.floorGrid[position.x + '_' + position.y] || 'grass';
+    },
+
     getTileMaterial: function(position) {
         var tile = this.getTile(position);
-        return (tile) ? tile.material : 'grass' ;
+        if (tile) {
+            return tile.material;
+        }
+        return this.getFloorMaterial(position);
     },
 
     gameOver: function(status) {
         if (gGameEngine.menu.visible) { return; }
 
         if (status == 'win') {
-            var winText = "You won!";
-            if (gGameEngine.playersCount > 1) {
-                var winner = gGameEngine.getWinner();
-                winText = winner == 0 ? "Player 1 won!" : "Player 2 won!";
+            // Victory! Award level bonus points and fanfare
+            this.addScore(1000 * this.currentLevel);
+
+            if (window.AudioSynth) {
+                AudioSynth.play('win');
             }
-            this.menu.show([{text: winText, color: '#669900'}, {text: ' ;D', color: '#99CC00'}]);
+
+            // Show level clear screen with Next Level progression!
+            this.menu.show(null, true);
         } else {
-            this.menu.show([{text: 'Game Over', color: '#CC0000'}, {text: ' :(', color: '#FF4444'}]);
+            // Game Over
+            this.menu.show([{text: 'Game Over', color: '#CC0000'}, {text: ' :(', color: '#FF4444'}], false);
         }
     },
 
@@ -412,6 +677,7 @@ GameEngine = Class.extend({
                 return i;
             }
         }
+        return 0;
     },
 
     restart: function() {
@@ -420,12 +686,16 @@ GameEngine = Class.extend({
         gGameEngine.setup();
     },
 
-    /**
-     * Moves specified child to the front.
-     */
     moveToFront: function(child) {
         var children = gGameEngine.stage.getNumChildren();
         gGameEngine.stage.setChildIndex(child, children - 1);
+    },
+
+    intersectRect: function(r1, r2) {
+        return !(r2.left > r1.right ||
+                 r2.right < r1.left ||
+                 r2.top > r1.bottom ||
+                 r2.bottom < r1.top);
     },
 
     toggleSound: function() {
@@ -453,17 +723,14 @@ GameEngine = Class.extend({
     },
 
     getPlayersAndBots: function() {
-        var players = [];
-
+        var entities = [];
         for (var i = 0; i < gGameEngine.players.length; i++) {
-            players.push(gGameEngine.players[i]);
+            entities.push(gGameEngine.players[i]);
         }
-
         for (var i = 0; i < gGameEngine.bots.length; i++) {
-            players.push(gGameEngine.bots[i]);
+            entities.push(gGameEngine.bots[i]);
         }
-
-        return players;
+        return entities;
     }
 });
 
