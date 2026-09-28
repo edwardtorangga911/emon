@@ -36,15 +36,19 @@ Bonus = Entity.extend({
         this.bmp.y = pixels.y;
 
         // Subtle gentle bobbing animation
-        createjs.Tween.get(this.bmp, { loop: true })
-            .to({ y: pixels.y - 2 }, 600, createjs.Ease.sineInOut)
-            .to({ y: pixels.y + 2 }, 600, createjs.Ease.sineInOut);
+        if (window.createjs && createjs.Tween) {
+            createjs.Tween.get(this.bmp, { loop: true })
+                .to({ y: pixels.y - 2 }, 600, createjs.Ease.sineInOut)
+                .to({ y: pixels.y + 2 }, 600, createjs.Ease.sineInOut);
+        }
 
         gGameEngine.stage.addChild(this.bmp);
     },
 
     destroy: function() {
-        createjs.Tween.removeTweens(this.bmp);
+        if (window.createjs && createjs.Tween) {
+            createjs.Tween.removeTweens(this.bmp);
+        }
         gGameEngine.stage.removeChild(this.bmp);
         Utils.removeFromArray(gGameEngine.bonuses, this);
     }
